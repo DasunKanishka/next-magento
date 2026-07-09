@@ -7,6 +7,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // The `server-only` marker package throws on import outside a
+      // React-Server build (it has no `react-server` export condition active
+      // under Vitest). Alias it to its own no-op entry so server-only modules
+      // (the connector, the BFF route) are importable in tests. This does not
+      // weaken the boundary — the real build still resolves the throwing entry
+      // in any client bundle, and the adapter-import check stays enforced.
+      'server-only': fileURLToPath(
+        new URL('./node_modules/server-only/empty.js', import.meta.url),
+      ),
     },
   },
   test: {

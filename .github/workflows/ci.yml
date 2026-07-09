@@ -43,6 +43,11 @@ jobs:
       - name: Adapter-import restriction
         run: pnpm check:imports
 
+      # Server-only trust boundary: no backend endpoint/store config may be
+      # exposed to the client bundle via a NEXT_PUBLIC_ prefix.
+      - name: No NEXT_PUBLIC_ backend secrets
+        run: pnpm check:no-public-secrets
+
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
       - name: Typecheck

@@ -97,3 +97,18 @@ export const EditorialBlocksDocument = graphql(`
     }
   }
 `);
+
+/**
+ * Newsletter subscribe — the one client-initiated mutation. Proxies the
+ * backend's native `subscribeEmailToNewsletter`; the returned `status`
+ * (an enum: SUBSCRIBED / NOT_ACTIVE / …) is mapped to the neutral
+ * `{ status: 'subscribed' | 'error' }` contract by the adapter, so no
+ * backend-specific value ever reaches the caller.
+ */
+export const SubscribeNewsletterDocument = graphql(`
+  mutation SubscribeNewsletter($email: String!) {
+    subscribeEmailToNewsletter(email: $email) {
+      status
+    }
+  }
+`);

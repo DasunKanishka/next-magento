@@ -19,6 +19,7 @@ type Documents = {
     "\n  fragment HomeProductFields on ProductInterface {\n    sku\n    name\n    url_key\n    small_image {\n      url\n      label\n    }\n    price_range {\n      minimum_price {\n        regular_price {\n          value\n          currency\n        }\n        final_price {\n          value\n          currency\n        }\n      }\n    }\n    rating_summary\n    review_count\n    stock_status\n  }\n": typeof types.HomeProductFieldsFragmentDoc,
     "\n  query MerchandisingProducts($categoryId: String!, $pageSize: Int!) {\n    products(filter: { category_id: { eq: $categoryId } }, pageSize: $pageSize) {\n      items {\n        ...HomeProductFields\n      }\n    }\n  }\n": typeof types.MerchandisingProductsDocument,
     "\n  query EditorialBlocks($identifiers: [String]!) {\n    cmsBlocks(identifiers: $identifiers) {\n      items {\n        identifier\n        title\n        content\n      }\n    }\n  }\n": typeof types.EditorialBlocksDocument,
+    "\n  mutation SubscribeNewsletter($email: String!) {\n    subscribeEmailToNewsletter(email: $email) {\n      status\n    }\n  }\n": typeof types.SubscribeNewsletterDocument,
 };
 const documents: Documents = {
     "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n    }\n  }\n": types.StoreConfigDocument,
@@ -26,6 +27,7 @@ const documents: Documents = {
     "\n  fragment HomeProductFields on ProductInterface {\n    sku\n    name\n    url_key\n    small_image {\n      url\n      label\n    }\n    price_range {\n      minimum_price {\n        regular_price {\n          value\n          currency\n        }\n        final_price {\n          value\n          currency\n        }\n      }\n    }\n    rating_summary\n    review_count\n    stock_status\n  }\n": types.HomeProductFieldsFragmentDoc,
     "\n  query MerchandisingProducts($categoryId: String!, $pageSize: Int!) {\n    products(filter: { category_id: { eq: $categoryId } }, pageSize: $pageSize) {\n      items {\n        ...HomeProductFields\n      }\n    }\n  }\n": types.MerchandisingProductsDocument,
     "\n  query EditorialBlocks($identifiers: [String]!) {\n    cmsBlocks(identifiers: $identifiers) {\n      items {\n        identifier\n        title\n        content\n      }\n    }\n  }\n": types.EditorialBlocksDocument,
+    "\n  mutation SubscribeNewsletter($email: String!) {\n    subscribeEmailToNewsletter(email: $email) {\n      status\n    }\n  }\n": types.SubscribeNewsletterDocument,
 };
 
 /**
@@ -62,6 +64,10 @@ export function graphql(source: "\n  query MerchandisingProducts($categoryId: St
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query EditorialBlocks($identifiers: [String]!) {\n    cmsBlocks(identifiers: $identifiers) {\n      items {\n        identifier\n        title\n        content\n      }\n    }\n  }\n"): (typeof documents)["\n  query EditorialBlocks($identifiers: [String]!) {\n    cmsBlocks(identifiers: $identifiers) {\n      items {\n        identifier\n        title\n        content\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SubscribeNewsletter($email: String!) {\n    subscribeEmailToNewsletter(email: $email) {\n      status\n    }\n  }\n"): (typeof documents)["\n  mutation SubscribeNewsletter($email: String!) {\n    subscribeEmailToNewsletter(email: $email) {\n      status\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

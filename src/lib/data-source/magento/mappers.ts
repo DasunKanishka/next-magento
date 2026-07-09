@@ -162,3 +162,18 @@ export function mapCmsBlock(raw: RawCmsBlock): CmsBlock {
 export function mapCmsBlocks(raw: RawCmsBlock[]): CmsBlock[] {
   return raw.map(mapCmsBlock);
 }
+
+/**
+ * Map the backend newsletter-subscribe status enum to the neutral
+ * `{ status: 'subscribed' | 'error' }` contract.
+ *
+ * Both `SUBSCRIBED` (single opt-in complete) and `NOT_ACTIVE` (double opt-in
+ * pending a confirmation email) are success outcomes — the address was
+ * accepted and a confirmation flow started. Any other value (including
+ * `null`/`undefined` or an unknown status) maps to `'error'` so the caller
+ * never over-reports success. This is a pure function so the success/error
+ * mapping is unit-testable without any I/O.
+ */
+export function mapNewsletterStatus(raw?: string | null): 'subscribed' | 'error' {
+  return raw === 'SUBSCRIBED' || raw === 'NOT_ACTIVE' ? 'subscribed' : 'error';
+}
