@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   mapCategories,
   mapCmsBlocks,
+  mapNewsletterStatus,
   mapProduct,
   mapProducts,
   mapStoreConfig,
@@ -225,5 +226,23 @@ describe('mapCmsBlocks', () => {
       { identifier: 'home_hero', title: null, content: null },
     ]);
     expect(block).toStrictEqual({ identifier: 'home_hero', title: '', content: '' });
+  });
+});
+
+describe('mapNewsletterStatus', () => {
+  it('maps SUBSCRIBED (single opt-in) to subscribed', () => {
+    expect(mapNewsletterStatus('SUBSCRIBED')).toBe('subscribed');
+  });
+
+  it('maps NOT_ACTIVE (double opt-in pending confirmation) to subscribed', () => {
+    expect(mapNewsletterStatus('NOT_ACTIVE')).toBe('subscribed');
+  });
+
+  it('maps any other/unknown/absent status to error', () => {
+    expect(mapNewsletterStatus('UNSUBSCRIBED')).toBe('error');
+    expect(mapNewsletterStatus('UNCONFIRMED')).toBe('error');
+    expect(mapNewsletterStatus('SOMETHING_ELSE')).toBe('error');
+    expect(mapNewsletterStatus(null)).toBe('error');
+    expect(mapNewsletterStatus(undefined)).toBe('error');
   });
 });

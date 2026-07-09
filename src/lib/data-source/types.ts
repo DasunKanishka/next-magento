@@ -113,4 +113,20 @@ export interface DataSource {
     storeCode: string;
     identifiers: string[];
   }): Promise<CmsBlock[]>;
+
+  /**
+   * Subscribe an email address to the store newsletter — the one
+   * client-initiated mutation in the surface. `storeCode` + `currency` are
+   * passed explicitly so the outbound call is scope-correct like every other
+   * backend call (all backend access goes through this interface).
+   *
+   * The return is a neutral `{ status }` outcome only: the adapter catches any
+   * backend/transport error and maps it to `{ status: 'error' }` — a raw
+   * backend error, URL, or header MUST NEVER propagate to the caller.
+   */
+  subscribeToNewsletter(args: {
+    email: string;
+    storeCode: string;
+    currency: string;
+  }): Promise<{ status: 'subscribed' | 'error' }>;
 }

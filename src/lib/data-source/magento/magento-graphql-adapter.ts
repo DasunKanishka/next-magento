@@ -4,12 +4,19 @@ import { resolveSlotCategoryId } from '@/config/merchandising-slots';
 import type { DataSource } from '@/lib/data-source/types';
 
 import { getMagentoClient } from './client';
-import { mapCategories, mapCmsBlocks, mapProducts, mapStoreConfig } from './mappers';
+import {
+  mapCategories,
+  mapCmsBlocks,
+  mapNewsletterStatus,
+  mapProducts,
+  mapStoreConfig,
+} from './mappers';
 import {
   EditorialBlocksDocument,
   MerchandisingProductsDocument,
   NavigationCategoriesDocument,
   StoreConfigDocument,
+  SubscribeNewsletterDocument,
 } from './operations';
 
 /**
@@ -62,5 +69,20 @@ export const magentoGraphQLAdapter: DataSource = {
     const data = await client.request(EditorialBlocksDocument, { identifiers });
     const items = (data.cmsBlocks?.items ?? []).filter(notNull);
     return mapCmsBlocks(items);
+  },
+
+  async subscribeToNewsletter({ storeCode, currency, email }) {
+    // `Store` + `Content-Currency` are set explicitly on the outbound request,
+    // like every other scope-bound backend call.
+    const client = getMagentoClient({ storeCode, currency });
+    try {
+      const data = await client.request(SubscribeNewsletterDocument, { email });
+      return { status: mapNewsletterStatus(data.subscribeEmailToNewsletter?.status) };
+    } catch {
+      // Trust-boundary containment: swallow the raw backend/transport error so
+      // no backend URL, header, or error text can reach the caller. The caller
+      // only ever sees the neutral `{ status: 'error' }` outcome.
+      return { status: 'error' };
+    }
   },
 };
