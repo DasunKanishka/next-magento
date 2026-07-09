@@ -1,0 +1,12 @@
+# Generated / vendored — never format (would create codegen drift)
+src/gql/
+schema.graphql
+pnpm-lock.yaml
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+next-env.d.ts
