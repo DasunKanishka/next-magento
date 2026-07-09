@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Lint · Codegen drift · Import boundary · Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Regenerate typed documents from the COMMITTED schema snapshot (never a
+      # live introspection — production has introspection disabled), then fail
+      # the build if the committed src/gql or schema drifts from a fresh run.
+      - name: Codegen against committed schema.graphql
+        run: pnpm codegen
+
+      - name: Fail on schema/codegen drift
+        run: git diff --exit-code -- schema.graphql src/gql
+
+      # Architectural rule: the concrete Magento adapter may be imported only by
+      # the single DataSource resolution module.
+      - name: Adapter-import restriction
+        run: pnpm check:imports
+
+      # "Typed end-to-end" is the connector's premise — enforce it for the
+      # hand-written adapter/mapper code, not just the generated documents.
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Unit tests
+        run: pnpm test
