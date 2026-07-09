@@ -15,7 +15,8 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:check": "node scripts/codegen-check.mjs",
     "check:imports": "bash scripts/check-adapter-imports.sh",
-    "check:no-public-secrets": "bash scripts/check-no-public-secrets.sh"
+    "check:no-public-secrets": "bash scripts/check-no-public-secrets.sh",
+    "check:contract-neutral": "bash scripts/check-contract-neutral.sh"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
