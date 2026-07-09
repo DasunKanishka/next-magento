@@ -48,6 +48,11 @@ jobs:
       - name: No NEXT_PUBLIC_ backend secrets
         run: pnpm check:no-public-secrets
 
+      # Multi-brand token inheritance: the neutral parent contract may only
+      # declare CSS custom-property names, never a brand's concrete values.
+      - name: Neutral-contract guard
+        run: pnpm check:contract-neutral
+
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
       - name: Typecheck
