@@ -10,11 +10,9 @@ export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> 
 }
 
 /**
- * PINNED DECISION (pre-execute /analyze): the default `title` is the
- * PRD-unified phrasing "Voor 22:00 besteld, morgen in huis" — NOT the source
- * design spec's default "Besteld vóór 22:00, morgen in huis". The PRD
- * wording is authoritative; the design-spec `.jsx` default is off-spec and
- * is intentionally not reproduced here.
+ * The default `title` is the authoritative phrasing "Voor 22:00 besteld, morgen
+ * in huis" — deliberately NOT the source mockup's default "Besteld vóór 22:00,
+ * morgen in huis", which is off-spec and intentionally not reproduced here.
  */
 const DEFAULT_TITLE = 'Voor 22:00 besteld, morgen in huis';
 

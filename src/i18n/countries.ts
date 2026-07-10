@@ -13,7 +13,7 @@ export interface Country {
   name: string;
   /** The UI locale most natural for this country — used to pair a country pick with a sensible default language. */
   defaultLocale: SupportedLocale;
-  /** Inline flag as an SVG data-URI (no external asset request), per design-spec. */
+  /** Inline flag as an SVG data-URI (no external asset request). */
   flag: string;
 }
 
@@ -45,8 +45,7 @@ const ES_FLAG = flag(
 );
 
 /**
- * The 7 seeded delivery countries (PRD Design Decisions "Country/language
- * selector fallback"). All are selectable from day one; only `nl` resolves to
+ * The 7 seeded delivery countries. All are selectable from day one; only `nl` resolves to
  * distinct real content in V0.1.0 (the rest fall back — see `./locale-resolver`).
  */
 export const countries: readonly Country[] = [

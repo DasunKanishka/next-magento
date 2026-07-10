@@ -3,14 +3,14 @@ import { expect, test, type Page } from '@playwright/test';
 import { seedConsent } from './helpers';
 
 /**
- * AC#7 — selecting any non-`nl` country/language combination resolves to the
+ * Selecting any non-`nl` country/language combination resolves to the
  * `default`/EUR store content WITHOUT a runtime error. Asserted here against a
  * real browser (not assumed): a page-error listener fails the test on any
  * uncaught runtime error during the flow.
  *
- * The age/country gate (issue 008) now blocks every storefront route until
- * consent exists, so each test seeds a valid `nbns_gate` cookie first to reach
- * the header selectors under test.
+ * The age/country gate now blocks every storefront route until consent exists,
+ * so each test seeds a valid `nbns_gate` cookie first to reach the header
+ * selectors under test.
  */
 
 /** Seed consent before every storefront navigation so the gate does not block. */

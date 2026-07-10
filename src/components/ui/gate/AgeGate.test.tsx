@@ -58,7 +58,7 @@ describe('AgeGate', () => {
     );
   });
 
-  it('CTA is disabled until a country is selected AND 18+ is confirmed, then enables (A-01/A-04)', () => {
+  it('CTA is disabled until a country is selected AND 18+ is confirmed, then enables', () => {
     renderGate();
     const cta = screen.getByRole('button', { name: /De winkel betreden/ });
     // After hydration (effects flushed by RTL) the CTA gates on validity.
