@@ -12,10 +12,10 @@ export interface LocaleResolution {
 }
 
 /**
- * PRD M4 deep-module interface: given a request locale, resolve the store view
- * and currency that must accompany every backend call. The shape is fixed by
- * the PRD and must not drift — `resolve(locale)` plus the readonly
- * `supportedLocales` list are the entire contract.
+ * Deep-module interface: given a request locale, resolve the store view
+ * and currency that must accompany every backend call. The shape is a fixed
+ * contract and must not drift — `resolve(locale)` plus the readonly
+ * `supportedLocales` list are the entire surface.
  */
 export interface LocaleResolver {
   resolve(locale: SupportedLocale): LocaleResolution;
@@ -27,8 +27,7 @@ export interface LocaleResolver {
  *
  * V0.1.0 has EXACTLY ONE real-content entry — `nl` — backed by a live Magento
  * store view. This is a deliberate, disclosed limitation of the single-store
- * V0.1.0 backend (PRD M4 + Design Decisions "Country/language selector
- * fallback"): the selector UI is fully real for all 6 languages / 7 countries,
+ * V0.1.0 backend: the selector UI is fully real for all 6 languages / 7 countries,
  * but only `nl` currently resolves to distinct real content. V0.2.0+ locales
  * are additive entries in THIS object — no new UI, no re-architecture.
  */

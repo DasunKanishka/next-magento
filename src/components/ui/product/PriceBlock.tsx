@@ -19,13 +19,12 @@ export interface PriceBlockProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Local nl-NL / EUR formatter for V0.1.0. Issue 006 does not depend on issue
- * 007 (next-intl), so `PriceBlock` formats "€34,95" (comma-decimal, "€"
- * prefix) internally instead of pulling in an i18n library. Kept isolated in
- * this one function — not inlined — so issue 007 can later swap it for a
- * centralized `Intl.NumberFormat('nl-NL', { style: 'currency', currency:
- * 'EUR' })`-based formatter without touching any call site. Non-numeric
- * (preformatted string) prices pass through unchanged.
+ * Local nl-NL / EUR formatter for V0.1.0. `PriceBlock` formats "€34,95"
+ * (comma-decimal, "€" prefix) internally instead of pulling in an i18n
+ * library. Kept isolated in this one function — not inlined — so it can later
+ * be swapped for a centralized `Intl.NumberFormat('nl-NL', { style:
+ * 'currency', currency: 'EUR' })`-based formatter without touching any call
+ * site. Non-numeric (preformatted string) prices pass through unchanged.
  */
 export function formatEuro(value: number | string): string {
   return typeof value === 'number' ? `€${value.toFixed(2).replace('.', ',')}` : value;

@@ -5,7 +5,7 @@ import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions
 import { DeliveryNote } from './DeliveryNote';
 
 describe('DeliveryNote', () => {
-  it('defaults the title to the PRD-unified phrasing, not the design-spec default', () => {
+  it('defaults the title to the authoritative phrasing, not the off-spec mockup default', () => {
     render(<DeliveryNote />);
     expect(screen.getByText('Voor 22:00 besteld, morgen in huis')).toBeInTheDocument();
     expect(

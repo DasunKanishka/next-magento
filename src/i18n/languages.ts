@@ -4,7 +4,7 @@ import type { SupportedLocale } from './locales';
 export type LanguageCode = 'EN' | 'NL' | 'FR' | 'DE' | 'DA' | 'ES';
 
 export interface Language {
-  /** Uppercase 2-letter chip code (design-spec "2-letter code chip"). */
+  /** Uppercase 2-letter chip code shown in the selector. */
   code: LanguageCode;
   /** The routing/message locale this language maps to. */
   locale: SupportedLocale;
@@ -13,8 +13,7 @@ export interface Language {
 }
 
 /**
- * The 6 seeded UI languages (design-spec "LanguageSelector"; PRD Design
- * Decisions). Order matches the design-spec seed list. Every language is a real,
+ * The 6 seeded UI languages shown in the LanguageSelector. Every language is a real,
  * selectable option; the store-view/currency each resolves to is governed by
  * `./locale-resolver.ts` (only `nl` has distinct real content in V0.1.0).
  */

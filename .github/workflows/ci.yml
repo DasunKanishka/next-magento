@@ -53,6 +53,12 @@ jobs:
       - name: Neutral-contract guard
         run: pnpm check:contract-neutral
 
+      # Public-repo hygiene: source comments/tests must not leak internal
+      # planning/process vocabulary (governance-doc names, requirement/issue IDs,
+      # work-item/story IDs, operator/tooling names).
+      - name: No internal planning vocabulary
+        run: pnpm check:no-internal-vocab
+
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
       - name: Typecheck
