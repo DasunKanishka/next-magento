@@ -17,6 +17,8 @@ import { ProductCard } from './product/ProductCard';
 import { PriceBlock } from './product/PriceBlock';
 import { DeliveryNote } from './commerce/DeliveryNote';
 import { QuantityStepper } from './commerce/QuantityStepper';
+import { CountrySelector } from './i18n/CountrySelector';
+import { LanguageSelector } from './i18n/LanguageSelector';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -112,6 +114,9 @@ function Harness() {
       <DeliveryNote countdown="5u 42m" threshold="Gratis vanaf €150" />
 
       <QuantityStepper value={2} onChange={() => {}} size="lg" />
+
+      <CountrySelector value="NL" language="nl" />
+      <LanguageSelector value="nl" />
     </div>
   );
 }

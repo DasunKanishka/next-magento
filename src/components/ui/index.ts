@@ -39,3 +39,9 @@ export type {
   QuantityStepperProps,
   QuantityStepperSize,
 } from './commerce/QuantityStepper';
+
+export { CountrySelector } from './i18n/CountrySelector';
+export type { CountrySelectorProps } from './i18n/CountrySelector';
+
+export { LanguageSelector } from './i18n/LanguageSelector';
+export type { LanguageSelectorProps } from './i18n/LanguageSelector';
