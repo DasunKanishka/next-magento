@@ -26,13 +26,19 @@ describe('Alert', () => {
 
   it('tones resolve to their contract tint tokens', () => {
     const { container, rerender } = render(<Alert tone="success">x</Alert>);
-    expect(container.firstElementChild).toHaveStyle({ background: 'var(--color-cta-tint)' });
+    expect(container.firstElementChild).toHaveStyle({
+      background: 'var(--color-cta-tint)',
+    });
 
     rerender(<Alert tone="info">x</Alert>);
-    expect(container.firstElementChild).toHaveStyle({ background: 'var(--color-trust-tint)' });
+    expect(container.firstElementChild).toHaveStyle({
+      background: 'var(--color-trust-tint)',
+    });
 
     rerender(<Alert tone="error">x</Alert>);
-    expect(container.firstElementChild).toHaveStyle({ background: 'var(--color-urgency-tint)' });
+    expect(container.firstElementChild).toHaveStyle({
+      background: 'var(--color-urgency-tint)',
+    });
   });
 
   it('renders a real, keyboard-accessible dismiss button when onClose is provided', () => {

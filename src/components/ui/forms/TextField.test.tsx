@@ -2,7 +2,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { defaultTokens } from '@/theme/brands/default';
-import { expectAllVarTokensAreContractKeys, pxValue } from '../test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  pxValue,
+} from '../test-utils/tokenAssertions';
 import { TextField } from './TextField';
 
 describe('TextField', () => {
@@ -47,7 +50,10 @@ describe('TextField', () => {
 
   it('supports the type prop (e.g. email)', () => {
     render(<TextField type="email" placeholder="you@example.com" />);
-    expect(screen.getByPlaceholderText('you@example.com')).toHaveAttribute('type', 'email');
+    expect(screen.getByPlaceholderText('you@example.com')).toHaveAttribute(
+      'type',
+      'email',
+    );
   });
 
   it('every var(--*) this component emits is a real contract token', () => {

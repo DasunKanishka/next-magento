@@ -43,12 +43,22 @@ export function Rating({
         {stars}
       </span>
       {score != null ? (
-        <span style={{ font: `600 ${size}px/1 var(--font-brand)`, color: 'var(--color-brand-ink)' }}>
+        <span
+          style={{
+            font: `600 ${size}px/1 var(--font-brand)`,
+            color: 'var(--color-brand-ink)',
+          }}
+        >
           {score}
         </span>
       ) : null}
       {count != null ? (
-        <span style={{ font: `500 ${size}px/1 var(--font-brand)`, color: 'var(--color-text-subtle)' }}>
+        <span
+          style={{
+            font: `500 ${size}px/1 var(--font-brand)`,
+            color: 'var(--color-text-subtle)',
+          }}
+        >
           {count} reviews
         </span>
       ) : null}

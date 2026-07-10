@@ -2,8 +2,10 @@
 
 import React from 'react';
 
-export interface TextFieldProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style'> {
+export interface TextFieldProps extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'style'
+> {
   style?: React.CSSProperties;
 }
 
@@ -47,7 +49,9 @@ export function TextField({
           height: 'var(--control-height-md)',
           minHeight: 'var(--control-height-md)',
           width: '100%',
-          border: focus ? '2px solid var(--color-brand)' : '1.5px solid var(--color-border-field)',
+          border: focus
+            ? '2px solid var(--color-brand)'
+            : '1.5px solid var(--color-border-field)',
           borderRadius: 'var(--radius-md)',
           padding: '0 14px',
           font: '400 13px/1 var(--font-brand)',

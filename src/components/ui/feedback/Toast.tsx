@@ -86,7 +86,12 @@ export function Toast({ tone = 'success', children, style = {}, ...rest }: Toast
           {ICONS[tone]}
         </svg>
       </div>
-      <div style={{ font: '600 13px/1.35 var(--font-brand)', color: 'var(--color-brand-ink)' }}>
+      <div
+        style={{
+          font: '600 13px/1.35 var(--font-brand)',
+          color: 'var(--color-brand-ink)',
+        }}
+      >
         {children}
       </div>
     </div>

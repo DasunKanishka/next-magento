@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { defaultTokens } from '@/theme/brands/default';
-import { expectAllVarTokensAreContractKeys, pxValue } from '../test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  pxValue,
+} from '../test-utils/tokenAssertions';
 import { SearchBar } from './SearchBar';
 
 const push = vi.fn();
@@ -50,7 +53,9 @@ describe('SearchBar', () => {
     await user.click(screen.getByRole('button', { name: '⌕ Zoeken' }));
 
     expect(push).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('Vul een zoekterm in om te zoeken.');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Vul een zoekterm in om te zoeken.',
+    );
     expect(screen.getByRole('searchbox')).toHaveAttribute('aria-invalid', 'true');
   });
 

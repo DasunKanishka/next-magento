@@ -2,7 +2,10 @@ import { fireEvent, render, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { defaultTokens } from '@/theme/brands/default';
-import { expectAllVarTokensAreContractKeys, pxValue } from '../test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  pxValue,
+} from '../test-utils/tokenAssertions';
 import { IconButton } from './IconButton';
 
 describe('IconButton', () => {

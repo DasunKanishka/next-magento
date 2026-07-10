@@ -20,7 +20,14 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
  */
 const TONES: Record<
   AlertTone,
-  { bg: string; border: string; accent: string; title: string; body: string; iconStroke: string }
+  {
+    bg: string;
+    border: string;
+    accent: string;
+    title: string;
+    body: string;
+    iconStroke: string;
+  }
 > = {
   success: {
     bg: 'var(--color-cta-tint)',
@@ -123,7 +130,9 @@ export function Alert({
       </div>
       <div style={{ flex: 1 }}>
         {title ? (
-          <div style={{ font: '700 14px/1.3 var(--font-brand)', color: t.title }}>{title}</div>
+          <div style={{ font: '700 14px/1.3 var(--font-brand)', color: t.title }}>
+            {title}
+          </div>
         ) : null}
         {children ? (
           <div

@@ -4,8 +4,10 @@ import React from 'react';
 
 export type IconButtonShape = 'circle' | 'rounded';
 
-export interface IconButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
+export interface IconButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'color'
+> {
   shape?: IconButtonShape;
   /**
    * Control size in px. Defaults to the contract's `--tap-target-min` (44px)

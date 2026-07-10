@@ -5,8 +5,10 @@ import React from 'react';
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
-export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
+export interface ButtonProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'color'
+> {
   /**
    * Visual style. Only `primary` resolves to `--color-cta` — the single
    * call-to-action color for the whole product. No other variant ever maps
@@ -131,7 +133,11 @@ export function Button({
           padding: 0,
           cursor: disabled ? 'not-allowed' : 'pointer',
           font: `600 ${s.font}px/1 var(--font-brand)`,
-          color: disabled ? '#AEB6C4' : hover ? 'var(--color-trust)' : 'var(--color-brand)',
+          color: disabled
+            ? '#AEB6C4'
+            : hover
+              ? 'var(--color-trust)'
+              : 'var(--color-brand)',
           textDecoration: disabled ? 'none' : 'underline',
           textUnderlineOffset: '3px',
           ...style,
@@ -181,11 +187,15 @@ export function Button({
       }}
       {...rest}
     >
-      {iconLeft && !subLabel ? <span style={{ display: 'inline-flex' }}>{iconLeft}</span> : null}
+      {iconLeft && !subLabel ? (
+        <span style={{ display: 'inline-flex' }}>{iconLeft}</span>
+      ) : null}
       {subLabel ? (
         <>
           <span>{children}</span>
-          <span style={{ font: '500 11px/1 var(--font-brand)', opacity: 0.85 }}>{subLabel}</span>
+          <span style={{ font: '500 11px/1 var(--font-brand)', opacity: 0.85 }}>
+            {subLabel}
+          </span>
         </>
       ) : (
         children

@@ -63,7 +63,13 @@ const VARIANTS: Record<ChipVariant, React.CSSProperties> = {
 };
 
 /** Status & attribute chips: stock, urgency, award ribbon, outline spec pill. */
-export function Chip({ variant = 'spec', dot = false, children, style = {}, ...rest }: ChipProps) {
+export function Chip({
+  variant = 'spec',
+  dot = false,
+  children,
+  style = {},
+  ...rest
+}: ChipProps) {
   return (
     <span style={{ ...(VARIANTS[variant] ?? VARIANTS.spec), ...style }} {...rest}>
       {dot ? (

@@ -24,10 +24,14 @@ describe('Badge', () => {
 
   it('sale/deals map to --color-urgency, new/bestseller to --color-brand, tip to --color-premium-accent', () => {
     const { rerender, container } = render(<Badge variant="sale">-17%</Badge>);
-    expect(container.querySelector('span')?.style.background).toBe('var(--color-urgency)');
+    expect(container.querySelector('span')?.style.background).toBe(
+      'var(--color-urgency)',
+    );
 
     rerender(<Badge variant="deals">Deals</Badge>);
-    expect(container.querySelector('span')?.style.background).toBe('var(--color-urgency)');
+    expect(container.querySelector('span')?.style.background).toBe(
+      'var(--color-urgency)',
+    );
 
     rerender(<Badge variant="new">Nieuw</Badge>);
     expect(container.querySelector('span')?.style.background).toBe('var(--color-brand)');
@@ -36,7 +40,9 @@ describe('Badge', () => {
     expect(container.querySelector('span')?.style.background).toBe('var(--color-brand)');
 
     rerender(<Badge variant="tip">Toptip</Badge>);
-    expect(container.querySelector('span')?.style.background).toBe('var(--color-premium-accent)');
+    expect(container.querySelector('span')?.style.background).toBe(
+      'var(--color-premium-accent)',
+    );
   });
 
   it('every var(--*) this component emits is a real contract token', () => {

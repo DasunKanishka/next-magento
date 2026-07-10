@@ -22,14 +22,16 @@ export function extractVarTokenNames(html: string): string[] {
  */
 export function expectAllVarTokensAreContractKeys(html: string): void {
   const found = extractVarTokenNames(html);
-  expect(found.length, 'expected at least one var(--*) token reference to check').toBeGreaterThan(
-    0,
-  );
+  expect(
+    found.length,
+    'expected at least one var(--*) token reference to check',
+  ).toBeGreaterThan(0);
 
   const unknown = found.filter((name) => !KNOWN_TOKENS.has(name));
-  expect(unknown, `unknown/unresolved contract tokens referenced: ${unknown.join(', ')}`).toEqual(
-    [],
-  );
+  expect(
+    unknown,
+    `unknown/unresolved contract tokens referenced: ${unknown.join(', ')}`,
+  ).toEqual([]);
 }
 
 /** Parses a `defaultTokens` px value (e.g. "44px") into a number for numeric assertions. */
