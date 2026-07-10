@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 
+import { AgeGate } from '@/components/ui/gate/AgeGate';
+import { recordConsent } from '@/lib/age-gate/actions';
+import { hasConsented } from '@/lib/age-gate/server';
 import { routing } from '@/i18n/routing';
 import { buildBrandStyleBlock } from '@/theme/css';
 import { getActiveBrand, resolveTokens } from '@/theme/resolver';
@@ -63,9 +66,19 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Enables static rendering for this locale (next-intl requirement).
+  // Provides the locale to next-intl's server components. Note the storefront is
+  // NOT statically rendered: `hasConsented()` reads a cookie below, which makes
+  // every gated route dynamic by design — the storefront
+  // HTML is only ever produced once consent is verified server-side.
   setRequestLocale(locale);
   const messages = await getMessages();
+
+  // Alcohol-compliance gate: read the consent
+  // cookie server-side and, when absent/invalid, render the gate IN PLACE OF the
+  // storefront so no product or price HTML is ever sent. This is non-bypassable
+  // with client JS disabled because the page simply does not exist in the
+  // response until consent is recorded.
+  const consented = await hasConsented();
 
   // Server-side, at render time: resolve the deployment's active brand and its
   // full token sheet, then inject the resolved CSS custom-property block so
@@ -81,7 +94,11 @@ export default async function LocaleLayout({
       </head>
       <body data-brand={activeBrand}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
+          {consented ? (
+            children
+          ) : (
+            <AgeGate locale={locale} recordConsentAction={recordConsent} />
+          )}
         </NextIntlClientProvider>
       </body>
     </html>
