@@ -13,6 +13,10 @@ import { SearchBar } from './forms/SearchBar';
 import { TextField } from './forms/TextField';
 import { Alert } from './feedback/Alert';
 import { Toast } from './feedback/Toast';
+import { ProductCard } from './product/ProductCard';
+import { PriceBlock } from './product/PriceBlock';
+import { DeliveryNote } from './commerce/DeliveryNote';
+import { QuantityStepper } from './commerce/QuantityStepper';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -86,12 +90,34 @@ function Harness() {
       <Toast tone="success">Toegevoegd aan winkelmandje</Toast>
       <Toast tone="info">Prijs bijgewerkt</Toast>
       <Toast tone="error">Kon niet toevoegen</Toast>
+
+      <ProductCard
+        brand="Tanqueray"
+        name="Tanqueray No. TEN 1L"
+        price={34.95}
+        oldPrice={39.95}
+        reviews={412}
+        saleBadge="−15%"
+        onAdd={() => {}}
+      />
+
+      <PriceBlock
+        price={74.95}
+        oldPrice={89.95}
+        showSavings
+        perUnit="€107,07 / liter"
+        note="Incl. btw, excl. verzendkosten"
+      />
+
+      <DeliveryNote countdown="5u 42m" threshold="Gratis vanaf €150" />
+
+      <QuantityStepper value={2} onChange={() => {}} size="lg" />
     </div>
   );
 }
 
 describe('component library — axe-core a11y scan (jsdom)', () => {
-  it('reports zero critical/serious violations across all 9 ported components', async () => {
+  it('reports zero critical/serious violations across all 13 ported components', async () => {
     const { container } = render(<Harness />);
 
     const results = await axe.run(container, {

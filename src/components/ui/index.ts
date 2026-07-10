@@ -24,3 +24,18 @@ export type { AlertProps, AlertTone } from './feedback/Alert';
 
 export { Toast } from './feedback/Toast';
 export type { ToastProps, ToastTone } from './feedback/Toast';
+
+export { ProductCard } from './product/ProductCard';
+export type { ProductCardProps } from './product/ProductCard';
+
+export { PriceBlock, formatEuro } from './product/PriceBlock';
+export type { PriceBlockProps } from './product/PriceBlock';
+
+export { DeliveryNote } from './commerce/DeliveryNote';
+export type { DeliveryNoteProps } from './commerce/DeliveryNote';
+
+export { QuantityStepper } from './commerce/QuantityStepper';
+export type {
+  QuantityStepperProps,
+  QuantityStepperSize,
+} from './commerce/QuantityStepper';
