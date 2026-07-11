@@ -1,0 +1,92 @@
+name: Release gate
+
+# Performance / Core Web Vitals + accessibility release gate for the storefront
+# home page. These jobs exercise the fully rendered page and therefore require a
+# reachable backend (MAGENTO_GRAPHQL_ENDPOINT) whose TLS certificate the runner
+# trusts — run them on a runner with network access to the backend. They are
+# intentionally SEPARATE from the unit CI (ci.yml), which runs with no backend.
+#
+# The two jobs below are DISTINCT signals and are never conflated:
+#   - e2e-layout-a11y : Playwright layout/interaction + real-browser axe scan +
+#                       44px tap-target measurement (light AND dark scheme).
+#   - perf-cwv        : Lighthouse mobile lab + scripted INP interaction trace.
+# Either job failing (a threshold unmet — including a CLS >= 0.1 hard blocker)
+# fails the workflow, because the underlying commands exit non-zero.
+#
+# TRIGGER: manual `workflow_dispatch` ONLY. These jobs require a running
+# storefront talking to a reachable backend (MAGENTO_GRAPHQL_ENDPOINT), which
+# GitHub's ephemeral runners do not have — wiring them to push/pull_request
+# would fail every PR structurally, not on a real regression. Run this gate
+# deliberately from a runner (or self-hosted/staging) with network access to a
+# seeded backend. For V0.1.0 the gate was run + independently reproduced against
+# the live backend before release. Set the two `vars.MAGENTO_*` repo variables
+# and dispatch when a backend is reachable.
+
+on:
+  workflow_dispatch:
+
+env:
+  MAGENTO_GRAPHQL_ENDPOINT: ${{ vars.MAGENTO_GRAPHQL_ENDPOINT }}
+  MAGENTO_STORE_CODE: ${{ vars.MAGENTO_STORE_CODE }}
+
+jobs:
+  e2e-layout-a11y:
+    name: E2E layout + real-browser accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Playwright E2E + axe + tap-target gate
+        run: pnpm test:e2e
+      - name: Upload accessibility report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: a11y-report/
+          if-no-files-found: warn
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: warn
+
+  perf-cwv:
+    name: Lighthouse mobile + Core Web Vitals
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Production build
+        run: pnpm build
+      - name: Lighthouse + CWV gate
+        run: pnpm perf:gate
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: lighthouse-report/
+          if-no-files-found: warn

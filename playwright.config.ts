@@ -12,6 +12,13 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
+  // The dev web server compiles each locale route on its first request; under
+  // full parallelism a first hit to an un-compiled route can exceed the 5s
+  // default web-first-assertion timeout, so give assertions more headroom and
+  // allow a retry to absorb that cold-compile latency (production `next start`,
+  // which the perf gate uses, has no such compile step).
+  expect: { timeout: 10_000 },
+  retries: process.env.CI ? 2 : 1,
   fullyParallel: true,
   reporter: 'list',
   use: {

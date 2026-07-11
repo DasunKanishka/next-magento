@@ -134,17 +134,32 @@ export function HeroSlider({ slides }: HeroSliderProps) {
               aria-label={`Campagne ${i + 1}`}
               onClick={() => setActive(i)}
               style={{
-                width: i === index ? 26 : 12,
-                height: 12,
-                minWidth: 12,
-                borderRadius: 'var(--radius-full)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                // 44×44 tap target; the visible pill inside stays compact.
+                width: 'var(--tap-target-min)',
+                height: 'var(--tap-target-min)',
+                minWidth: 'var(--tap-target-min)',
+                padding: 0,
                 border: 'none',
-                background:
-                  i === index ? 'var(--color-cta)' : 'var(--color-border-field)',
+                background: 'transparent',
                 cursor: 'pointer',
-                transition: 'width .2s ease',
               }}
-            />
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'block',
+                  width: i === index ? 26 : 12,
+                  height: 12,
+                  borderRadius: 'var(--radius-full)',
+                  background:
+                    i === index ? 'var(--color-cta)' : 'var(--color-border-field)',
+                  transition: 'width .2s ease',
+                }}
+              />
+            </button>
           ))}
         </div>
       ) : null}

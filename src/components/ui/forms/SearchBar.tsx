@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export interface SearchBarProps {
   placeholder?: string;
   buttonLabel?: string;
-  /** Container height in px. Defaults to 50 (desktop); pass 44 for the mobile header row. Must stay ≥44 to keep the submit button's own tap target compliant. */
+  /** Requested row height in px. Defaults to 50 (desktop); pass 44 for the mobile header row. The row's effective min-height is `max(height, 48)` so the border-box border never shrinks the stretched controls below the 44px tap-target minimum. */
   height?: number;
   /** Called with the trimmed, non-empty query on submit (Enter or button click), after navigation is triggered. */
   onSearch?: (value: string) => void;
@@ -58,12 +58,16 @@ export function SearchBar({
         }}
         style={{
           display: 'flex',
-          alignItems: 'center',
+          // Stretch the input + button to the full row height so each is a
+          // >=44px tap target (the 2px border makes a fixed-height row's content
+          // box fall short otherwise).
+          alignItems: 'stretch',
           border: `2px solid ${invalid ? 'var(--color-urgency)' : 'var(--color-brand)'}`,
           borderRadius: 'var(--radius-md)',
           overflow: 'hidden',
-          height,
-          minHeight: 'var(--tap-target-min)',
+          // Border-box: +4px for the 2px border so the content row (and thus
+          // the stretched controls) is at least the 44px tap-target minimum.
+          minHeight: Math.max(height, 48),
           boxShadow: focused ? 'var(--focus-ring)' : 'none',
           transition: 'box-shadow .15s ease',
         }}
@@ -104,7 +108,10 @@ export function SearchBar({
           type="submit"
           style={{
             background: 'var(--color-cta)',
-            height: '100%',
+            // Stretch to the row height (the flex row is `align-items: stretch`);
+            // a percentage height would be undefined against the row's auto
+            // height and collapse the button.
+            alignSelf: 'stretch',
             minWidth: 'var(--tap-target-min)',
             display: 'flex',
             alignItems: 'center',

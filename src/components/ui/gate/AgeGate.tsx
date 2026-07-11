@@ -127,8 +127,8 @@ const GATE_CSS = `
   background: var(--color-cta-tint);
 }
 .agegate__checkbox {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
   accent-color: var(--color-cta);
   cursor: pointer;

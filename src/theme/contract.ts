@@ -34,6 +34,16 @@
  * distinct, independently-valued CSS custom properties; this deviation from
  * the "70" figure is intentional and is called out explicitly wherever this
  * contract is consumed or tested.
+ *
+ * Accessibility addendum (total now 94, color now 39): one token beyond the
+ * source palette — `--color-premium-accent-ink` — was added so the gold
+ * premium accent has a readable variant for text on light surfaces. The bright
+ * `--color-premium-accent` clears AA only against the dark brand background
+ * (where it is used for on-navy accents and decorative star glyphs); a single
+ * gold value cannot satisfy both a dark and a light background at once, so a
+ * darker ink shade is required for gold-toned label text. This mirrors the
+ * existing `-ink` pairings (`--color-brand`/`--color-brand-ink`,
+ * `--color-trust`/`--color-trust-ink`).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -44,6 +54,7 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-cta-active',
   '--color-urgency',
   '--color-premium-accent',
+  '--color-premium-accent-ink',
   '--color-trust',
   '--color-trust-ink',
   '--color-surface-on-brand',

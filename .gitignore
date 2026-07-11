@@ -40,6 +40,10 @@ yarn-error.log*
 /blob-report
 /playwright/.cache
 
+# release-gate reports (regenerated on each run)
+/lighthouse-report
+/a11y-report
+
 # vercel
 .vercel
 

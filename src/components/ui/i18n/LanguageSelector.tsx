@@ -9,6 +9,7 @@ import {
   Chevron,
   codeChipStyle,
   columnHeadingStyle,
+  handleMenuArrowKeys,
   optionBaseStyle,
   panelStyle,
   triggerBaseStyle,
@@ -94,9 +95,10 @@ export function LanguageSelector({
         <div
           role="menu"
           aria-label="Taal"
+          onKeyDown={handleMenuArrowKeys}
           style={{ ...panelStyle(alignLeft), minWidth: 180 }}
         >
-          <div style={{ width: '100%' }}>
+          <div role="group" aria-label="Taal" style={{ width: '100%' }}>
             <div style={columnHeadingStyle}>Taal</div>
             {languages.map((l, index) => {
               const active = l.locale === value;

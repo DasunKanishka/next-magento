@@ -49,7 +49,7 @@ export function ProductOfMonth({ editorial }: ProductOfMonthProps) {
         <span
           style={{
             font: '600 12px/1 var(--font-brand)',
-            color: 'var(--color-premium-accent)',
+            color: 'var(--color-premium-accent-ink)',
             letterSpacing: 'var(--type-eyebrow-tracking)',
             textTransform: 'uppercase',
           }}

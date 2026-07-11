@@ -112,6 +112,34 @@ describe('CountrySelector', () => {
     expect(menu.style.right).toBe('');
   });
 
+  it('wraps each column in a labeled group', () => {
+    render(<CountrySelector value="NL" language="nl" />);
+    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
+    expect(screen.getByRole('group', { name: 'Land' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Taal' })).toBeInTheDocument();
+  });
+
+  it('roves focus across options with ArrowDown/ArrowUp and wraps around', () => {
+    render(<CountrySelector value="NL" language="nl" />);
+    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
+    const menu = screen.getByRole('menu');
+    const options = screen.getAllByRole('menuitemradio');
+
+    options[0].focus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(options[1]).toHaveFocus();
+
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(options[0]).toHaveFocus();
+
+    // ArrowUp from the first option wraps to the last.
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(options[options.length - 1]).toHaveFocus();
+
+    fireEvent.keyDown(menu, { key: 'Home' });
+    expect(options[0]).toHaveFocus();
+  });
+
   it('every var(--*) this component emits is a real contract token', () => {
     const { container } = render(<CountrySelector value="NL" language="nl" />);
     fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));

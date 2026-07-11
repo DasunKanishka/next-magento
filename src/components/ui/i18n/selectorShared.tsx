@@ -54,6 +54,36 @@ export function useDismiss(
   return rootRef;
 }
 
+/**
+ * Roving-focus keydown handler for an open dropdown panel. ArrowDown/ArrowUp
+ * move focus across every option (`menuitemradio`) in the panel, with
+ * wrap-around, so the whole open list is operable by keyboard alone (Home/End
+ * jump to the first/last option). Attach to the `role="menu"` container; the
+ * trigger's Esc-close/focus-return stays owned by `useDismiss`.
+ */
+export function handleMenuArrowKeys(event: React.KeyboardEvent<HTMLElement>): void {
+  const { key } = event;
+  if (key !== 'ArrowDown' && key !== 'ArrowUp' && key !== 'Home' && key !== 'End') {
+    return;
+  }
+  const panel = event.currentTarget;
+  const items = Array.from(panel.querySelectorAll<HTMLElement>('[role="menuitemradio"]'));
+  if (items.length === 0) return;
+
+  event.preventDefault();
+  const active = document.activeElement as HTMLElement | null;
+  const current = active ? items.indexOf(active) : -1;
+
+  let next: number;
+  if (key === 'Home') next = 0;
+  else if (key === 'End') next = items.length - 1;
+  else {
+    const delta = key === 'ArrowDown' ? 1 : -1;
+    next = current === -1 ? 0 : (current + delta + items.length) % items.length;
+  }
+  items[next]?.focus();
+}
+
 /** Down chevron; rotates when the dropdown is open. */
 export function Chevron({ open }: { open: boolean }) {
   return (

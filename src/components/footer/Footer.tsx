@@ -59,7 +59,9 @@ const headingStyle: React.CSSProperties = {
 };
 
 const linkStyle: React.CSSProperties = {
-  display: 'inline-flex',
+  // Full-width row so the tap target spans the column (>= 44px in both axes),
+  // not just the text glyphs.
+  display: 'flex',
   alignItems: 'center',
   minHeight: 'var(--tap-target-min)',
   font: '400 14px/1 var(--font-brand)',
@@ -106,6 +108,9 @@ export function Footer() {
               href="/"
               aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: 'var(--tap-target-min)',
                 font: '800 22px/1 var(--font-brand)',
                 color: '#fff',
                 textDecoration: 'none',

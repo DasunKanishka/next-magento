@@ -69,10 +69,12 @@ describe('SearchBar', () => {
     expect(frame?.style.boxShadow).toBe('none');
   });
 
-  it('default height (50) and submit button min-width both meet the 44px minimum touch target', () => {
+  it('default row min-height (50) and submit button min-width both meet the 44px minimum touch target', () => {
     const { container } = render(<SearchBar />);
     const frame = container.querySelector('form');
-    expect(frame?.style.height).toBe('50px');
+    // The row stretches its controls to this min-height; the +4px border-box
+    // allowance keeps the inner controls at >=44px even at the mobile height.
+    expect(frame?.style.minHeight).toBe('50px');
     expect(50).toBeGreaterThanOrEqual(pxValue(defaultTokens['--tap-target-min']));
 
     const submitBtn = screen.getByRole('button', { name: '⌕ Zoeken' });
