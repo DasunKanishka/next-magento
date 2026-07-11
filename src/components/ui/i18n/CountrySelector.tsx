@@ -16,6 +16,7 @@ import {
   codeChipStyle,
   columnHeadingStyle,
   Flag,
+  handleMenuArrowKeys,
   optionActiveTealStyle,
   optionBaseStyle,
   panelStyle,
@@ -105,8 +106,13 @@ export function CountrySelector({
       </button>
 
       {open && (
-        <div role="menu" aria-label="Land en taal" style={panelStyle(alignLeft)}>
-          <div style={{ minWidth: 190 }}>
+        <div
+          role="menu"
+          aria-label="Land en taal"
+          onKeyDown={handleMenuArrowKeys}
+          style={panelStyle(alignLeft)}
+        >
+          <div role="group" aria-label="Land" style={{ minWidth: 190 }}>
             <div style={columnHeadingStyle}>Land</div>
             {countries.map((c, index) => {
               const active = c.code === value;
@@ -133,6 +139,8 @@ export function CountrySelector({
           </div>
 
           <div
+            role="group"
+            aria-label="Taal"
             style={{
               minWidth: 170,
               borderLeft: 'var(--border-width-default) solid var(--color-border-card)',

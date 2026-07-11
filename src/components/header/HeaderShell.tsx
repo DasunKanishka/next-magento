@@ -137,6 +137,9 @@ export function HeaderShell({
       href="/"
       aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
       style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        minHeight: 'var(--tap-target-min)',
         font: '800 22px/1 var(--font-brand)',
         color: 'var(--color-brand)',
         textDecoration: 'none',
@@ -216,7 +219,7 @@ export function HeaderShell({
               <span style={{ color: 'var(--color-cta)' }}>
                 ✓ {DELIVERY_DEADLINE_COPY}
               </span>
-              <span style={{ color: 'var(--color-premium-accent)' }}>
+              <span style={{ color: 'var(--color-premium-accent-ink)' }}>
                 ★ {REVIEW_RATING_COPY}
               </span>
             </div>

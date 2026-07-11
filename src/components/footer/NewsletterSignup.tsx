@@ -110,8 +110,11 @@ export function NewsletterSignup({
         htmlFor={`${consentId}-consent`}
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           gap: 8,
+          // Full 44px tap target for the consent toggle (the whole label row is
+          // clickable and toggles the checkbox).
+          minHeight: 'var(--tap-target-min)',
           font: '400 12px/1.4 var(--font-brand)',
           color: 'var(--color-text-on-brand)',
           cursor: 'pointer',
@@ -122,7 +125,7 @@ export function NewsletterSignup({
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          style={{ marginTop: 2, width: 16, height: 16, flex: '0 0 auto' }}
+          style={{ width: 24, height: 24, flex: '0 0 auto' }}
         />
         Ja, ik wil de nieuwsbrief ontvangen en ga akkoord met dubbele opt-in bevestiging.
       </label>

@@ -2,23 +2,32 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the single child brand
- * shipping in V0.1.0. Every one of the 93 contract keys (see `../contract`
- * for the reconciliation note on why 93, not the 70 quoted in the source
- * design specification's summary prose) has a value here sourced 1:1 from
- * the design specification's brand token-value tables. The `TokenSheet`
- * annotation makes this a compile-time-checked exhaustive mapping: TypeScript
- * rejects this object literal if any contract key is missing or if an
- * unknown key is present.
+ * shipping in V0.1.0. Every one of the 94 contract keys (see `../contract`
+ * for the reconciliation note on why 94 — the source palette's 93 plus the
+ * accessibility-driven `--color-premium-accent-ink`) has a value here. Every
+ * value is sourced 1:1 from the design specification's brand token-value
+ * tables, except four adjusted to clear WCAG AA contrast (the CTA green ramp,
+ * the subtle-text gray, the strikethrough gray) and the added gold ink. The
+ * `TokenSheet` annotation makes this a compile-time-checked exhaustive mapping:
+ * TypeScript rejects this object literal if any contract key is missing or if
+ * an unknown key is present.
  */
 export const defaultTokens: TokenSheet = {
   // Color
   '--color-brand': '#04163A',
   '--color-brand-ink': '#03122E',
-  '--color-cta': '#1C8F57',
-  '--color-cta-hover': '#18804E',
-  '--color-cta-active': '#146B40',
+  // CTA green darkened from the source #1C8F57 so BOTH white-on-green (button
+  // fills) and green-on-white (inline trust copy) clear WCAG AA 4.5:1 — the
+  // source value sat at 4.1:1 in both directions.
+  '--color-cta': '#1A8551',
+  '--color-cta-hover': '#167246',
+  '--color-cta-active': '#13613B',
   '--color-urgency': '#A02C44',
+  // Bright gold — reserved for on-dark accents and decorative star glyphs.
   '--color-premium-accent': '#E0982A',
+  // Darker gold ink for premium-toned label text on light surfaces (the bright
+  // gold above only clears AA against the navy brand background).
+  '--color-premium-accent-ink': '#92631B',
   '--color-trust': '#14808A',
   '--color-trust-ink': '#0F6A72',
   '--color-surface-on-brand': '#0E2444',
@@ -31,11 +40,15 @@ export const defaultTokens: TokenSheet = {
   '--color-border-field': '#D8D3CA',
   '--color-text-primary': '#04163A',
   '--color-text-muted': '#4A463F',
-  '--color-text-subtle': '#8A857C',
+  // Darkened from the source #8A857C so subtle label text clears AA 4.5:1 on
+  // the page's light surfaces (source sat at 3.7:1 on white).
+  '--color-text-subtle': '#706C65',
   '--color-text-on-brand': '#9AAAC0',
   '--color-text-on-brand-muted': '#5E6E86',
   '--color-text-placeholder': '#9A958C',
-  '--color-text-strikethrough': '#9AAAC0',
+  // Darkened from the source #9AAAC0 so struck-through prices remain legible
+  // (meaningful text) at AA on light surfaces (source sat at 2.4:1).
+  '--color-text-strikethrough': '#636E7C',
   '--color-cta-tint': '#ECF6F0',
   '--color-cta-tint-border': '#CDE8DA',
   '--color-trust-tint': '#E9F3F4',
@@ -109,6 +122,6 @@ export const defaultTokens: TokenSheet = {
   '--shadow-card': '0 1px 3px rgba(4,22,58,.08)',
   '--shadow-raised': '0 6px 24px rgba(4,22,58,.12)',
   '--shadow-overlay': '0 16px 40px rgba(4,12,28,.18)',
-  '--shadow-cta': '0 4px 16px rgba(28,143,87,.32)',
+  '--shadow-cta': '0 4px 16px rgba(26,133,81,.32)',
   '--focus-ring': '0 0 0 3px rgba(4,22,58,.32)',
 };

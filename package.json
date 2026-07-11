@@ -11,6 +11,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "perf:gate": "node scripts/perf-gate.mjs",
     "schema:pull": "node scripts/schema-pull.mjs",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:check": "node scripts/codegen-check.mjs",
@@ -31,6 +32,7 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@graphql-codegen/cli": "^7.2.0",
     "@graphql-codegen/client-preset": "^6.1.0",
     "@playwright/test": "^1.61.1",
@@ -42,11 +44,13 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.3",
     "axe-core": "^4.12.1",
+    "chrome-launcher": "^1.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "eslint-config-prettier": "^10.1.8",
     "get-graphql-schema": "^2.1.2",
     "jsdom": "^29.1.1",
+    "lighthouse": "13.4.0",
     "prettier": "^3.9.4",
     "typescript": "^5",
     "vitest": "^4.1.10"

@@ -64,17 +64,17 @@ describe('theme resolver — resolveTokens("default")', () => {
     const sheet = resolveTokens('default');
     const keys = Object.keys(sheet);
 
-    // The parent contract currently declares 93 distinct CSS custom-property
-    // keys once every grouped source-table row (e.g. a type-scale step's
+    // The parent contract declares 94 distinct CSS custom-property keys once
+    // every grouped source-table row (e.g. a type-scale step's
     // -size/-weight/-line-height, or the space-1..8 scale) is expanded into
-    // its independently-settable properties — see contract.ts's
-    // reconciliation note for why this is 93 rather than the 70 quoted in
-    // the source design specification's summary prose (that figure
-    // undercounts its own tables by one row apiece in the color and
-    // typography sections). Asserting against CONTRACT_TOKEN_NAMES.length
-    // (rather than a bare literal) keeps this test honest if the contract
-    // ever changes.
-    expect(CONTRACT_TOKEN_NAMES.length).toBe(93);
+    // its independently-settable properties — see contract.ts's reconciliation
+    // note for why this is 94 (the source palette's 93 plus the
+    // accessibility-driven --color-premium-accent-ink), and not the 70 quoted
+    // in the source design specification's summary prose (that figure
+    // undercounts its own tables by one row apiece in the color and typography
+    // sections). Asserting against CONTRACT_TOKEN_NAMES.length (rather than a
+    // bare literal) keeps this test honest if the contract ever changes.
+    expect(CONTRACT_TOKEN_NAMES.length).toBe(94);
     expect(keys.length).toBe(CONTRACT_TOKEN_NAMES.length);
     expect(new Set(keys)).toEqual(new Set(CONTRACT_TOKEN_NAMES));
 

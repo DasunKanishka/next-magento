@@ -80,6 +80,32 @@ describe('LanguageSelector', () => {
     expect(trigger.style.minWidth).toBe('var(--tap-target-min)');
   });
 
+  it('wraps the option list in a labeled group', () => {
+    render(<LanguageSelector value="nl" />);
+    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
+    expect(screen.getByRole('group', { name: 'Taal' })).toBeInTheDocument();
+  });
+
+  it('roves focus across options with ArrowDown/ArrowUp and wraps around', () => {
+    render(<LanguageSelector value="nl" />);
+    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
+    const menu = screen.getByRole('menu');
+    const options = screen.getAllByRole('menuitemradio');
+
+    options[0].focus();
+    fireEvent.keyDown(menu, { key: 'ArrowDown' });
+    expect(options[1]).toHaveFocus();
+
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(options[0]).toHaveFocus();
+
+    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(options[options.length - 1]).toHaveFocus();
+
+    fireEvent.keyDown(menu, { key: 'End' });
+    expect(options[options.length - 1]).toHaveFocus();
+  });
+
   it('every var(--*) this component emits is a real contract token', () => {
     const { container } = render(<LanguageSelector value="nl" />);
     fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));

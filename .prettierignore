@@ -9,4 +9,6 @@ build/
 coverage/
 playwright-report/
 test-results/
+lighthouse-report/
+a11y-report/
 next-env.d.ts
