@@ -24,5 +24,13 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // The home page renders server-side against the local backend over HTTPS
+    // with a locally-trusted (mkcert) certificate. `--use-system-ca` makes the
+    // dev server's Node process trust the OS certificate store that `mkcert
+    // -install` populates — a certificate env var read from `.env.local` is
+    // applied too late to affect Node's TLS bootstrap.
+    env: {
+      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --use-system-ca`.trim(),
+    },
   },
 });

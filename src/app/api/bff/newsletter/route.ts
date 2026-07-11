@@ -10,12 +10,15 @@ import { createRateLimiter } from '@/lib/rate-limit';
  * here, and this handler reaches the backend through the `DataSource`
  * interface. No backend URL, header, or token is ever placed in the response.
  *
+ * This handler runs on the default (Node.js) server runtime — the connector is
+ * server-only and relies on Node APIs / server env vars that must never be
+ * edge/client-bundled. The runtime is not pinned via a route-segment export,
+ * which is incompatible with the cache directive enabled app-wide; Node is the
+ * default for route handlers, and the `server-only` import keeps this off any
+ * client/edge bundle regardless.
+ *
  * Contract:  POST { email: string; consent: true }  ->  { status: 'subscribed' | 'error' }
  */
-
-// Force the Node.js runtime: the connector is server-only and relies on Node
-// APIs / server env vars that must never be edge/client-bundled.
-export const runtime = 'nodejs';
 
 /** The neutral response shape — the ONLY thing ever returned to the client. */
 interface NewsletterResponse {

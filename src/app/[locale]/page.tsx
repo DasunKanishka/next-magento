@@ -1,63 +1,124 @@
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import React from 'react';
+import { setRequestLocale } from 'next-intl/server';
 
-import { localeResolver } from '@/i18n/locale-resolver';
-import { isSupportedLocale } from '@/i18n/locales';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
+import {
+  BannerTiles,
+  BusinessReviews,
+  CategoryBar,
+  HeroSlider,
+  ProductOfMonth,
+  ProductRail,
+  SeoContent,
+} from '@/components/home';
+import { STORE_IDENTITY } from '@/config/store-identity';
+import { isSupportedLocale, type SupportedLocale } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
-import styles from './page.module.css';
-import { LocaleSwitcher } from './LocaleSwitcher';
+import { getHomeShellData } from '@/lib/home/home-data';
 
+/** Pre-render every supported locale segment at build time. */
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+const srOnly: React.CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
+
+const sectionStack: React.CSSProperties = {
+  maxWidth: 'var(--layout-maxw)',
+  margin: '0 auto',
+  padding: 'clamp(20px, 4vw, 40px) 20px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--space-section)',
+};
+
+/**
+ * Storefront home page. Rendered only once the age/country gate in the locale
+ * layout has recorded consent, so the header, the full section stack, and the
+ * footer all live here rather than in the layout.
+ *
+ * The section order is fixed. The cacheable shell (navigation, editorial zones,
+ * the resolved home route) comes from a single tagged read; each merchandising
+ * band streams its fresh price/stock content into its own boundary.
+ */
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
-  const locale = isSupportedLocale(raw) ? raw : routing.defaultLocale;
+  const locale: SupportedLocale = isSupportedLocale(raw) ? raw : routing.defaultLocale;
   setRequestLocale(locale);
 
-  const t = await getTranslations('Home');
-  // Pure, backend-free resolution — every locale resolves to a store view +
-  // currency (only `nl` distinct; all others fall back to `default`/EUR).
-  const { storeViewCode, currencyCode } = localeResolver.resolve(locale);
+  // Resolve the store's configured home route and, keyed to it, the page-level
+  // editorial. `data-home-route` reflects the resolved value so the configured
+  // route (never a pinned id) is observable end to end.
+  const shell = await getHomeShellData('home');
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main} style={{ gap: 24, alignItems: 'flex-start' }}>
-        <h1
-          style={{ font: '600 30px/1.1 var(--font-brand)', color: 'var(--color-brand)' }}
-        >
-          {t('title')}
+    <div data-testid="home-page" data-home-route={shell.homeRoute}>
+      <Header locale={locale} />
+
+      <main>
+        <h1 style={srOnly}>
+          {STORE_IDENTITY.name} — {STORE_IDENTITY.tagline}
         </h1>
-        <p
-          style={{
-            font: '400 15px/1.6 var(--font-brand)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
-          {t('intro')}
-        </p>
 
-        <LocaleSwitcher locale={locale} />
+        <div style={sectionStack}>
+          <HeroSlider slides={shell.hero} />
 
-        <dl
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'auto auto',
-            gap: '4px 16px',
-            font: '500 14px/1.4 var(--font-brand)',
-            color: 'var(--color-text-primary)',
-          }}
-        >
-          <dt style={{ color: 'var(--color-text-muted)' }}>{t('storeLabel')}</dt>
-          <dd data-testid="resolved-store" style={{ margin: 0, fontWeight: 700 }}>
-            {storeViewCode}
-          </dd>
-          <dt style={{ color: 'var(--color-text-muted)' }}>{t('currencyLabel')}</dt>
-          <dd data-testid="resolved-currency" style={{ margin: 0, fontWeight: 700 }}>
-            {currencyCode}
-          </dd>
-          <dt style={{ color: 'var(--color-text-muted)' }}>Locale</dt>
-          <dd data-testid="active-locale" style={{ margin: 0, fontWeight: 700 }}>
-            {locale}
-          </dd>
-        </dl>
+          <ProductRail
+            slot="highlighted"
+            limit={4}
+            heading="Aanbevolen voor jou"
+            variant="grid"
+          />
+
+          <CategoryBar categories={shell.categories} />
+
+          <BusinessReviews content={shell.reviews} />
+
+          <ProductRail
+            slot="weekdeals"
+            limit={6}
+            heading="Weekdeals"
+            variant="carousel"
+          />
+
+          <BannerTiles tiles={shell.banners1} />
+
+          <ProductRail
+            slot="new-in"
+            limit={6}
+            heading="Nieuw binnen"
+            variant="carousel"
+          />
+
+          <BannerTiles tiles={shell.banners2} />
+
+          <ProductRail
+            slot="featured"
+            limit={6}
+            heading="Uitgelichte producten"
+            variant="carousel"
+          />
+
+          <BannerTiles tiles={shell.banners3} />
+
+          <ProductOfMonth editorial={shell.productOfMonth} />
+
+          <SeoContent html={shell.seoHtml} />
+        </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
