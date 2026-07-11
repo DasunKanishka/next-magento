@@ -1,0 +1,81 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import { NewsletterSignup } from './NewsletterSignup';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+function fillEmail(value: string) {
+  fireEvent.change(screen.getByLabelText('E-mailadres'), { target: { value } });
+}
+
+describe('NewsletterSignup', () => {
+  it('renders an email field, a consent checkbox, and a subscribe button', () => {
+    render(<NewsletterSignup />);
+    expect(screen.getByLabelText('E-mailadres')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Inschrijven' })).toBeInTheDocument();
+  });
+
+  it('rejects an invalid email without calling the endpoint', () => {
+    const fetchSpy = vi.spyOn(global, 'fetch');
+    render(<NewsletterSignup />);
+    fillEmail('not-an-email');
+    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/geldig e-mailadres/i);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('requires consent before submitting', () => {
+    const fetchSpy = vi.spyOn(global, 'fetch');
+    render(<NewsletterSignup />);
+    fillEmail('jij@voorbeeld.nl');
+    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/toestemming/i);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('posts to the endpoint and shows the confirmation state on success', async () => {
+    const fetchSpy = vi
+      .spyOn(global, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ status: 'subscribed' }), { status: 200 }),
+      );
+    render(<NewsletterSignup />);
+    fillEmail('jij@voorbeeld.nl');
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+
+    await waitFor(() => expect(screen.getByRole('status')).toBeInTheDocument());
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/api/bff/newsletter',
+      expect.objectContaining({ method: 'POST' }),
+    );
+    const [, init] = fetchSpy.mock.calls[0];
+    expect(JSON.parse(String(init?.body))).toEqual({
+      email: 'jij@voorbeeld.nl',
+      consent: true,
+    });
+  });
+
+  it('shows an error state when the endpoint reports failure', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ status: 'error' }), { status: 200 }),
+    );
+    render(<NewsletterSignup />);
+    fillEmail('jij@voorbeeld.nl');
+    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.getByRole('alert')).toHaveTextContent(/niet gelukt/i);
+  });
+
+  it('emits only real contract tokens', () => {
+    const { container } = render(<NewsletterSignup />);
+    expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+});

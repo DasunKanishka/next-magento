@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test';
  *
  * These specs use fresh browser contexts with NO `nbns_gate` cookie, so the
  * gate is in force. The gate title is the stable marker for "gate is showing";
- * the home page's `resolved-store` testid is the stable marker for "storefront
+ * the home page's `home-page` testid is the stable marker for "storefront
  * is showing" — its absence proves the underlying page was not rendered.
  */
 
@@ -32,14 +32,13 @@ test('MUST-3: with client JS disabled and no consent cookie, the gate renders an
   ).toBeVisible();
 
   // ...and the storefront page (its product/price/store content) is NOT.
-  await expect(page.getByTestId('resolved-store')).toHaveCount(0);
-  await expect(page.getByTestId('resolved-currency')).toHaveCount(0);
+  await expect(page.getByTestId('home-page')).toHaveCount(0);
 
   // Belt-and-braces: assert against the raw response HTML too, so this holds
   // even independent of client-side hydration.
   const html = await response!.text();
   expect(html).toContain(GATE_TITLE);
-  expect(html).not.toContain('data-testid="resolved-store"');
+  expect(html).not.toContain('data-testid="home-page"');
 
   await context.close();
 });
@@ -54,7 +53,7 @@ test('full flow: blocked → select country → confirm 18+ → CTA enables → 
 
   // Blocked: gate visible, storefront absent.
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
-  await expect(page.getByTestId('resolved-store')).toHaveCount(0);
+  await expect(page.getByTestId('home-page')).toHaveCount(0);
 
   const cta = page.getByRole('button', { name: /De winkel betreden/ });
   // Once hydrated the CTA gates on validity.
@@ -72,7 +71,7 @@ test('full flow: blocked → select country → confirm 18+ → CTA enables → 
   await cta.click();
 
   // Storefront now renders; gate is gone.
-  await expect(page.getByTestId('resolved-store')).toBeVisible();
+  await expect(page.getByTestId('home-page')).toBeVisible();
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toHaveCount(0);
 
   // Consent persisted in the cookie.
@@ -82,7 +81,7 @@ test('full flow: blocked → select country → confirm 18+ → CTA enables → 
 
   // Reload: a returning visitor with a valid cookie does NOT see the gate again.
   await page.reload();
-  await expect(page.getByTestId('resolved-store')).toBeVisible();
+  await expect(page.getByTestId('home-page')).toBeVisible();
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toHaveCount(0);
 
   await context.close();

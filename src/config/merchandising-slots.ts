@@ -37,3 +37,21 @@ export function resolveSlotCategoryId(slot: MerchandisingSlot): string {
     ? override.trim()
     : SLOT_CATEGORY_DEFAULT[slot];
 }
+
+/** Every merchandising-slot category id (resolved). */
+const ALL_SLOTS: MerchandisingSlot[] = [
+  'highlighted',
+  'weekdeals',
+  'new-in',
+  'featured',
+  'product-of-month',
+];
+
+/**
+ * The set of all merchandising curation-category ids. These are content
+ * containers, not shopping categories, so the header nav filters them out of
+ * the live category tree it renders.
+ */
+export function allSlotCategoryIds(): Set<string> {
+  return new Set(ALL_SLOTS.map(resolveSlotCategoryId));
+}
