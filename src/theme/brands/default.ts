@@ -1,17 +1,17 @@
 import type { TokenSheet } from '../contract';
 
 /**
- * Concrete design values for the `default` brand — the single child brand
- * shipping in V0.1.0. Every one of the 119 contract keys (see `../contract`
+ * Concrete design values for the `default` brand — the sole child brand
+ * shipping today. Every one of the 119 contract keys (see `../contract`
  * for the reconciliation note on why 119 — the source palette's 93, the
  * accessibility-driven `--color-premium-accent-ink`, and the 25 gaps closed
- * by the v0.1.1 "M1 — Contract token-scale extension" issue) has a value
- * here. Every value is sourced 1:1 from the design specification's brand
- * token-value tables or promoted 1:1 from the component source it replaces,
- * except four adjusted to clear WCAG AA contrast (the CTA green ramp, the
- * subtle-text gray, the strikethrough gray), the added gold ink, and the
- * v0.1.1 alert `warning` tone (derived — no `warning` tone exists in
- * Alert.tsx/Toast.tsx to promote from; see the inline comment beside it).
+ * by the token-scale-coverage addendum) has a value here. Every value is
+ * sourced 1:1 from the design specification's brand token-value tables or
+ * promoted 1:1 from the component source it replaces, except four adjusted
+ * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
+ * strikethrough gray), the added gold ink, and the alert `warning` tone
+ * (derived — no `warning` tone exists in Alert.tsx/Toast.tsx to promote
+ * from; see the inline comment beside it).
  * The `TokenSheet` annotation makes this a compile-time-checked exhaustive
  * mapping: TypeScript rejects this object literal if any contract key is
  * missing or if an unknown key is present.
@@ -38,7 +38,7 @@ export const defaultTokens: TokenSheet = {
   '--color-trust': '#14808A',
   '--color-trust-ink': '#0F6A72',
   '--color-surface-on-brand': '#0E2444',
-  // Pinned per issue 001 — white content on a brand/navy surface. A DISTINCT
+  // White content on a brand/navy surface. A DISTINCT
   // structural role from the muted `--color-text-on-brand` below and from
   // `--color-text-on-fill`; all three may share white in this default brand
   // yet remain independently child-overridable.
@@ -72,7 +72,7 @@ export const defaultTokens: TokenSheet = {
   '--color-disabled-fg': '#AEB6C4',
   '--color-text-on-brand': '#9AAAC0',
   '--color-text-on-brand-muted': '#5E6E86',
-  // Pinned per issue 001 — on-fill text (e.g. Badge's shared `color: '#fff'`
+  // On-fill text (e.g. Badge's shared `color: '#fff'`
   // on-fill exception). A distinct role from `--color-on-brand` above.
   '--color-text-on-fill': '#FFFFFF',
   '--color-text-placeholder': '#9A958C',
@@ -129,7 +129,7 @@ export const defaultTokens: TokenSheet = {
   // Typography
   '--font-brand': "var(--font-figtree), system-ui, -apple-system, 'Segoe UI', sans-serif",
   '--font-mono': 'ui-monospace, Menlo, Consolas, monospace',
-  // Pinned per issue 001. Standalone weight — 800 is loaded in the font
+  // Standalone weight — 800 is loaded in the font
   // weight set but not assigned to a named type-scale step in the source
   // design spec (reserved headroom, e.g. a future display-black treatment;
   // design-spec.md's type-scale table note).
@@ -192,11 +192,11 @@ export const defaultTokens: TokenSheet = {
   '--space-2': '8px',
   '--space-3': '12px',
   '--space-4': '16px',
-  // Pinned per issue 001 — fills the space-scale gap between space-4 (16px)
+  // Fills the space-scale gap between space-4 (16px)
   // and space-6 (24px); previously undefined in the source design.
   '--space-5': '20px',
   '--space-6': '24px',
-  // Pinned per issue 001 — fills the space-scale gap between space-6 (24px)
+  // Fills the space-scale gap between space-6 (24px)
   // and space-8 (32px); previously undefined in the source design.
   '--space-7': '28px',
   '--space-8': '32px',
@@ -208,14 +208,14 @@ export const defaultTokens: TokenSheet = {
   '--radius-lg': '13px',
   '--radius-xl': '14px',
   '--radius-2xl': '18px',
-  // Pinned per issue 001 (design-spec "Entry gate" intent per V0.1.0 issue
-  // 008 — supersedes the 13px cosmetic compromise noted there).
+  // Entry-gate card radius (design-spec intent) — supersedes the 13px
+  // cosmetic compromise the gate previously used for lack of this token.
   '--radius-gate-card': '20px',
   '--radius-full': '30px',
   '--control-height-md': '44px',
   '--control-height-lg': '56px',
   '--tap-target-min': '44px',
-  // Pinned per issue 001 — the recurring media-placeholder slot height
+  // The recurring media-placeholder slot height
   // (product-of-the-month / gallery-style placeholders).
   '--media-placeholder-h': '320px',
   '--border-width-default': '1px',

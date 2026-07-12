@@ -45,23 +45,22 @@
  * existing `-ink` pairings (`--color-brand`/`--color-brand-ink`,
  * `--color-trust`/`--color-trust-ink`).
  *
- * V0.1.1 addendum (total now 119, color 54, typography 35, spacing/radius/
- * sizing 30): the "M1 — Contract token-scale extension" issue (v0.1.1
- * discovery audit) closes 25 further gaps a 34-file component audit found
- * with no matching token to point at — component literals that would
- * otherwise stay orphaned. This batch: fills the two previously-undefined
- * space-scale steps called out above (`--space-5`, `--space-7`); adds the
- * recurring media-placeholder height; adds the 5 type-scale line-heights the
- * source design left undefined for the price/ui/label/eyebrow/meta steps
- * (promoted from the line-height each step's text consistently uses in the
- * component source, since the source spec's own tables never list a
- * line-height column for these 5 rows); adds a standalone heavy weight (not
- * step-scoped — used by wordmarks/stat-figures that map to no named type
- * step); adds an on-fill text color, a 3-token disabled-state group, 8
- * alert-tone ink colors (4 tones × title/body), 2 label-role colors, and 2
- * folded structural follow-ups (`--color-on-brand`, `--radius-gate-card`).
- * Every new value's source citation lives in the v0.1.1 issue's Execution
- * Notes, not here (this file stays values-free per MUST-4).
+ * Scale-coverage addendum (total now 119, color 54, typography 35, spacing/
+ * radius/sizing 30): a component-styling audit surfaced 25 further gaps —
+ * component literals with no matching token to point at, which would
+ * otherwise stay orphaned and un-overridable by a child brand. This batch:
+ * fills the two previously-undefined space-scale steps called out above
+ * (`--space-5`, `--space-7`); adds the recurring media-placeholder height;
+ * adds the 5 type-scale line-heights left undefined for the
+ * price/ui/label/eyebrow/meta steps (promoted from the line-height each
+ * step's text consistently uses in the component source, since the source
+ * tables never list a line-height column for these 5 rows); adds a
+ * standalone heavy weight (not step-scoped — used by wordmarks/stat-figures
+ * that map to no named type step); adds an on-fill text color, a 3-token
+ * disabled-state group, 8 alert-tone ink colors (4 tones × title/body), 2
+ * label-role colors, and 2 folded structural follow-ups (`--color-on-brand`,
+ * `--radius-gate-card`). This file stays values-free (keys only); each new
+ * value's provenance is tracked outside the source tree.
  * `--color-on-brand-strong` was considered and intentionally dropped — no
  * concrete definition exists for it anywhere in the source material, and an
  * undefined token is itself a smell.
