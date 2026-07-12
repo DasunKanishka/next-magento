@@ -44,6 +44,27 @@
  * darker ink shade is required for gold-toned label text. This mirrors the
  * existing `-ink` pairings (`--color-brand`/`--color-brand-ink`,
  * `--color-trust`/`--color-trust-ink`).
+ *
+ * V0.1.1 addendum (total now 119, color 54, typography 35, spacing/radius/
+ * sizing 30): the "M1 — Contract token-scale extension" issue (v0.1.1
+ * discovery audit) closes 25 further gaps a 34-file component audit found
+ * with no matching token to point at — component literals that would
+ * otherwise stay orphaned. This batch: fills the two previously-undefined
+ * space-scale steps called out above (`--space-5`, `--space-7`); adds the
+ * recurring media-placeholder height; adds the 5 type-scale line-heights the
+ * source design left undefined for the price/ui/label/eyebrow/meta steps
+ * (promoted from the line-height each step's text consistently uses in the
+ * component source, since the source spec's own tables never list a
+ * line-height column for these 5 rows); adds a standalone heavy weight (not
+ * step-scoped — used by wordmarks/stat-figures that map to no named type
+ * step); adds an on-fill text color, a 3-token disabled-state group, 8
+ * alert-tone ink colors (4 tones × title/body), 2 label-role colors, and 2
+ * folded structural follow-ups (`--color-on-brand`, `--radius-gate-card`).
+ * Every new value's source citation lives in the v0.1.1 issue's Execution
+ * Notes, not here (this file stays values-free per MUST-4).
+ * `--color-on-brand-strong` was considered and intentionally dropped — no
+ * concrete definition exists for it anywhere in the source material, and an
+ * undefined token is itself a smell.
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -52,12 +73,14 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-cta',
   '--color-cta-hover',
   '--color-cta-active',
+  '--color-cta-disabled-bg',
   '--color-urgency',
   '--color-premium-accent',
   '--color-premium-accent-ink',
   '--color-trust',
   '--color-trust-ink',
   '--color-surface-on-brand',
+  '--color-on-brand',
   '--color-bg-page',
   '--color-surface',
   '--color-surface-inset-a',
@@ -65,11 +88,15 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-border',
   '--color-border-card',
   '--color-border-field',
+  '--color-disabled-bg',
   '--color-text-primary',
   '--color-text-muted',
   '--color-text-subtle',
+  '--color-text-label',
+  '--color-disabled-fg',
   '--color-text-on-brand',
   '--color-text-on-brand-muted',
+  '--color-text-on-fill',
   '--color-text-placeholder',
   '--color-text-strikethrough',
   '--color-cta-tint',
@@ -84,13 +111,26 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-info',
   '--color-info-border',
   '--color-info-ink',
+  '--color-alert-success-title',
+  '--color-alert-success-ink',
+  '--color-alert-info-title',
+  '--color-alert-info-ink',
+  '--color-alert-warning-title',
+  '--color-alert-warning-ink',
+  '--color-alert-error-title',
+  '--color-alert-error-ink',
   '--pattern-photo-placeholder-a',
   '--pattern-photo-placeholder-b',
+  '--color-media-placeholder-label',
 ] as const;
 
 export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--font-brand',
   '--font-mono',
+  // Standalone weight primitive — intentionally NOT step-scoped (a
+  // `--type-{step}-weight` name would be wrong here). Used for wordmarks and
+  // stat-figures that map to no named type-scale step.
+  '--type-weight-heavy',
   '--type-display-size',
   '--type-display-weight',
   '--type-display-line-height',
@@ -105,27 +145,46 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--type-h3-line-height',
   '--type-price-size',
   '--type-price-weight',
+  '--type-price-line-height',
   '--type-body-size',
   '--type-body-weight',
   '--type-body-line-height',
   '--type-ui-size',
   '--type-ui-weight',
+  '--type-ui-line-height',
   '--type-label-size',
   '--type-label-weight',
+  '--type-label-line-height',
   '--type-eyebrow-size',
   '--type-eyebrow-weight',
+  '--type-eyebrow-line-height',
   '--type-eyebrow-tracking',
   '--type-tag-tracking',
   '--type-meta-size',
   '--type-meta-weight',
+  '--type-meta-line-height',
 ] as const;
 
+/**
+ * Extend-vs-snap rule (canonical statement — later additions and downstream
+ * batches reference this comment rather than restating the thresholds):
+ * a novel off-scale value earns a NEW token when it is systemic — a
+ * scale-step gap (fills a hole between two existing steps), OR a
+ * ≥3-distinct-file recurrence, OR a structural role (a value that names a
+ * component-level concept, not just a number). Otherwise, snap the value to
+ * the nearest existing token: ≤2px of drift is an acceptable snap; >2px of
+ * drift must escalate (re-open the contract to add a token) rather than
+ * silently absorbing a new systemic value or leaving a literal in a
+ * component.
+ */
 export const SPACING_CONTRACT_KEYS = [
   '--space-1',
   '--space-2',
   '--space-3',
   '--space-4',
+  '--space-5',
   '--space-6',
+  '--space-7',
   '--space-8',
   '--space-section',
   '--layout-maxw',
@@ -135,10 +194,12 @@ export const SPACING_CONTRACT_KEYS = [
   '--radius-lg',
   '--radius-xl',
   '--radius-2xl',
+  '--radius-gate-card',
   '--radius-full',
   '--control-height-md',
   '--control-height-lg',
   '--tap-target-min',
+  '--media-placeholder-h',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',
