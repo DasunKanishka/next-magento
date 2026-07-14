@@ -30,6 +30,10 @@ export const defaultTokens: TokenSheet = {
   // Promoted 1:1 from Button.tsx PALETTE.primary.disabledBg (the CTA
   // button's disabled-state fill).
   '--color-cta-disabled-bg': '#BBE0CC',
+  // Promoted 1:1 from the button's disabled CTA label color — the foreground
+  // partner of `--color-cta-disabled-bg` above (previously a component literal
+  // because no token covered it).
+  '--color-cta-disabled-fg': '#82B098',
   '--color-urgency': '#A02C44',
   // Bright gold — reserved for on-dark accents and decorative star glyphs.
   '--color-premium-accent': '#E0982A',
@@ -48,9 +52,21 @@ export const defaultTokens: TokenSheet = {
   '--color-surface': '#FFFFFF',
   '--color-surface-inset-a': '#FBFAF7',
   '--color-surface-inset-b': '#F4F1EC',
+  // Neutral interactive-surface family — promoted 1:1 from the button's
+  // secondary/tertiary fills. The resting tint is shared: it is the tertiary
+  // fill at rest and the secondary fill on hover. `-hover`/`-active` are the
+  // tertiary fill's deepening states; `-emphasis` is the secondary fill's
+  // pressed tint.
+  '--color-surface-neutral': '#EEF1F6',
+  '--color-surface-neutral-hover': '#E1E7F0',
+  '--color-surface-neutral-active': '#D5DDEA',
+  '--color-surface-neutral-emphasis': '#DFE5EF',
   '--color-border': '#ECE7DD',
   '--color-border-card': '#EFE9DE',
   '--color-border-field': '#D8D3CA',
+  // Promoted 1:1 from the button's disabled secondary/tertiary border color —
+  // the disabled control border, sibling of `--color-disabled-bg`/`-fg`.
+  '--color-border-disabled': '#D2D8E2',
   // Promoted 1:1 from Button.tsx PALETTE.tertiary.disabledBg — the neutral
   // (non-CTA) disabled-state surface, distinct from tertiary's normal
   // `#EEF1F6` fill.
@@ -135,6 +151,12 @@ export const defaultTokens: TokenSheet = {
   // design spec (reserved headroom, e.g. a future display-black treatment;
   // design-spec.md's type-scale table note).
   '--type-weight-heavy': '800',
+  // Generic control/label weight primitives — promoted 1:1 from the button's
+  // per-variant weights (primary uses bold; secondary/tertiary/link use
+  // semibold). Standalone, like `--type-weight-heavy` above, because a button's
+  // weight belongs to no named type-scale step.
+  '--type-weight-bold': '700',
+  '--type-weight-semibold': '600',
   '--type-display-size': '52px',
   '--type-display-weight': '700',
   '--type-display-line-height': '1.04',
@@ -216,6 +238,10 @@ export const defaultTokens: TokenSheet = {
   // cosmetic compromise the gate previously used for lack of this token.
   '--radius-gate-card': '20px',
   '--radius-full': '30px',
+  // Promoted 1:1 from the button's `sm` height — the small control height,
+  // sibling of md/lg. Below the 44×44px minimum touch target, so it is for
+  // dense, non-primary contexts only.
+  '--control-height-sm': '36px',
   '--control-height-md': '44px',
   '--control-height-lg': '56px',
   '--tap-target-min': '44px',

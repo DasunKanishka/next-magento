@@ -72,6 +72,31 @@
  * between the 14px UI size and the 12px label size). Standalone — no
  * accompanying weight or line-height token, matching the precedent set by
  * `--type-weight-heavy` above.
+ *
+ * Interactive-surface & disabled-pair addendum (total now 127, color 60,
+ * spacing/radius/sizing 31): promotes the last raw component literals in the
+ * button exemplar into the contract so a child brand can override them — all
+ * 1:1 promotions with no rendered-value change. Adds a neutral
+ * interactive-surface family for the non-CTA (secondary/tertiary) button
+ * fills: `--color-surface-neutral` is the shared resting tint (the tertiary
+ * fill at rest AND the secondary fill on hover — one value, two consumers),
+ * with `-hover` and `-active` for the tertiary fill's deepening states and
+ * `-emphasis` for the secondary fill's pressed tint. Adds
+ * `--color-cta-disabled-fg`, the disabled CTA label color paired with the
+ * existing `--color-cta-disabled-bg` (the pair was previously split — bg a
+ * token, fg a literal). Adds `--color-border-disabled`, the disabled control
+ * border, sibling of `--color-disabled-bg`/`-fg`. Adds `--control-height-sm`
+ * (36px), the small control height, sibling of `--control-height-md`/`-lg`;
+ * 36px sits more than the snap tolerance below the 44px md height, so per the
+ * extend-vs-snap rule below it earns a token rather than snapping.
+ *
+ * Generic-weight addendum (total now 129, typography 38): the button exemplar
+ * carried its control weights (700/600) as raw numerics. Rather than borrow an
+ * unrelated named type step's weight token (which would mis-couple a control's
+ * weight to, say, the price or label role), two standalone weight primitives
+ * were added — `--type-weight-bold` (700) and `--type-weight-semibold` (600) —
+ * mirroring the `--type-weight-heavy` precedent for weights that map to no
+ * named type-scale step. 1:1 promotion, no rendered-value change.
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -81,6 +106,7 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-cta-hover',
   '--color-cta-active',
   '--color-cta-disabled-bg',
+  '--color-cta-disabled-fg',
   '--color-urgency',
   '--color-premium-accent',
   '--color-premium-accent-ink',
@@ -92,9 +118,14 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-surface',
   '--color-surface-inset-a',
   '--color-surface-inset-b',
+  '--color-surface-neutral',
+  '--color-surface-neutral-hover',
+  '--color-surface-neutral-active',
+  '--color-surface-neutral-emphasis',
   '--color-border',
   '--color-border-card',
   '--color-border-field',
+  '--color-border-disabled',
   '--color-disabled-bg',
   '--color-text-primary',
   '--color-text-muted',
@@ -134,10 +165,15 @@ export const COLOR_CONTRACT_KEYS = [
 export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--font-brand',
   '--font-mono',
-  // Standalone weight primitive — intentionally NOT step-scoped (a
-  // `--type-{step}-weight` name would be wrong here). Used for wordmarks and
-  // stat-figures that map to no named type-scale step.
+  // Standalone weight primitives — intentionally NOT step-scoped (a
+  // `--type-{step}-weight` name would be wrong here). `-heavy` is used for
+  // wordmarks and stat-figures that map to no named type-scale step; `-bold`
+  // and `-semibold` are generic control/label weights for elements (e.g.
+  // buttons) whose weight belongs to no single type step, so they must not
+  // borrow another step's weight token.
   '--type-weight-heavy',
+  '--type-weight-bold',
+  '--type-weight-semibold',
   '--type-display-size',
   '--type-display-weight',
   '--type-display-line-height',
@@ -205,6 +241,7 @@ export const SPACING_CONTRACT_KEYS = [
   '--radius-2xl',
   '--radius-gate-card',
   '--radius-full',
+  '--control-height-sm',
   '--control-height-md',
   '--control-height-lg',
   '--tap-target-min',
