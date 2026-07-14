@@ -2,10 +2,11 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 119 contract keys (see `../contract`
- * for the reconciliation note on why 119 — the source palette's 93, the
- * accessibility-driven `--color-premium-accent-ink`, and the 25 gaps closed
- * by the token-scale-coverage addendum) has a value here. Every value is
+ * shipping today. Every one of the 120 contract keys (see `../contract`
+ * for the reconciliation note on why 120 — the source palette's 93, the
+ * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
+ * by the token-scale-coverage addendum, and the standalone caption-size
+ * addendum) has a value here. Every value is
  * sourced 1:1 from the design specification's brand token-value tables or
  * promoted 1:1 from the component source it replaces, except four adjusted
  * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
@@ -167,6 +168,9 @@ export const defaultTokens: TokenSheet = {
   // MegaMenu.tsx, MobileMenu.tsx, LanguageSelector.tsx, CountrySelector.tsx,
   // Footer.tsx) uses a `/1` line-height.
   '--type-ui-line-height': '1',
+  // Caption/label text size — a systemic 13px value; see the extend-vs-snap
+  // rule in contract.ts.
+  '--type-caption-size': '13px',
   '--type-label-size': '12px',
   '--type-label-weight': '600',
   // Promoted from component source: Badge.tsx and ProductOfMonth.tsx's

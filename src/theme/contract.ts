@@ -64,6 +64,14 @@
  * `--color-on-brand-strong` was considered and intentionally dropped — no
  * concrete definition exists for it anywhere in the source material, and an
  * undefined token is itself a smell.
+ *
+ * Caption-size addendum (total now 120, typography 36): a recurring 13px
+ * label/meta font-size used across the component tree had no matching
+ * token, leaving a child brand unable to override it. `--type-caption-size`
+ * closes that gap per the extend-vs-snap rule below (a scale-step gap
+ * between the 14px UI size and the 12px label size). Standalone — no
+ * accompanying weight or line-height token, matching the precedent set by
+ * `--type-weight-heavy` above.
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -151,6 +159,8 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--type-ui-size',
   '--type-ui-weight',
   '--type-ui-line-height',
+  // Caption/label text size — a systemic 13px value; see the extend-vs-snap rule below.
+  '--type-caption-size',
   '--type-label-size',
   '--type-label-weight',
   '--type-label-line-height',
