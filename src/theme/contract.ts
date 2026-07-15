@@ -97,6 +97,25 @@
  * were added — `--type-weight-bold` (700) and `--type-weight-semibold` (600) —
  * mirroring the `--type-weight-heavy` precedent for weights that map to no
  * named type-scale step. 1:1 promotion, no rendered-value change.
+ *
+ * Header/nav literal-closure addendum (total now 139, color 61, typography 39,
+ * spacing/radius/sizing 39): a header/nav styling pass adopted a strict
+ * no-literal-anywhere policy, promoting the last raw values in the header,
+ * mega-menu, drawer, cart and button exemplar into the contract so a child
+ * brand can override every one. All 1:1 promotions (no rendered-value change)
+ * except the two header min-heights, promoted at their EXACT source values
+ * (previously carried as ~4–6px approximations, now zero-drift). Adds:
+ * `--color-scrim`, the modal/drawer backdrop ink (the compact-drawer variant;
+ * named so a stronger-alpha sibling can join later without a rename); a
+ * mega-menu column-width family `--mega-rail-w`/`--mega-col-w`/`--mega-promo-w`
+ * (left rail / subtype column / promo column); `--menu-drawer-w`, the mobile
+ * drawer width; `--media-thumb-h`, a compact media-thumbnail height (sibling of
+ * `--media-placeholder-h`, scaled for an inline tile rather than a full slot);
+ * `--header-logo-h` and `--header-nav-h`, the header logo-row and nav-row
+ * min-heights; `--icon-size-md`, a reusable icon-glyph size primitive (a text
+ * size token is semantically wrong for an icon); and `--type-underline-offset`,
+ * the link underline offset (previously a structural-constant carve-out in the
+ * button exemplar, now a token under the no-literal policy).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -160,6 +179,10 @@ export const COLOR_CONTRACT_KEYS = [
   '--pattern-photo-placeholder-a',
   '--pattern-photo-placeholder-b',
   '--color-media-placeholder-label',
+  // Modal/drawer backdrop ink (compact-drawer variant). Named without an
+  // alpha/emphasis suffix so a stronger sibling (e.g. a full-screen overlay)
+  // can be added later without renaming this one.
+  '--color-scrim',
 ] as const;
 
 export const TYPOGRAPHY_CONTRACT_KEYS = [
@@ -208,6 +231,9 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--type-meta-size',
   '--type-meta-weight',
   '--type-meta-line-height',
+  // Link/underline offset — the small legibility gap between text and its
+  // underline. Maps to no type step; a standalone typographic primitive.
+  '--type-underline-offset',
 ] as const;
 
 /**
@@ -246,6 +272,21 @@ export const SPACING_CONTRACT_KEYS = [
   '--control-height-lg',
   '--tap-target-min',
   '--media-placeholder-h',
+  // Compact media-thumbnail height — sibling of --media-placeholder-h, scaled
+  // for an inline promo tile rather than a full-width gallery slot.
+  '--media-thumb-h',
+  // Reusable icon-glyph size primitive (medium). Icons recur across
+  // components; a text-size token is semantically wrong for an icon.
+  '--icon-size-md',
+  // Mega-menu column widths: left rail / subtype column / promo column.
+  '--mega-rail-w',
+  '--mega-col-w',
+  '--mega-promo-w',
+  // Mobile navigation drawer width.
+  '--menu-drawer-w',
+  // Header row min-heights: logo row / nav row.
+  '--header-logo-h',
+  '--header-nav-h',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',

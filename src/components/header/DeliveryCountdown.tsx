@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { deliveryCountdownLabel, DELIVERY_DEADLINE_COPY } from '@/config/delivery';
+import styles from './DeliveryCountdown.module.css';
 
 export interface DeliveryCountdownProps {
   /** Optional style hook for the containing element. */
@@ -27,17 +28,7 @@ export function DeliveryCountdown({ style = {} }: DeliveryCountdownProps) {
   }, []);
 
   return (
-    <span
-      aria-live="polite"
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        font: '600 13px/1 var(--font-brand)',
-        color: 'var(--color-urgency)',
-        ...style,
-      }}
-    >
+    <span aria-live="polite" className={styles.countdown} style={style}>
       <span aria-hidden="true">⚡</span>
       {label ?? DELIVERY_DEADLINE_COPY}
     </span>

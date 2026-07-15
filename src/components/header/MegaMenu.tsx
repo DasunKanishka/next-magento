@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
+import styles from './MegaMenu.module.css';
 import type { NavCategory } from './types';
 
 export interface MegaMenuProps {
@@ -44,33 +45,17 @@ export function MegaMenu({
     <div
       role="region"
       aria-label={`Categoriemenu: ${active.name}`}
-      style={{
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        right: 0,
-        zIndex: 60,
-        background: 'var(--color-surface)',
-        border: 'var(--border-width-default) solid var(--color-border-card)',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-overlay)',
-        overflow: 'hidden',
-      }}
+      className={styles.panel}
     >
-      <div style={{ display: 'flex', gap: 0 }}>
+      <div className={styles.cols}>
         {/* Left rail: every top-level category; hover/focus switches the panel. */}
-        <ul
-          style={{
-            listStyle: 'none',
-            margin: 0,
-            padding: 12,
-            minWidth: 220,
-            borderRight: 'var(--border-width-default) solid var(--color-border-card)',
-            background: 'var(--color-surface-inset-a)',
-          }}
-        >
+        <ul className={styles.rail}>
           {categories.map((c) => {
             const isActive = c.id === active.id;
+            const bridge = {
+              '--local-fg': isActive ? 'var(--color-trust)' : 'var(--color-text-primary)',
+              '--local-bg': isActive ? 'var(--color-trust-tint)' : 'transparent',
+            } as React.CSSProperties;
             return (
               <li key={c.id}>
                 <Link
@@ -78,18 +63,8 @@ export function MegaMenu({
                   onMouseEnter={() => onActivate(c.id)}
                   onFocus={() => onActivate(c.id)}
                   onClick={onClose}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    minHeight: 'var(--tap-target-min)',
-                    padding: '0 14px',
-                    borderRadius: 'var(--radius-sm)',
-                    textDecoration: 'none',
-                    font: '600 14px/1 var(--font-brand)',
-                    color: isActive ? 'var(--color-trust)' : 'var(--color-text-primary)',
-                    background: isActive ? 'var(--color-trust-tint)' : 'transparent',
-                  }}
+                  className={styles.railLink}
+                  style={bridge}
                 >
                   {c.name}
                   <span aria-hidden="true">›</span>
@@ -100,42 +75,16 @@ export function MegaMenu({
         </ul>
 
         {/* Middle: the active category's subtypes. */}
-        <div style={{ flex: 1, padding: 20, minWidth: 240 }}>
-          <div
-            style={{
-              font: '600 11px/1 var(--font-brand)',
-              letterSpacing: 'var(--type-eyebrow-tracking)',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-subtle)',
-              marginBottom: 12,
-            }}
-          >
-            {active.name}
-          </div>
+        <div className={styles.middle}>
+          <div className={styles.middleEyebrow}>{active.name}</div>
           {active.children.length > 0 ? (
-            <ul
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                gap: '2px 20px',
-              }}
-            >
+            <ul className={styles.subtypeGrid}>
               {active.children.map((child) => (
                 <li key={child.id}>
                   <Link
                     href={`/${child.urlPath}`}
                     onClick={onClose}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      minHeight: 'var(--tap-target-min)',
-                      font: '500 14px/1.3 var(--font-brand)',
-                      color: 'var(--color-text-muted)',
-                      textDecoration: 'none',
-                    }}
+                    className={styles.subtypeLink}
                   >
                     {child.name}
                   </Link>
@@ -143,49 +92,17 @@ export function MegaMenu({
               ))}
             </ul>
           ) : (
-            <p
-              style={{
-                margin: 0,
-                font: '500 14px/1.4 var(--font-brand)',
-                color: 'var(--color-text-muted)',
-              }}
-            >
-              Ontdek de volledige collectie.
-            </p>
+            <p className={styles.emptyState}>Ontdek de volledige collectie.</p>
           )}
         </div>
 
         {/* Right: live "shop all" promo tile for the active category. */}
-        <div
-          style={{
-            width: 260,
-            padding: 20,
-            borderLeft: 'var(--border-width-default) solid var(--color-border-card)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-          }}
-        >
-          <div
-            aria-hidden="true"
-            style={{
-              height: 120,
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--pattern-photo-placeholder-b)',
-            }}
-          />
+        <div className={styles.promoCol}>
+          <div aria-hidden="true" className={styles.promoTile} />
           <Link
             href={`/${active.urlPath}`}
             onClick={onClose}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              minHeight: 'var(--tap-target-min)',
-              font: '700 14px/1 var(--font-brand)',
-              color: 'var(--color-trust)',
-              textDecoration: 'none',
-            }}
+            className={styles.promoLink}
           >
             Bekijk alles in {active.name}
             <span aria-hidden="true">→</span>
@@ -197,12 +114,7 @@ export function MegaMenu({
       {promoHtml ? (
         <div
           data-testid="mega-custom-links"
-          style={{
-            background: 'var(--color-brand-ink)',
-            color: '#fff',
-            padding: '14px 20px',
-            font: '500 13px/1.5 var(--font-brand)',
-          }}
+          className={styles.promoBar}
           dangerouslySetInnerHTML={{ __html: promoHtml }}
         />
       ) : null}

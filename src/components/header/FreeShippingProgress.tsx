@@ -8,6 +8,7 @@ import {
   freeShippingRemaining,
 } from '@/config/delivery';
 import { formatEuro } from '@/components/ui';
+import styles from './FreeShippingProgress.module.css';
 
 export interface FreeShippingProgressProps {
   /** Running cart subtotal in EUR. Defaults to 0 (no cart mutation in this version). */
@@ -33,38 +34,23 @@ export function FreeShippingProgress({
     ? 'Je hebt gratis bezorging'
     : `Nog ${formatEuro(remaining)} tot gratis bezorging`;
 
+  const bridge = {
+    '--local-message-fg': reached ? 'var(--color-cta)' : 'var(--color-text-muted)',
+    '--local-fill-width': `${pct}%`,
+  } as React.CSSProperties;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, ...style }}>
-      <div
-        style={{
-          font: '600 11px/1 var(--font-brand)',
-          color: reached ? 'var(--color-cta)' : 'var(--color-text-muted)',
-        }}
-      >
-        {message}
-      </div>
+    <div className={styles.wrap} style={{ ...bridge, ...style }}>
+      <div className={styles.message}>{message}</div>
       <div
         role="progressbar"
         aria-label={`Gratis bezorging vanaf ${formatEuro(FREE_SHIPPING_THRESHOLD_EUR)}`}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
-        style={{
-          height: 6,
-          borderRadius: 'var(--radius-full)',
-          background: 'var(--color-surface-inset-b)',
-          overflow: 'hidden',
-        }}
+        className={styles.track}
       >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: '100%',
-            background: 'var(--color-cta)',
-            borderRadius: 'var(--radius-full)',
-            transition: 'width .25s ease',
-          }}
-        />
+        <div className={styles.fill} />
       </div>
     </div>
   );

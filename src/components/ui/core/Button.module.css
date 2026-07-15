@@ -9,8 +9,8 @@
  * No themable brand value (color, on-scale dimension, font, or shadow) is
  * written as a literal here; the component's value map holds only token
  * references, which arrive through the bridge. Structural constants that a
- * brand would never re-theme (layout keywords, transition timing, opacity, and
- * the link's small underline offset) are written directly.
+ * brand would never re-theme (layout keywords, transition timing, and opacity)
+ * are written directly.
  */
 
 .button {
@@ -81,8 +81,7 @@
   box-shadow: none;
   color: var(--local-fg);
   text-decoration: underline;
-  /* Structural legibility offset, not a themable scale value. */
-  text-underline-offset: 3px;
+  text-underline-offset: var(--type-underline-offset);
 }
 
 .link:hover:not(:disabled) {

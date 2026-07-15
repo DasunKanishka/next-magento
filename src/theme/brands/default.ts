@@ -2,11 +2,13 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 120 contract keys (see `../contract`
- * for the reconciliation note on why 120 — the source palette's 93, the
+ * shipping today. Every one of the 139 contract keys (see `../contract`
+ * for the reconciliation note on why 139 — the source palette's 93, the
  * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
- * by the token-scale-coverage addendum, and the standalone caption-size
- * addendum) has a value here. Every value is
+ * by the token-scale-coverage addendum, the standalone caption-size
+ * addendum, the interactive-surface & disabled-pair and generic-weight
+ * button-promotion addenda, and the 10 header/nav literal-closure
+ * promotions) has a value here. Every value is
  * sourced 1:1 from the design specification's brand token-value tables or
  * promoted 1:1 from the component source it replaces, except four adjusted
  * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
@@ -142,6 +144,10 @@ export const defaultTokens: TokenSheet = {
     'repeating-linear-gradient(40deg,#EDF3F0,#EDF3F0 7px,#DCE8E2 7px,#DCE8E2 14px)',
   // Promoted 1:1 from ProductCard.tsx's PLACEHOLDER_LABEL_COLOR constant.
   '--color-media-placeholder-label': '#B0926A',
+  // Modal/drawer backdrop ink — promoted 1:1 from the mobile drawer's scrim.
+  // Same base ink (4,12,28) as --shadow-overlay's shadow color, at the
+  // drawer-scrim alpha.
+  '--color-scrim': 'rgba(4,12,28,.45)',
 
   // Typography
   '--font-brand': "var(--font-figtree), system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -212,6 +218,8 @@ export const defaultTokens: TokenSheet = {
   // `subLabel` line, ProductCard.tsx's tag-tracked brand line) uses a `/1`
   // line-height.
   '--type-meta-line-height': '1',
+  // Promoted 1:1 from the button exemplar's link underline offset.
+  '--type-underline-offset': '3px',
 
   // Spacing, radius, sizing & elevation
   '--space-1': '4px',
@@ -248,6 +256,24 @@ export const defaultTokens: TokenSheet = {
   // The recurring media-placeholder slot height
   // (product-of-the-month / gallery-style placeholders).
   '--media-placeholder-h': '320px',
+  // Compact media-thumbnail height — promoted 1:1 from the mega-menu promo
+  // tile; a smaller inline sibling of --media-placeholder-h.
+  '--media-thumb-h': '120px',
+  // Icon-glyph size (medium) — promoted 1:1 from the cart control's cart
+  // glyph. A reusable primitive for icon sizing across components.
+  '--icon-size-md': '16px',
+  // Mega-menu column widths — promoted 1:1 from the desktop mega-menu panel:
+  // the left category rail, the subtype column, and the promo column.
+  '--mega-rail-w': '220px',
+  '--mega-col-w': '240px',
+  '--mega-promo-w': '260px',
+  // Mobile navigation drawer width — promoted 1:1 from the drawer panel.
+  '--menu-drawer-w': '262px',
+  // Header row min-heights — promoted at their EXACT source values (the logo
+  // row and the nav row); previously carried as ~4–6px snap approximations,
+  // now zero-drift.
+  '--header-logo-h': '50px',
+  '--header-nav-h': '48px',
   '--border-width-default': '1px',
   '--border-width-emphasis': '1.5px',
   '--border-width-cta': '2px',

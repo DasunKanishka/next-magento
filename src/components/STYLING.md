@@ -37,10 +37,13 @@ A rendered component may reference values from exactly two places:
   bridge.
 - Structural constants that a brand would never re-theme may be written
   directly: layout keywords (`display`, `flex-direction`, `inline-flex`,
-  `center`, `100%`, `auto`, `none`, `transparent`), transition timing,
-  `opacity`, and small typographic offsets that map to no token scale (e.g. an
-  underline offset). These are not design values. This is a narrow list — a
-  color or an on-scale dimension is never a "structural constant".
+  `center`, `100%`, `auto`, `none`, `transparent`), transition timing, and
+  `opacity`. Media-query conditions (e.g. `@media (max-width: 900px)`) are also
+  written directly — CSS forbids `var()` inside a media condition, so a
+  breakpoint is a responsive mechanic, not a themeable value. This is a narrow
+  list — a color, any dimension (spacing, size, width, height), or a
+  typographic value (font-size, weight, offset) is a design value and gets a
+  token; it is never a "structural constant".
 - `line-height` is a design value: use its token whenever one exists (the
   contract carries a `line-height` for every named type step, so a control that
   maps to a type step should reference that token, e.g.
