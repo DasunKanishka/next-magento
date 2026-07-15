@@ -3,6 +3,7 @@
 import React from 'react';
 
 import type { HeroSlide } from '@/lib/home/editorial';
+import styles from './HeroSlider.module.css';
 
 export interface HeroSliderProps {
   slides: HeroSlide[];
@@ -25,73 +26,12 @@ export function HeroSlider({ slides }: HeroSliderProps) {
 
   return (
     <section aria-label="Uitgelichte campagnes" aria-roledescription="carousel">
-      <style>{`
-        .hero-headline { font-size: clamp(30px, 5vw, 48px); }
-      `}</style>
-      <div
-        style={{
-          position: 'relative',
-          borderRadius: 'var(--radius-2xl)',
-          overflow: 'hidden',
-          background: 'var(--color-brand)',
-          color: 'var(--color-text-on-brand)',
-          minHeight: 320,
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 640,
-            padding: '48px clamp(20px, 5vw, 56px)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-          }}
-        >
-          <h2
-            className="hero-headline"
-            style={{
-              margin: 0,
-              fontFamily: 'var(--font-brand)',
-              fontWeight:
-                'var(--type-display-weight)' as React.CSSProperties['fontWeight'],
-              lineHeight: 'var(--type-display-line-height)',
-              color: '#fff',
-            }}
-          >
-            {slide.title}
-          </h2>
-          {slide.body ? (
-            <p
-              style={{
-                margin: 0,
-                maxWidth: 520,
-                font: '400 16px/1.6 var(--font-brand)',
-                color: 'var(--color-text-on-brand)',
-              }}
-            >
-              {slide.body}
-            </p>
-          ) : null}
+      <div className={styles.stage}>
+        <div className={styles.content}>
+          <h2 className={styles.headline}>{slide.title}</h2>
+          {slide.body ? <p className={styles.body}>{slide.body}</p> : null}
           {slide.ctaHref && slide.ctaLabel ? (
-            <a
-              href={slide.ctaHref}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                alignSelf: 'flex-start',
-                minHeight: 'var(--tap-target-min)',
-                padding: '0 22px',
-                marginTop: 8,
-                background: 'var(--color-cta)',
-                color: '#fff',
-                borderRadius: 'var(--radius-full)',
-                font: '700 15px/1 var(--font-brand)',
-                textDecoration: 'none',
-                boxShadow: 'var(--shadow-cta)',
-              }}
-            >
+            <a href={slide.ctaHref} className={styles.cta}>
               {slide.ctaLabel}
             </a>
           ) : null}
@@ -103,7 +43,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
               type="button"
               aria-label="Vorige campagne"
               onClick={() => go(index - 1)}
-              style={arrowStyle('left')}
+              className={`${styles.arrow} ${styles.arrowPrev}`}
             >
               ‹
             </button>
@@ -111,7 +51,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
               type="button"
               aria-label="Volgende campagne"
               onClick={() => go(index + 1)}
-              style={arrowStyle('right')}
+              className={`${styles.arrow} ${styles.arrowNext}`}
             >
               ›
             </button>
@@ -120,66 +60,34 @@ export function HeroSlider({ slides }: HeroSliderProps) {
       </div>
 
       {slides.length > 1 ? (
-        <div
-          role="tablist"
-          aria-label="Kies een campagne"
-          style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14 }}
-        >
-          {slides.map((s, i) => (
-            <button
-              key={s.title || i}
-              type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Campagne ${i + 1}`}
-              onClick={() => setActive(i)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                // 44×44 tap target; the visible pill inside stays compact.
-                width: 'var(--tap-target-min)',
-                height: 'var(--tap-target-min)',
-                minWidth: 'var(--tap-target-min)',
-                padding: 0,
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  display: 'block',
-                  width: i === index ? 26 : 12,
-                  height: 12,
-                  borderRadius: 'var(--radius-full)',
-                  background:
-                    i === index ? 'var(--color-cta)' : 'var(--color-border-field)',
-                  transition: 'width .2s ease',
-                }}
-              />
-            </button>
-          ))}
+        <div role="tablist" aria-label="Kies een campagne" className={styles.tablist}>
+          {slides.map((s, i) => {
+            const isActive = i === index;
+            const bridge = {
+              // 26px active width snapped to --space-6 (24px, -2px); 12px
+              // inactive width matches --space-3 exactly.
+              '--local-dot-width': isActive ? 'var(--space-6)' : 'var(--space-3)',
+              '--local-dot-bg': isActive
+                ? 'var(--color-cta)'
+                : 'var(--color-border-field)',
+            } as React.CSSProperties;
+            return (
+              <button
+                key={s.title || i}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Campagne ${i + 1}`}
+                onClick={() => setActive(i)}
+                className={styles.dot}
+                style={bridge}
+              >
+                <span aria-hidden="true" className={styles.dotPip} />
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </section>
   );
-}
-
-function arrowStyle(side: 'left' | 'right'): React.CSSProperties {
-  return {
-    position: 'absolute',
-    top: '50%',
-    [side]: 12,
-    transform: 'translateY(-50%)',
-    minWidth: 'var(--tap-target-min)',
-    minHeight: 'var(--tap-target-min)',
-    borderRadius: 'var(--radius-full)',
-    border: 'none',
-    background: 'var(--color-surface-on-brand)',
-    color: '#fff',
-    font: '700 20px/1 var(--font-brand)',
-    cursor: 'pointer',
-  };
 }

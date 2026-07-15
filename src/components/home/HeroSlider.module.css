@@ -1,0 +1,137 @@
+/*
+ * HeroSlider styles. See src/components/STYLING.md for the convention. The
+ * only per-render values are the dot indicator's active/inactive width and
+ * fill color, bridged through --local-dot-width/--local-dot-bg.
+ */
+
+.stage {
+  position: relative;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  background: var(--color-brand);
+  color: var(--color-text-on-brand);
+  /* The recurring 320px media-placeholder slot height, shared with
+     ProductOfMonth and ProductRail. */
+  min-height: var(--media-placeholder-h);
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  /* Hero copy column max-width — see contract.ts's home literal-closure
+     addendum. */
+  max-width: var(--hero-content-w);
+  /* Fixed vertical padding (see --hero-pad-y's contract.ts comment for why it
+     sits above --space-section) with a fluid horizontal clamp whose max is the
+     paired --hero-pad-x; the fluid middle term (vw) is an allowed viewport
+     mechanic. */
+  padding: var(--hero-pad-y) clamp(var(--space-5), 5vw, var(--hero-pad-x));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-brand);
+  /* Fluid clamp: min snaps exactly to --type-h2-size (30px); max is
+     --type-hero-size (48px), a scale-step gap token — see contract.ts. */
+  font-size: clamp(var(--type-h2-size), 5vw, var(--type-hero-size));
+  font-weight: var(--type-display-weight);
+  line-height: var(--type-display-line-height);
+  color: var(--color-text-on-fill);
+}
+
+.body {
+  margin: 0;
+  /* Hero body-copy max-width — see contract.ts's home literal-closure
+     addendum. */
+  max-width: var(--hero-body-w);
+  font-family: var(--font-brand);
+  font-weight: var(--type-body-weight);
+  /* 16px snapped to --type-body-size (15px, +1px). */
+  font-size: var(--type-body-size);
+  /* No type-step line-height matches 1.6 (body is 1.65); kept as a raw
+     structural ratio per STYLING.md (no token applies). */
+  line-height: 1.6;
+  color: var(--color-text-on-brand);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: var(--tap-target-min);
+  /* 22px padding snapped to --space-6 (24px, +2px) — matches the Button
+     exemplar's identical md padX snap precedent. */
+  padding: 0 var(--space-6);
+  margin-top: var(--space-2);
+  background: var(--color-cta);
+  color: var(--color-text-on-fill);
+  border-radius: var(--radius-full);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-bold);
+  /* 15px matches --type-body-size exactly. */
+  font-size: var(--type-body-size);
+  line-height: var(--type-ui-line-height);
+  text-decoration: none;
+  box-shadow: var(--shadow-cta);
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--color-surface-on-brand);
+  color: var(--color-text-on-fill);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-bold);
+  /* 20px snapped to --type-h3-size (22px, +2px). */
+  font-size: var(--type-h3-size);
+  line-height: var(--type-ui-line-height);
+  cursor: pointer;
+}
+
+.arrowPrev {
+  left: var(--space-3);
+}
+
+.arrowNext {
+  right: var(--space-3);
+}
+
+.tablist {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  /* 14px snapped to --space-4 (16px, +2px). */
+  margin-top: var(--space-4);
+}
+
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 tap target; the visible pip inside stays compact. */
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dotPip {
+  display: block;
+  width: var(--local-dot-width);
+  /* 12px matches --space-3 exactly. */
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--local-dot-bg);
+  transition: width 0.2s ease;
+}

@@ -4,6 +4,7 @@ import type { MerchandisingSlot } from '@/lib/data-source';
 import { getSlotProducts } from '@/lib/home/home-data';
 import { AddToCartCard } from './AddToCartCard';
 import { Carousel } from './Carousel';
+import styles from './ProductRail.module.css';
 
 type RailVariant = 'grid' | 'carousel';
 
@@ -14,25 +15,12 @@ export interface ProductRailProps {
   variant: RailVariant;
 }
 
-const GRID_STYLE: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-  gap: 16,
-};
-
 /** Placeholder cells shown while the fresh price/stock read is in flight. */
 function RailSkeleton({ count }: { count: number }) {
   return (
-    <div style={GRID_STYLE} aria-hidden="true">
+    <div className={styles.grid} aria-hidden="true">
       {Array.from({ length: count }, (_, i) => (
-        <div
-          key={i}
-          style={{
-            height: 320,
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--color-surface-inset-b)',
-          }}
-        />
+        <div key={i} className={styles.skeletonCell} />
       ))}
     </div>
   );
@@ -58,12 +46,7 @@ async function RailItems({
 
   if (products.length === 0) {
     return (
-      <p
-        style={{
-          font: '400 14px/1.5 var(--font-brand)',
-          color: 'var(--color-text-muted)',
-        }}
-      >
+      <p className={styles.emptyNote}>
         Er zijn op dit moment geen producten in deze selectie.
       </p>
     );
@@ -76,7 +59,7 @@ async function RailItems({
   if (variant === 'carousel') {
     return <Carousel label={heading}>{cards}</Carousel>;
   }
-  return <div style={GRID_STYLE}>{cards}</div>;
+  return <div className={styles.grid}>{cards}</div>;
 }
 
 /**
@@ -87,15 +70,7 @@ async function RailItems({
 export function ProductRail({ slot, limit, heading, variant }: ProductRailProps) {
   return (
     <section aria-label={heading}>
-      <h2
-        style={{
-          margin: '0 0 16px',
-          font: '700 22px/1.1 var(--font-brand)',
-          color: 'var(--color-brand-ink)',
-        }}
-      >
-        {heading}
-      </h2>
+      <h2 className={styles.heading}>{heading}</h2>
       <Suspense fallback={<RailSkeleton count={Math.min(limit, 4)} />}>
         <RailItems slot={slot} limit={limit} variant={variant} heading={heading} />
       </Suspense>

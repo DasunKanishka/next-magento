@@ -40,10 +40,16 @@ A rendered component may reference values from exactly two places:
   `center`, `100%`, `auto`, `none`, `transparent`), transition timing, and
   `opacity`. Media-query conditions (e.g. `@media (max-width: 900px)`) are also
   written directly — CSS forbids `var()` inside a media condition, so a
-  breakpoint is a responsive mechanic, not a themeable value. This is a narrow
-  list — a color, any dimension (spacing, size, width, height), or a
-  typographic value (font-size, weight, offset) is a design value and gets a
-  token; it is never a "structural constant".
+  breakpoint is a responsive mechanic, not a themeable value. Two further
+  mechanics belong to this same carve-out: `z-index` integers (a stacking-order
+  index — a child brand never needs to override which layer a panel paints on,
+  so it is a mechanic, not a design value) and the viewport-relative middle term
+  of a `clamp()` (`vw`/`vh`, e.g. `clamp(var(--space-6), 4vw, var(--space-section))`)
+  — the viewport unit is itself the fluid-scaling mechanic CSS provides; only
+  the clamp's min/max _endpoints_ are design values and so those still must be
+  `var(--token)`. This is a narrow list — a color, any dimension (spacing,
+  size, width, height), or a typographic value (font-size, weight, offset) is
+  a design value and gets a token; it is never a "structural constant".
 - `line-height` is a design value: use its token whenever one exists (the
   contract carries a `line-height` for every named type step, so a control that
   maps to a type step should reference that token, e.g.
@@ -114,3 +120,10 @@ lockstep) so the value is overridable, then reference it.
    properties is complete.
 6. Add a token-swap test proving a consumed token is overridable
    (`renderWithBrandTokens` + `resolvedToken`).
+7. Add a className-wiring assertion: jsdom does not apply module CSS to
+   computed styles, so a dropped `className` currently passes every test above
+   silently. Import the module's `styles` object in the test and assert the
+   rendered element carries it, e.g.
+   `expect(el.className).toContain(styles.wrap)` — never a hardcoded string,
+   since the module's exported key is the only stable handle once class names
+   are hashed.

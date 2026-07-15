@@ -116,6 +116,35 @@
  * size token is semantically wrong for an icon); and `--type-underline-offset`,
  * the link underline offset (previously a structural-constant carve-out in the
  * button exemplar, now a token under the no-literal policy).
+ *
+ * Home literal-closure addendum (total now 149, color 61, typography 41,
+ * spacing/radius/sizing 47): a home-surface styling pass adopted the same
+ * strict no-literal-anywhere policy for the 9 home components. Two off-scale
+ * type-scale gaps surfaced (per the extend-vs-snap rule above, each sits more
+ * than 2px from its nearest neighbor step, so each earns a token rather than
+ * a snap): `--type-hero-size` (48px), the hero campaign headline's fluid
+ * `clamp()` max — fills the gap between `--type-h1-size` (38px) and
+ * `--type-display-size` (52px); and `--type-stat-size` (34px), a large
+ * aggregate stat/score figure (the business-reviews score number) — fills the
+ * gap between `--type-h2-size` (30px) and `--type-h1-size` (38px), and pairs
+ * with the existing `--type-weight-heavy` (already documented above as the
+ * stat-figure weight). Two hero panel copy widths — `--hero-content-w` (640px)
+ * and `--hero-body-w` (520px), the copy-column and body-copy max-widths — and
+ * the hero panel's fixed padding pair: `--hero-pad-y` (48px), 4px above
+ * `--space-section` (44px, the top of the spacing scale), a deliberately
+ * deeper hero-band vertical padding, and `--hero-pad-x` (56px), its horizontal
+ * counterpart (the fluid `clamp()` max of the hero content padding). A
+ * dedicated responsive-grid floor family, `--grid-min-{xs,sm,md,lg}`
+ * (180/220/240/260px), replaces what an earlier draft had reused by exact
+ * numeric coincidence from the mega-menu width family and a control height —
+ * a home grid floor and a mega-menu column width are unrelated concepts that
+ * merely happen to share a pixel value today, so each home surface now points
+ * at its own semantically-named token: `--grid-min-xs` the compact
+ * proof-point grid (SeoContent), `--grid-min-sm` the standard product/tile
+ * grids (ProductRail, BannerTiles), `--grid-min-md` the reviews grid
+ * (BusinessReviews), `--grid-min-lg` the feature-split grid (ProductOfMonth).
+ * None of the 10 changes a rendered value (each promotes the exact literal
+ * already shipping).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -234,6 +263,13 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   // Link/underline offset — the small legibility gap between text and its
   // underline. Maps to no type step; a standalone typographic primitive.
   '--type-underline-offset',
+  // Hero campaign headline's fluid clamp max — fills the scale-step gap
+  // between --type-h1-size (38px) and --type-display-size (52px).
+  '--type-hero-size',
+  // Large aggregate stat/score figure (e.g. an aggregate review score) —
+  // fills the scale-step gap between --type-h2-size (30px) and
+  // --type-h1-size (38px). Pairs with --type-weight-heavy above.
+  '--type-stat-size',
 ] as const;
 
 /**
@@ -287,6 +323,22 @@ export const SPACING_CONTRACT_KEYS = [
   // Header row min-heights: logo row / nav row.
   '--header-logo-h',
   '--header-nav-h',
+  // Hero panel copy-column / body-copy max-widths.
+  '--hero-content-w',
+  '--hero-body-w',
+  // Hero panel's fixed content padding — vertical (sits above --space-section,
+  // the top of the spacing scale; a deliberately deeper hero-band padding) and
+  // its horizontal counterpart (the fluid clamp max of the content padding).
+  '--hero-pad-y',
+  '--hero-pad-x',
+  // Responsive grid-item minimum-width floors — a dedicated family for the
+  // home content grids (proof-point / product / reviews / feature-split), so a
+  // grid floor never borrows an unrelated mega-menu column width or control
+  // height by pixel coincidence.
+  '--grid-min-xs',
+  '--grid-min-sm',
+  '--grid-min-md',
+  '--grid-min-lg',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',

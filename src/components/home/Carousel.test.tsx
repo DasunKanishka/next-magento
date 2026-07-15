@@ -1,9 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import {
+  expectBridgePropsConsistent,
+  expectModuleCssReferencesRealTokens,
+} from '../ui/test-utils/tokenAssertions';
 import { Carousel } from './Carousel';
+import styles from './Carousel.module.css';
+
+const MODULE_CSS_PATH = join(process.cwd(), 'src/components/home/Carousel.module.css');
 
 describe('Carousel', () => {
   it('exposes a labelled group containing its items', () => {
@@ -34,12 +43,36 @@ describe('Carousel', () => {
     ).not.toBeNull();
   });
 
-  it('emits only real contract tokens', () => {
-    const { container } = render(
+  it('carries its module class on the track', () => {
+    render(
       <Carousel label="Weekdeals">
         <div>Item</div>
       </Carousel>,
     );
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+    expect(screen.getByRole('group', { name: 'Weekdeals' }).className).toContain(
+      styles.track,
+    );
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
+  });
+
+  it('bridge is consistent, including with a caller-overridden item width', () => {
+    const defaultWidth = render(
+      <Carousel label="Weekdeals">
+        <div>Item</div>
+      </Carousel>,
+    );
+    const customWidth = render(
+      <Carousel label="Weekdeals" itemMinWidth={200}>
+        <div>Item</div>
+      </Carousel>,
+    );
+    const elements = [
+      ...defaultWidth.container.querySelectorAll('div'),
+      ...customWidth.container.querySelectorAll('div'),
+    ];
+    expectBridgePropsConsistent(elements, readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

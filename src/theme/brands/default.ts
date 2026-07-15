@@ -2,13 +2,15 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 139 contract keys (see `../contract`
- * for the reconciliation note on why 139 — the source palette's 93, the
+ * shipping today. Every one of the 149 contract keys (see `../contract`
+ * for the reconciliation note on why 149 — the source palette's 93, the
  * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
  * by the token-scale-coverage addendum, the standalone caption-size
  * addendum, the interactive-surface & disabled-pair and generic-weight
- * button-promotion addenda, and the 10 header/nav literal-closure
- * promotions) has a value here. Every value is
+ * button-promotion addenda, the 10 header/nav literal-closure promotions,
+ * and the 10 home literal-closure promotions — 2 type-scale-gap sizes, the
+ * hero copy widths + padding pair, and the dedicated `--grid-min-*` grid-floor
+ * family) has a value here. Every value is
  * sourced 1:1 from the design specification's brand token-value tables or
  * promoted 1:1 from the component source it replaces, except four adjusted
  * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
@@ -220,6 +222,12 @@ export const defaultTokens: TokenSheet = {
   '--type-meta-line-height': '1',
   // Promoted 1:1 from the button exemplar's link underline offset.
   '--type-underline-offset': '3px',
+  // Promoted 1:1 from HeroSlider's headline clamp max (see contract.ts's home
+  // literal-closure addendum for the scale-gap rationale).
+  '--type-hero-size': '48px',
+  // Promoted 1:1 from BusinessReviews' aggregate score figure (see
+  // contract.ts's home literal-closure addendum for the scale-gap rationale).
+  '--type-stat-size': '34px',
 
   // Spacing, radius, sizing & elevation
   '--space-1': '4px',
@@ -274,6 +282,19 @@ export const defaultTokens: TokenSheet = {
   // now zero-drift.
   '--header-logo-h': '50px',
   '--header-nav-h': '48px',
+  // Promoted 1:1 from HeroSlider's copy-column / body-copy max-widths.
+  '--hero-content-w': '640px',
+  '--hero-body-w': '520px',
+  // Promoted 1:1 from HeroSlider's fixed content padding (vertical + the
+  // horizontal clamp max).
+  '--hero-pad-y': '48px',
+  '--hero-pad-x': '56px',
+  // Promoted 1:1 from the home content-grid minmax floors — each surface's
+  // own token rather than a mega-menu width borrowed by pixel coincidence.
+  '--grid-min-xs': '180px',
+  '--grid-min-sm': '220px',
+  '--grid-min-md': '240px',
+  '--grid-min-lg': '260px',
   '--border-width-default': '1px',
   '--border-width-emphasis': '1.5px',
   '--border-width-cta': '2px',

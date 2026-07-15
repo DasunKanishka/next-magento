@@ -4,6 +4,7 @@ import React from 'react';
 
 import { ProductCard } from '@/components/ui';
 import type { CanonicalProduct } from '@/lib/data-source';
+import styles from './AddToCartCard.module.css';
 
 export interface AddToCartCardProps {
   product: CanonicalProduct;
@@ -33,11 +34,15 @@ export function AddToCartCard({ product }: AddToCartCardProps) {
     setAcknowledged(true);
   }, []);
 
+  const bridge = {
+    '--local-status-fg': inStock ? 'var(--color-cta)' : 'var(--color-urgency)',
+  } as React.CSSProperties;
+
   return (
     <div
       data-testid="product-card"
       data-stock={product.stockStatus}
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      className={styles.wrap}
     >
       <ProductCard
         brand={product.brand || undefined}
@@ -49,15 +54,7 @@ export function AddToCartCard({ product }: AddToCartCardProps) {
         onAdd={handleAdd}
         style={{ height: '100%' }}
       />
-      <div
-        aria-live="polite"
-        style={{
-          minHeight: 18,
-          marginTop: 6,
-          font: '500 12px/1.4 var(--font-brand)',
-          color: inStock ? 'var(--color-cta)' : 'var(--color-urgency)',
-        }}
-      >
+      <div aria-live="polite" className={styles.status} style={bridge}>
         {!inStock ? 'Tijdelijk uitverkocht' : acknowledged ? 'Toegevoegd ✓' : ''}
       </div>
     </div>

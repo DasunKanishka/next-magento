@@ -1,11 +1,24 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectBridgePropsConsistent,
+  expectModuleCssReferencesRealTokens,
+} from '../ui/test-utils/tokenAssertions';
 import { AddToCartCard } from './AddToCartCard';
+import styles from './AddToCartCard.module.css';
 import type { CanonicalProduct } from '@/lib/data-source';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/home/AddToCartCard.module.css',
+);
 
 function product(overrides: Partial<CanonicalProduct> = {}): CanonicalProduct {
   return {
@@ -50,5 +63,26 @@ describe('AddToCartCard', () => {
   it('emits only real contract tokens', () => {
     const { container } = render(<AddToCartCard product={product()} />);
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('carries its module class on the wrapper', () => {
+    render(<AddToCartCard product={product()} />);
+    expect(screen.getByTestId('product-card').className).toContain(styles.wrap);
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
+  });
+
+  it('bridge is consistent across the in-stock/out-of-stock surface', () => {
+    const inStock = render(<AddToCartCard product={product()} />);
+    const outOfStock = render(
+      <AddToCartCard product={product({ stockStatus: 'OUT_OF_STOCK' })} />,
+    );
+    const elements = [
+      ...inStock.container.querySelectorAll('div'),
+      ...outOfStock.container.querySelectorAll('div'),
+    ];
+    expectBridgePropsConsistent(elements, readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });
