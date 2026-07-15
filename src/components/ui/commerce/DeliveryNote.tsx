@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './DeliveryNote.module.css';
+
 export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   /** Countdown to the same-day order deadline, e.g. "5u 42m". Omit/null to hide. */
@@ -25,30 +27,14 @@ export function DeliveryNote({
   ...rest
 }: DeliveryNoteProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 11,
-        padding: '13px 15px',
-        background: 'var(--color-info)',
-        border: '1px solid var(--color-info-border)',
-        borderRadius: 10,
-        ...style,
-      }}
-      {...rest}
-    >
+    <div className={styles.wrap} style={style} {...rest}>
       <svg
-        width="22"
-        height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="var(--color-brand)"
-        strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
         aria-hidden="true"
-        style={{ flex: '0 0 auto', marginTop: 1 }}
+        className={styles.icon}
       >
         <rect x="1" y="3" width="15" height="13" />
         <path d="M16 8h4l3 3v5h-7V8z" />
@@ -56,18 +42,8 @@ export function DeliveryNote({
         <circle cx="18.5" cy="18.5" r="2.5" />
       </svg>
       <div>
-        <div
-          style={{ font: '600 14px/1.3 var(--font-brand)', color: 'var(--color-brand)' }}
-        >
-          {title}
-        </div>
-        <div
-          style={{
-            font: '500 12px/1.4 var(--font-brand)',
-            color: 'var(--color-info-ink)',
-            marginTop: 3,
-          }}
-        >
+        <div className={styles.title}>{title}</div>
+        <div className={styles.body}>
           {countdown ? (
             <>
               Nog <strong>{countdown}</strong> om vandaag te bestellen ·{' '}

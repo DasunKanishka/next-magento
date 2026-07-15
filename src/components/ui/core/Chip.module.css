@@ -1,0 +1,75 @@
+/*
+ * Chip styles. See src/components/STYLING.md for the convention. The four
+ * variants share layout/typography-family primitives on the base class but
+ * differ in structural shape (padding/radius/border presence), so those live
+ * on `data-variant` selectors — mirroring Button's `data-variant` pattern —
+ * while every variant's colors are prop-driven and arrive through the
+ * `--local-*` bridge.
+ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  /* 7px gap (identical across every variant) snapped to --space-2 (8px, +1px). */
+  gap: var(--space-2);
+  font-family: var(--font-brand);
+  color: var(--local-fg);
+}
+
+/* spec: outline attribute pill. */
+.chip[data-variant='spec'] {
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  border: var(--border-width-default) solid var(--local-border);
+  background: var(--local-bg);
+  /* 7px vertical padding snapped to --space-2 (8px, +1px); 13px horizontal
+     snapped to --space-3 (12px, -1px). */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+/* stock: dot status — no fill/border/padding of its own. */
+.chip[data-variant='stock'] {
+  /* 14px matches --type-ui-size exactly. */
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+}
+
+/* urgency: trust-tinted pill. */
+.chip[data-variant='urgency'] {
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  background: var(--local-bg);
+  /* 6px vertical padding snapped to --space-2 (8px, +2px); 11px horizontal
+     snapped to --space-3 (12px, +1px). */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+/* award: trust ribbon. */
+.chip[data-variant='award'] {
+  /* 12px matches --type-label-size exactly. */
+  font-size: var(--type-label-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-label-line-height);
+  background: var(--local-bg);
+  border: var(--border-width-default) solid var(--local-border);
+  /* 7px vertical padding snapped to --space-2 (8px, +1px); 12px horizontal
+     matches --space-3 exactly. */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+/* Leading status dot (stock/urgency). */
+.dot {
+  /* 9px snapped to --space-2 (8px, -1px). */
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: 50%;
+  background: var(--local-dot-bg);
+}

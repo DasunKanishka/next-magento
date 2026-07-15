@@ -1,0 +1,35 @@
+/*
+ * IconButton styles. See src/components/STYLING.md for the convention.
+ * Every declaration is a var(--token) or a var(--local-*) bridge property;
+ * the only structural literal is the circle shape's 50% radius, which is the
+ * geometric relationship inherent to "circle" (always half of the button's
+ * own size) rather than a themable brand value.
+ */
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 0;
+  cursor: pointer;
+  user-select: none;
+
+  /* Prop-driven values, supplied inline through the bridge. */
+  width: var(--local-size);
+  height: var(--local-size);
+  min-width: var(--local-size);
+  min-height: var(--local-size);
+  font-size: var(--local-font-size);
+  background: var(--local-bg);
+  color: var(--local-fg);
+  border: var(--local-border);
+}
+
+.iconButton[data-shape='circle'] {
+  border-radius: 50%;
+}
+
+.iconButton[data-shape='rounded'] {
+  border-radius: var(--radius-md);
+}

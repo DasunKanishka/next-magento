@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './Chip.module.css';
+
 export type ChipVariant = 'spec' | 'stock' | 'urgency' | 'award';
 
 export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -9,56 +11,35 @@ export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
   dot?: boolean;
 }
 
-const BASE_FONT = '500 13px/1 var(--font-brand)';
-
 /**
- * Role-mapping object: assigns each chip variant to its contract tokens.
- * `spec`'s `border: '1px solid #E5DECF'` is preserved as a literal — it is
- * the delivered design's exact value for this outline pill and does not
- * correspond 1:1 to any single contract color token (closest neighbors,
- * `--color-border-field` #D8D3CA and `--color-border-card` #EFE9DE, are
- * both visibly different shades); flagged in the handoff rather than
- * force-mapped to an inexact token.
+ * Role-mapping object: assigns each chip variant to its contract color
+ * tokens, fed through the `--local-*` bridge (mirrors Button's
+ * `VARIANT_COLORS`). `spec`'s border now resolves to
+ * `--color-border-chip-spec` — a dedicated token added for this pill, since
+ * neither `--color-border-field` (#D8D3CA) nor `--color-border-card`
+ * (#EFE9DE) sits close enough to force-map onto (retiring the former
+ * literal-exception comment).
  */
-const VARIANTS: Record<ChipVariant, React.CSSProperties> = {
+const VARIANTS: Record<ChipVariant, { fg: string; bg: string; border: string }> = {
   spec: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 7,
-    font: BASE_FONT,
-    border: '1px solid #E5DECF',
-    background: '#fff',
-    color: 'var(--color-text-primary)',
-    padding: '7px 13px',
-    borderRadius: 'var(--radius-full)',
+    fg: 'var(--color-text-primary)',
+    bg: 'var(--color-surface)',
+    border: 'var(--color-border-chip-spec)',
   },
   stock: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 7,
-    font: '600 14px/1 var(--font-brand)',
-    color: 'var(--color-brand)',
+    fg: 'var(--color-brand)',
+    bg: 'none',
+    border: 'none',
   },
   urgency: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 7,
-    font: '600 13px/1 var(--font-brand)',
-    color: 'var(--color-trust)',
-    background: 'var(--color-trust-chip)',
-    padding: '6px 11px',
-    borderRadius: 'var(--radius-sm)',
+    fg: 'var(--color-trust)',
+    bg: 'var(--color-trust-chip)',
+    border: 'none',
   },
   award: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 7,
-    font: '500 12px/1 var(--font-brand)',
-    color: 'var(--color-trust-ink)',
-    background: 'var(--color-trust-chip)',
-    border: '1px solid var(--color-trust-chip-border)',
-    padding: '7px 12px',
-    borderRadius: 'var(--radius-full)',
+    fg: 'var(--color-trust-ink)',
+    bg: 'var(--color-trust-chip)',
+    border: 'var(--color-trust-chip-border)',
   },
 };
 
@@ -70,18 +51,22 @@ export function Chip({
   style = {},
   ...rest
 }: ChipProps) {
+  const v = VARIANTS[variant] ?? VARIANTS.spec;
+  const bridge = {
+    '--local-fg': v.fg,
+    '--local-bg': v.bg,
+    '--local-border': v.border,
+    '--local-dot-bg': variant === 'stock' ? 'var(--color-cta)' : 'currentColor',
+  } as React.CSSProperties;
+
   return (
-    <span style={{ ...(VARIANTS[variant] ?? VARIANTS.spec), ...style }} {...rest}>
-      {dot ? (
-        <span
-          style={{
-            width: 9,
-            height: 9,
-            borderRadius: '50%',
-            background: variant === 'stock' ? 'var(--color-cta)' : 'currentColor',
-          }}
-        />
-      ) : null}
+    <span
+      className={styles.chip}
+      data-variant={variant}
+      style={{ ...bridge, ...style }}
+      {...rest}
+    >
+      {dot ? <span className={styles.dot} /> : null}
       {children}
     </span>
   );

@@ -2,15 +2,17 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 149 contract keys (see `../contract`
- * for the reconciliation note on why 149 — the source palette's 93, the
+ * shipping today. Every one of the 154 contract keys (see `../contract`
+ * for the reconciliation note on why 154 — the source palette's 93, the
  * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
  * by the token-scale-coverage addendum, the standalone caption-size
  * addendum, the interactive-surface & disabled-pair and generic-weight
  * button-promotion addenda, the 10 header/nav literal-closure promotions,
- * and the 10 home literal-closure promotions — 2 type-scale-gap sizes, the
+ * the 10 home literal-closure promotions — 2 type-scale-gap sizes, the
  * hero copy widths + padding pair, and the dedicated `--grid-min-*` grid-floor
- * family) has a value here. Every value is
+ * family — and the 5 ui-core/product literal-closure promotions: the retired
+ * Chip spec-border exception, `--icon-size-lg`, `--media-card-h`,
+ * `--stepper-num-w-lg`, and `--type-star-tracking`) has a value here. Every value is
  * sourced 1:1 from the design specification's brand token-value tables or
  * promoted 1:1 from the component source it replaces, except four adjusted
  * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
@@ -150,6 +152,10 @@ export const defaultTokens: TokenSheet = {
   // Same base ink (4,12,28) as --shadow-overlay's shadow color, at the
   // drawer-scrim alpha.
   '--color-scrim': 'rgba(4,12,28,.45)',
+  // Chip's outline `spec` pill border — promoted 1:1 from Chip.tsx's former
+  // literal exception. Neither --color-border-field (#D8D3CA) nor
+  // --color-border-card (#EFE9DE) sits close enough to force-map onto.
+  '--color-border-chip-spec': '#E5DECF',
 
   // Typography
   '--font-brand': "var(--font-figtree), system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -228,6 +234,8 @@ export const defaultTokens: TokenSheet = {
   // Promoted 1:1 from BusinessReviews' aggregate score figure (see
   // contract.ts's home literal-closure addendum for the scale-gap rationale).
   '--type-stat-size': '34px',
+  // Rating's star-glyph letter-spacing — promoted 1:1 from Rating.tsx.
+  '--type-star-tracking': '1px',
 
   // Spacing, radius, sizing & elevation
   '--space-1': '4px',
@@ -267,9 +275,17 @@ export const defaultTokens: TokenSheet = {
   // Compact media-thumbnail height — promoted 1:1 from the mega-menu promo
   // tile; a smaller inline sibling of --media-placeholder-h.
   '--media-thumb-h': '120px',
+  // ProductCard's photo-slot height — a third sibling in the media-height
+  // family, distinct from the other two (promoted 1:1 from ProductCard.tsx).
+  '--media-card-h': '180px',
   // Icon-glyph size (medium) — promoted 1:1 from the cart control's cart
   // glyph. A reusable primitive for icon sizing across components.
   '--icon-size-md': '16px',
+  // Larger icon-glyph size — sibling of --icon-size-md, for the ~19–22px
+  // glyph cluster (ProductCard's add-to-cart glyph, both QuantityStepper
+  // button glyphs — each individually within the 2px snap tolerance of this
+  // one token).
+  '--icon-size-lg': '20px',
   // Mega-menu column widths — promoted 1:1 from the desktop mega-menu panel:
   // the left category rail, the subtype column, and the promo column.
   '--mega-rail-w': '220px',
@@ -295,6 +311,9 @@ export const defaultTokens: TokenSheet = {
   '--grid-min-sm': '220px',
   '--grid-min-md': '240px',
   '--grid-min-lg': '260px',
+  // QuantityStepper's `lg` numeral-column width — promoted 1:1. No existing
+  // token sits within 2px of 40px (nearest is --space-8 at 32px, 8px away).
+  '--stepper-num-w-lg': '40px',
   '--border-width-default': '1px',
   '--border-width-emphasis': '1.5px',
   '--border-width-cta': '2px',

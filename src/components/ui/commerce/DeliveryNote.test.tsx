@@ -1,8 +1,17 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../test-utils/tokenAssertions';
 import { DeliveryNote } from './DeliveryNote';
+import styles from './DeliveryNote.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/commerce/DeliveryNote.module.css',
+);
 
 describe('DeliveryNote', () => {
   it('defaults the title to the authoritative phrasing, not the off-spec mockup default', () => {
@@ -38,8 +47,21 @@ describe('DeliveryNote', () => {
     expect(screen.getByText(/Gratis vanaf €75/)).toBeInTheDocument();
   });
 
-  it('every var(--*) this component emits is a real contract token', () => {
+  it('wires the module classes for the wrap, icon, title and body', () => {
     const { container } = render(<DeliveryNote />);
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+    expect(container.querySelector(`.${styles.wrap}`)).not.toBeNull();
+    expect(container.querySelector('svg')?.getAttribute('class')).toContain(styles.icon);
+    expect(container.querySelector(`.${styles.title}`)?.textContent).toBe(
+      'Voor 22:00 besteld, morgen in huis',
+    );
+    expect(container.querySelector(`.${styles.body}`)).not.toBeNull();
+  });
+
+  // DeliveryNote is fully static (title/countdown/threshold are text
+  // content, not styling props): every token reference lives in the
+  // co-located module, not inline, so there is no rendered var(--*) to check
+  // here — the module-CSS test below covers token validity instead.
+  it('the co-located stylesheet references only real tokens (no --local-* bridge — fully static)', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

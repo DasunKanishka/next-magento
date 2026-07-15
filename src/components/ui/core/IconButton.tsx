@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import styles from './IconButton.module.css';
+
 export type IconButtonShape = 'circle' | 'rounded';
 
 export interface IconButtonProps extends Omit<
@@ -15,10 +17,14 @@ export interface IconButtonProps extends Omit<
    * which falls short of the project's 44×44px minimum touch target
    * requirement, so the default was raised to the token value. The prop is
    * fully overridable (same interface/type as documented), so call sites
-   * that intentionally need a smaller glyph can still pass a smaller number.
+   * that intentionally need a smaller glyph can still pass a smaller number
+   * — an explicit override is a caller-supplied dynamic value, not a baked
+   * brand literal, so it bridges as a plain computed px value (mirroring the
+   * FreeShippingProgress `--local-fill-width` / Carousel `--local-item-min-w`
+   * precedent) rather than a token.
    */
   size?: number;
-  /** Glyph colour override — e.g. `--color-urgency` for a wishlist heart. */
+  /** Glyph colour — a token reference, e.g. `var(--color-urgency)` for a wishlist heart. */
   color?: string;
   bordered?: boolean;
 }
@@ -36,29 +42,25 @@ export function IconButton({
   style = {},
   ...rest
 }: IconButtonProps) {
-  const dimension = size != null ? `${size}px` : DEFAULT_SIZE_TOKEN;
+  const bridge = {
+    '--local-size': size != null ? `${size}px` : DEFAULT_SIZE_TOKEN,
+    // Default glyph size: --icon-size-md (16px). ProductCard's add-to-cart
+    // button overrides this to --icon-size-lg via the consumer style bridge.
+    '--local-font-size': 'var(--icon-size-md)',
+    '--local-bg': 'var(--color-surface)',
+    '--local-fg': color,
+    '--local-border': bordered
+      ? 'var(--border-width-emphasis) solid var(--color-border-field)'
+      : 'none',
+  } as React.CSSProperties;
+
   return (
     <button
       type="button"
+      className={styles.iconButton}
+      data-shape={shape}
       onClick={onClick}
-      style={{
-        width: dimension,
-        height: dimension,
-        minWidth: dimension,
-        minHeight: dimension,
-        flex: '0 0 auto',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#fff',
-        color,
-        border: bordered ? '1.5px solid var(--color-border-field)' : 'none',
-        borderRadius: shape === 'circle' ? '50%' : 'var(--radius-md)',
-        cursor: 'pointer',
-        userSelect: 'none',
-        padding: 0,
-        ...style,
-      }}
+      style={{ ...bridge, ...style }}
       {...rest}
     >
       {children}

@@ -4,6 +4,7 @@ import { Badge } from '../core/Badge';
 import { IconButton } from '../core/IconButton';
 import { Rating } from '../core/Rating';
 import { formatEuro } from './PriceBlock';
+import styles from './ProductCard.module.css';
 
 export interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Uppercase trust-toned brand/category eyebrow. */
@@ -30,21 +31,16 @@ export interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * The "PRODUCTFOTO" placeholder-slot label tint. The source design spec does
- * not map this one-off text color to any contract token (its nearest
- * neighbors are visibly different shades), so it stays literal here — same
- * documented-exception pattern as `Chip`'s `spec` variant border.
- */
-const PLACEHOLDER_LABEL_COLOR = '#B0926A';
-
-/**
  * Grid product card — the repeating unit in listings & cross-sell.
  *
  * Composes `Badge` (sale flag, top-left) and `Rating` (review stars) rather
  * than reimplementing either. The wishlist heart and add-to-cart affordances
  * reuse `IconButton` so both meet the 44×44px minimum touch target by
  * default — the source mock's 32px wishlist / 40px add-button sizes fell
- * short of that minimum.
+ * short of that minimum. The wishlist glyph now takes IconButton's own
+ * default glyph size (`--icon-size-md`, 16px — a 14px→16px snap); the
+ * add-to-cart glyph overrides it to `--icon-size-lg` (20px, a 19px→20px
+ * snap) via the consumer-facing `--local-*` style bridge.
  */
 export function ProductCard({
   brand,
@@ -61,113 +57,50 @@ export function ProductCard({
   const onSale = oldPrice != null;
   const oldPriceLabel = oldPrice != null ? formatEuro(oldPrice) : null;
 
+  const priceBridge = {
+    '--local-price-fg': onSale ? 'var(--color-urgency)' : 'var(--color-brand-ink)',
+  } as React.CSSProperties;
+
   return (
-    <div
-      style={{
-        border: '1px solid var(--color-border-card)',
-        borderRadius: 'var(--radius-lg)',
-        padding: 16,
-        background: 'var(--color-surface)',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        ...style,
-      }}
-      {...rest}
-    >
+    <div className={styles.card} style={style} {...rest}>
       {saleBadge ? (
-        <span style={{ position: 'absolute', top: 14, left: 14, zIndex: 2 }}>
+        <span className={styles.saleBadgeSlot}>
           <Badge variant="sale">{saleBadge}</Badge>
         </span>
       ) : null}
       {wishlist ? (
-        <span style={{ position: 'absolute', top: 14, right: 14, zIndex: 2 }}>
-          <IconButton
-            aria-label="Voeg toe aan verlanglijst"
-            color="var(--color-urgency)"
-            style={{ fontSize: 14 }}
-          >
+        <span className={styles.wishlistSlot}>
+          <IconButton aria-label="Voeg toe aan verlanglijst" color="var(--color-urgency)">
             ♡
           </IconButton>
         </span>
       ) : null}
-      <div
-        style={{
-          height: 180,
-          borderRadius: 8,
-          background: 'var(--pattern-photo-placeholder-a)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          font: '600 9px/1 var(--font-brand)',
-          color: PLACEHOLDER_LABEL_COLOR,
-        }}
-      >
-        PRODUCTFOTO
-      </div>
-      {brand ? (
-        <div
-          style={{
-            font: '500 11px/1 var(--font-brand)',
-            color: 'var(--color-trust)',
-            marginTop: 13,
-            letterSpacing: 'var(--type-tag-tracking)',
-            textTransform: 'uppercase',
-          }}
-        >
-          {brand}
-        </div>
-      ) : null}
-      <div
-        style={{
-          font: '500 14px/1.3 var(--font-brand)',
-          marginTop: 5,
-          color: 'var(--color-brand-ink)',
-          flex: 1,
-        }}
-      >
-        {name}
-      </div>
+      <div className={styles.media}>PRODUCTFOTO</div>
+      {brand ? <div className={styles.brand}>{brand}</div> : null}
+      <div className={styles.name}>{name}</div>
       {reviews != null ? (
-        <div style={{ marginTop: 8 }}>
+        <div className={styles.ratingWrap}>
           <Rating value={5} count={reviews} size={11} />
         </div>
       ) : null}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginTop: 12,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 7 }}>
-          <span
-            style={{
-              font: '700 18px/1 var(--font-brand)',
-              color: onSale ? 'var(--color-urgency)' : 'var(--color-brand-ink)',
-            }}
-          >
+      <div className={styles.priceRow}>
+        <div className={styles.priceGroup}>
+          <span className={styles.price} style={priceBridge}>
             {formatEuro(price)}
           </span>
-          {onSale ? (
-            <span
-              style={{
-                font: '500 12px/1 var(--font-brand)',
-                color: 'var(--color-text-strikethrough)',
-                textDecoration: 'line-through',
-              }}
-            >
-              {oldPriceLabel}
-            </span>
-          ) : null}
+          {onSale ? <span className={styles.oldPrice}>{oldPriceLabel}</span> : null}
         </div>
         <IconButton
           onClick={onAdd}
           bordered={false}
-          color="#fff"
+          color="var(--color-text-on-fill)"
           aria-label="Toevoegen aan winkelmandje"
-          style={{ background: 'var(--color-cta)', fontSize: 19 }}
+          style={
+            {
+              '--local-bg': 'var(--color-cta)',
+              '--local-font-size': 'var(--icon-size-lg)',
+            } as React.CSSProperties
+          }
         >
           +
         </IconButton>

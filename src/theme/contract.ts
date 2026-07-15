@@ -145,6 +145,31 @@
  * (BusinessReviews), `--grid-min-lg` the feature-split grid (ProductOfMonth).
  * None of the 10 changes a rendered value (each promotes the exact literal
  * already shipping).
+ *
+ * ui-core/product literal-closure addendum (total now 154, color 62,
+ * typography 42, spacing/radius/sizing 50): a pass over the 8 remaining
+ * ui-core/commerce/product components (IconButton, Badge, Chip, Rating,
+ * ProductCard, PriceBlock, QuantityStepper, DeliveryNote) retired the last
+ * two "intentional literal" exceptions and closed 4 further gaps. Retired
+ * exceptions: `--color-media-placeholder-label` (already in the contract
+ * since the scale-coverage addendum, now actually consumed by ProductCard
+ * instead of its former literal-with-comment) and NEW `--color-border-chip-spec`
+ * — Chip's `spec` variant outline pill border, previously kept as a literal
+ * because neither of its two closest existing border-color neighbors was
+ * within a defensible distance (see `default.ts` for the concrete values);
+ * it gets its own token rather than an inexact force-map. New gaps, each a structural
+ * role per the extend-vs-snap rule (no existing token sits within 2px):
+ * `--icon-size-lg` (20px), a sibling of `--icon-size-md` (16px) for the
+ * ~19–22px glyph cluster (ProductCard's add-to-cart "+" glyph, both
+ * QuantityStepper button glyphs); `--media-card-h` (180px), the product-card
+ * photo-slot height, a sibling of `--media-placeholder-h`/`--media-thumb-h`
+ * scaled for the grid-card image slot (a distinct concept from either — kept
+ * separate per the no-coincidental-reuse rule); `--stepper-num-w-lg` (40px),
+ * QuantityStepper's `lg` numeral-column width (the `md` counterpart, 34px,
+ * snaps to the existing `--space-8` at 32px, so only `lg` needed a new
+ * token); and `--type-star-tracking` (1px), Rating's star-glyph
+ * letter-spacing (px-based, unlike the em-based `--type-eyebrow-tracking`/
+ * `--type-tag-tracking` pair, which style unrelated uppercase-label text).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -212,6 +237,9 @@ export const COLOR_CONTRACT_KEYS = [
   // alpha/emphasis suffix so a stronger sibling (e.g. a full-screen overlay)
   // can be added later without renaming this one.
   '--color-scrim',
+  // Chip's outline `spec` pill border — retired literal exception; neither
+  // --color-border-field nor --color-border-card sits close enough to force-map.
+  '--color-border-chip-spec',
 ] as const;
 
 export const TYPOGRAPHY_CONTRACT_KEYS = [
@@ -270,6 +298,10 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   // fills the scale-step gap between --type-h2-size (30px) and
   // --type-h1-size (38px). Pairs with --type-weight-heavy above.
   '--type-stat-size',
+  // Rating's star-glyph letter-spacing. px-based (not em-based like the
+  // eyebrow/tag tracking pair above, which style unrelated uppercase-label
+  // text) — a distinct role, so it is not shared with them.
+  '--type-star-tracking',
 ] as const;
 
 /**
@@ -311,9 +343,17 @@ export const SPACING_CONTRACT_KEYS = [
   // Compact media-thumbnail height — sibling of --media-placeholder-h, scaled
   // for an inline promo tile rather than a full-width gallery slot.
   '--media-thumb-h',
+  // ProductCard's photo-slot height — a third sibling in the media-height
+  // family, scaled for a grid-card image slot (distinct from the other two;
+  // kept separate rather than reused by coincidence).
+  '--media-card-h',
   // Reusable icon-glyph size primitive (medium). Icons recur across
   // components; a text-size token is semantically wrong for an icon.
   '--icon-size-md',
+  // Larger icon-glyph size — sibling of --icon-size-md, for the ~19–22px
+  // glyph cluster (ProductCard's add-to-cart glyph, QuantityStepper's ±
+  // glyphs).
+  '--icon-size-lg',
   // Mega-menu column widths: left rail / subtype column / promo column.
   '--mega-rail-w',
   '--mega-col-w',
@@ -339,6 +379,10 @@ export const SPACING_CONTRACT_KEYS = [
   '--grid-min-sm',
   '--grid-min-md',
   '--grid-min-lg',
+  // QuantityStepper's `lg` numeral-column width. The `md` counterpart (34px)
+  // snaps to the existing --space-8 (32px, -2px); `lg` (40px) sits 8px from
+  // --space-8, well past the snap tolerance, so it earns its own token.
+  '--stepper-num-w-lg',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',

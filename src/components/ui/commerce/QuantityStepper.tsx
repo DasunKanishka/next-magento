@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './QuantityStepper.module.css';
+
 export type QuantityStepperSize = 'md' | 'lg';
 
 export interface QuantityStepperProps extends Omit<
@@ -16,17 +18,44 @@ export interface QuantityStepperProps extends Omit<
 }
 
 /**
- * Sizing role-map. `md`'s button width is bumped from the source mock's 38px
- * to 44px (matching `--tap-target-min`) so the −/+ buttons meet the
- * project's 44×44px minimum touch target; `lg`'s 46px width already cleared
- * the minimum, so it is unchanged.
+ * Per-size dimensions fed through the `--local-*` bridge (the closest analog
+ * to Button's `SIZE_TOKENS`) — every value is a `var(--token)` reference, so
+ * every size this control paints stays brand-overridable. `md`'s button
+ * width is bumped from the source mock's 38px to 44px (`--tap-target-min`) so
+ * the −/+ buttons meet the project's 44×44px minimum touch target; `lg`'s
+ * 46px width already cleared the minimum, and also snaps to
+ * `--tap-target-min` (+2px, within tolerance) rather than staying a raw
+ * literal.
+ *
+ * Off-scale source values snapped within the 2px tolerance: `md.h` 46px →
+ * `--control-height-md` (44px, -2px); `md.num` 34px → `--space-8` (32px,
+ * -2px); `md.font`/`lg.font` (19px/22px) → `--icon-size-lg` (20px, +1px/-2px
+ * — a text-size token would be semantically wrong for these ± icon glyphs,
+ * per the icon-size family's own rationale in contract.ts); `lg.numFont` 17px
+ * → `--type-body-size` (15px, -2px). Exact matches: `lg.h` 56px →
+ * `--control-height-lg`; `md.numFont` 15px → `--type-body-size`. `lg.num`
+ * (40px) sits 8px from the nearest spacing token (`--space-8`, 32px), well
+ * past the snap tolerance, so it earns its own dedicated token,
+ * `--stepper-num-w-lg`.
  */
 const DIMS: Record<
   QuantityStepperSize,
-  { h: number; w: number; num: number; font: number; numFont: number }
+  { h: string; w: string; num: string; font: string; numFont: string }
 > = {
-  md: { h: 46, w: 44, num: 34, font: 19, numFont: 15 },
-  lg: { h: 56, w: 46, num: 40, font: 22, numFont: 17 },
+  md: {
+    h: 'var(--control-height-md)',
+    w: 'var(--tap-target-min)',
+    num: 'var(--space-8)',
+    font: 'var(--icon-size-lg)',
+    numFont: 'var(--type-body-size)',
+  },
+  lg: {
+    h: 'var(--control-height-lg)',
+    w: 'var(--tap-target-min)',
+    num: 'var(--stepper-num-w-lg)',
+    font: 'var(--icon-size-lg)',
+    numFont: 'var(--type-body-size)',
+  },
 };
 
 /** – value + quantity control. Controlled via value/onChange; clamps to [min,max] (default 1–99). */
@@ -42,58 +71,30 @@ export function QuantityStepper({
   const dims = DIMS[size] ?? DIMS.md;
   const set = (next: number) => onChange?.(Math.max(min, Math.min(max, next)));
 
-  const buttonStyle: React.CSSProperties = {
-    width: dims.w,
-    height: dims.h,
-    minWidth: dims.w,
-    minHeight: dims.h,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: dims.font,
-    color: 'var(--color-brand)',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    userSelect: 'none',
-    padding: 0,
-  };
+  const bridge = {
+    '--local-btn-w': dims.w,
+    '--local-btn-h': dims.h,
+    '--local-btn-font-size': dims.font,
+    '--local-num-w': dims.num,
+    '--local-num-font-size': dims.numFont,
+  } as React.CSSProperties;
 
   return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        border: '1.5px solid var(--color-border-field)',
-        borderRadius: 'var(--radius-md)',
-        overflow: 'hidden',
-        flex: '0 0 auto',
-        ...style,
-      }}
-      {...rest}
-    >
+    <div className={styles.wrap} style={{ ...bridge, ...style }} {...rest}>
       <button
         type="button"
         aria-label="Aantal verlagen"
         onClick={() => set(value - 1)}
-        style={buttonStyle}
+        className={styles.button}
       >
         –
       </button>
-      <div
-        style={{
-          width: dims.num,
-          textAlign: 'center',
-          font: `600 ${dims.numFont}px/1 var(--font-brand)`,
-        }}
-      >
-        {value}
-      </div>
+      <div className={styles.num}>{value}</div>
       <button
         type="button"
         aria-label="Aantal verhogen"
         onClick={() => set(value + 1)}
-        style={buttonStyle}
+        className={styles.button}
       >
         +
       </button>
