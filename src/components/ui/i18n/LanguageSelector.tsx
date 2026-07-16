@@ -4,13 +4,8 @@ import React from 'react';
 
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { findLanguageByLocale, languages } from '@/i18n/languages';
-import {
-  Checkmark,
-  Chevron,
-  handleMenuArrowKeys,
-  styles,
-  useDismiss,
-} from './selectorShared';
+import { useDismissMenu } from '../core/useDismissMenu';
+import { Checkmark, Chevron, styles } from './selectorShared';
 
 export interface LanguageSelectorProps {
   /** Active UI language locale. Defaults to Nederlands. */
@@ -41,7 +36,7 @@ export function LanguageSelector({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const firstOptionRef = React.useRef<HTMLButtonElement>(null);
   const close = React.useCallback(() => setOpen(false), []);
-  const rootRef = useDismiss(open, close, triggerRef);
+  const { rootRef, onPanelKeyDown } = useDismissMenu(open, close, triggerRef);
 
   React.useEffect(() => {
     if (open) firstOptionRef.current?.focus();
@@ -76,7 +71,7 @@ export function LanguageSelector({
         <div
           role="menu"
           aria-label="Taal"
-          onKeyDown={handleMenuArrowKeys}
+          onKeyDown={onPanelKeyDown}
           className={`${styles.panel} ${styles.panelLang} ${
             alignLeft ? styles.panelLeft : styles.panelRight
           }`}

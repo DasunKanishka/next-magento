@@ -5,6 +5,7 @@ import React from 'react';
 import { Link } from '@/i18n/navigation';
 import { languages } from '@/i18n/languages';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import selectorStyles from '@/components/ui/i18n/selectorShared.module.css';
 import { DEALS_HREF, DEALS_LABEL } from './navConfig';
 import styles from './MobileMenu.module.css';
@@ -38,22 +39,12 @@ export function MobileMenu({
     setDrillId(null);
   }, []);
 
-  React.useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        close();
-        triggerRef.current?.focus();
-      }
-    }
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, close]);
+  const { rootRef } = useDismissMenu(open, close, triggerRef);
 
   const drilled = drillId ? categories.find((c) => c.id === drillId) : null;
 
   return (
-    <div className={styles.wrap}>
+    <div ref={rootRef} className={styles.wrap}>
       <button
         ref={triggerRef}
         type="button"

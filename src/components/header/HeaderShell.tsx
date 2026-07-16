@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { CountrySelector, SearchBar } from '@/components/ui';
+import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { defaultCountryCode, findCountry, type CountryCode } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
@@ -48,7 +49,6 @@ export function HeaderShell({
   const [scrolled, setScrolled] = React.useState(false);
   const [country, setCountry] = React.useState<CountryCode>(defaultCountryCode);
   const [megaActiveId, setMegaActiveId] = React.useState<string | null>(null);
-  const navRef = React.useRef<HTMLDivElement>(null);
 
   const goTo = React.useCallback(
     (next: SupportedLocale) => {
@@ -65,22 +65,7 @@ export function HeaderShell({
   }, []);
 
   const closeMega = React.useCallback(() => setMegaActiveId(null), []);
-
-  React.useEffect(() => {
-    if (megaActiveId == null) return;
-    function onDown(e: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) closeMega();
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') closeMega();
-    }
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [megaActiveId, closeMega]);
+  const { rootRef: navRef } = useDismissMenu(megaActiveId != null, closeMega);
 
   const inlineCats = categories.slice(0, MAX_INLINE_NAV_ITEMS);
   const overflowCats = categories.slice(MAX_INLINE_NAV_ITEMS);

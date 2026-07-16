@@ -10,14 +10,8 @@ import {
 } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { languages } from '@/i18n/languages';
-import {
-  Checkmark,
-  Chevron,
-  Flag,
-  handleMenuArrowKeys,
-  styles,
-  useDismiss,
-} from './selectorShared';
+import { useDismissMenu } from '../core/useDismissMenu';
+import { Checkmark, Chevron, Flag, styles } from './selectorShared';
 
 export interface CountrySelectorProps {
   /** Active delivery country. Defaults to Nederland. */
@@ -54,7 +48,7 @@ export function CountrySelector({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const firstOptionRef = React.useRef<HTMLButtonElement>(null);
   const close = React.useCallback(() => setOpen(false), []);
-  const rootRef = useDismiss(open, close, triggerRef);
+  const { rootRef, onPanelKeyDown } = useDismissMenu(open, close, triggerRef);
 
   React.useEffect(() => {
     if (open) firstOptionRef.current?.focus();
@@ -87,7 +81,7 @@ export function CountrySelector({
         <div
           role="menu"
           aria-label="Land en taal"
-          onKeyDown={handleMenuArrowKeys}
+          onKeyDown={onPanelKeyDown}
           className={`${styles.panel} ${alignLeft ? styles.panelLeft : styles.panelRight}`}
         >
           <div role="group" aria-label="Land" className={styles.columnCountry}>
