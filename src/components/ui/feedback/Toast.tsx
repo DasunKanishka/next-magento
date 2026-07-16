@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './Toast.module.css';
+
 export type ToastTone = 'success' | 'info' | 'error';
 
 export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -8,8 +10,9 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Role-mapping object: shares its tint/accent tokens with `Alert`'s `TONES`
- * map (same contract keys, no independent literals besides token names).
+ * Per-tone icon-circle colors fed to the module through the `--local-*` bridge.
+ * Every value is a `var(--token)` reference (the same tint/accent families
+ * Alert uses), so each tone stays brand-overridable.
  */
 const TONES: Record<ToastTone, { tint: string; accent: string }> = {
   success: { tint: 'var(--color-cta-tint)', accent: 'var(--color-cta)' },
@@ -36,49 +39,34 @@ const ICONS: Record<ToastTone, React.ReactNode> = {
 };
 
 /**
- * Compact toast — a white pill with a tinted icon circle and one line of
- * text. Callers control auto-dismiss timing (~4s per the design spec);
- * this component only renders the visual — no timer is baked in here since
- * that belongs to whatever toast-queue/host manages multiple instances.
+ * Compact toast — a surface pill with a tinted icon circle and one line of
+ * text. Callers control auto-dismiss timing; this component only renders the
+ * visual. Styling follows the co-located CSS module (see src/components/
+ * STYLING.md): the per-tone icon-circle colors flow in as `--local-*` bridge
+ * properties, everything else is a static token.
  */
 export function Toast({ tone = 'success', children, style = {}, ...rest }: ToastProps) {
   const t = TONES[tone] ?? TONES.success;
+  const bridge = {
+    '--local-tint': t.tint,
+    '--local-accent': t.accent,
+  } as React.CSSProperties;
+
   return (
     <div
       role="status"
       aria-live="polite"
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 11,
-        background: '#fff',
-        border: '1px solid var(--color-border-card)',
-        borderRadius: 12,
-        padding: '13px 15px',
-        boxShadow: 'var(--shadow-raised)',
-        ...style,
-      }}
+      className={styles.toast}
+      style={{ ...bridge, ...style }}
       {...rest}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          flex: '0 0 auto',
-          width: 28,
-          height: 28,
-          borderRadius: '50%',
-          background: t.tint,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div aria-hidden="true" className={styles.icon}>
         <svg
           width="15"
           height="15"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={t.accent}
+          stroke="currentColor"
           strokeWidth="2.6"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -86,14 +74,7 @@ export function Toast({ tone = 'success', children, style = {}, ...rest }: Toast
           {ICONS[tone]}
         </svg>
       </div>
-      <div
-        style={{
-          font: '600 13px/1.35 var(--font-brand)',
-          color: 'var(--color-brand-ink)',
-        }}
-      >
-        {children}
-      </div>
+      <div className={styles.message}>{children}</div>
     </div>
   );
 }

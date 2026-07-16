@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './Alert.module.css';
+
 export type AlertTone = 'success' | 'info' | 'error';
 
 export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -11,47 +13,42 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   onClose?: () => void;
 }
 
+interface ToneColors {
+  bg: string;
+  border: string;
+  accent: string;
+  title: string;
+  body: string;
+}
+
 /**
- * Role-mapping object: assigns each tone to its contract tint tokens plus
- * `title`/`body` ink colors. The design spec's component-to-token mapping
- * for Alert names only the tint/border/accent tokens + `--font-brand` — it
- * does not name a contract token for the title/body text inks, so those
- * stay literal here (inside this role-map), matching the delivered design.
+ * Per-tone color values fed to the module through the `--local-*` bridge. Every
+ * value is a `var(--token)` reference, so each tone stays brand-overridable — no
+ * raw color literal lives here or in the module. The tint/border/accent tokens
+ * are the shared semantic families; the title/body inks are the dedicated
+ * per-tone alert-ink tokens.
  */
-const TONES: Record<
-  AlertTone,
-  {
-    bg: string;
-    border: string;
-    accent: string;
-    title: string;
-    body: string;
-    iconStroke: string;
-  }
-> = {
+const TONES: Record<AlertTone, ToneColors> = {
   success: {
     bg: 'var(--color-cta-tint)',
     border: 'var(--color-cta-tint-border)',
     accent: 'var(--color-cta)',
-    title: '#146B40',
-    body: '#3E6B54',
-    iconStroke: '#fff',
+    title: 'var(--color-alert-success-title)',
+    body: 'var(--color-alert-success-ink)',
   },
   info: {
     bg: 'var(--color-trust-tint)',
     border: 'var(--color-trust-tint-border)',
     accent: 'var(--color-trust)',
-    title: 'var(--color-trust-ink)',
-    body: '#3B6469',
-    iconStroke: '#fff',
+    title: 'var(--color-alert-info-title)',
+    body: 'var(--color-alert-info-ink)',
   },
   error: {
     bg: 'var(--color-urgency-tint)',
     border: 'var(--color-urgency-tint-border)',
     accent: 'var(--color-urgency)',
-    title: '#8E2A40',
-    body: '#7A3A48',
-    iconStroke: '#fff',
+    title: 'var(--color-alert-error-title)',
+    body: 'var(--color-alert-error-ink)',
   },
 };
 
@@ -74,8 +71,10 @@ const ICONS: Record<AlertTone, React.ReactNode> = {
 };
 
 /**
- * Inline notification banner — tinted fill, 4px accent bar, icon + text.
- * Persists until dismissed via `onClose`.
+ * Inline notification banner — tinted fill, accent bar, icon + text. Persists
+ * until dismissed via `onClose`. Styling follows the co-located CSS module (see
+ * src/components/STYLING.md): per-tone colors flow in exclusively as `--local-*`
+ * bridge properties, consumed by the module and inherited by its descendants.
  */
 export function Alert({
   tone = 'info',
@@ -86,41 +85,26 @@ export function Alert({
   ...rest
 }: AlertProps) {
   const t = TONES[tone] ?? TONES.info;
+  const bridge = {
+    '--local-bg': t.bg,
+    '--local-border': t.border,
+    '--local-accent': t.accent,
+    '--local-title-ink': t.title,
+    '--local-body-ink': t.body,
+    // White glyph on the tone's accent circle — the same on-fill role as the
+    // Button CTA label; shared across every tone, so it is not per-tone.
+    '--local-icon-stroke': 'var(--color-text-on-fill)',
+  } as React.CSSProperties;
+
   return (
-    <div
-      role="status"
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 14,
-        background: t.bg,
-        border: `1px solid ${t.border}`,
-        borderLeft: `4px solid ${t.accent}`,
-        borderRadius: 12,
-        padding: '16px 18px',
-        ...style,
-      }}
-      {...rest}
-    >
-      <div
-        aria-hidden="true"
-        style={{
-          flex: '0 0 auto',
-          width: 34,
-          height: 34,
-          borderRadius: '50%',
-          background: t.accent,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+    <div role="status" className={styles.alert} style={{ ...bridge, ...style }} {...rest}>
+      <div aria-hidden="true" className={styles.icon}>
         <svg
           width="18"
           height="18"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={t.iconStroke}
+          stroke="currentColor"
           strokeWidth="2.3"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -128,19 +112,13 @@ export function Alert({
           {ICONS[tone]}
         </svg>
       </div>
-      <div style={{ flex: 1 }}>
-        {title ? (
-          <div style={{ font: '700 14px/1.3 var(--font-brand)', color: t.title }}>
-            {title}
-          </div>
-        ) : null}
+      <div className={styles.body}>
+        {title ? <div className={styles.title}>{title}</div> : null}
         {children ? (
           <div
-            style={{
-              font: '400 13px/1.55 var(--font-brand)',
-              color: t.body,
-              marginTop: title ? 3 : 0,
-            }}
+            className={
+              title ? `${styles.message} ${styles.messageSpaced}` : styles.message
+            }
           >
             {children}
           </div>
@@ -151,15 +129,7 @@ export function Alert({
           type="button"
           onClick={onClose}
           aria-label="Sluiten"
-          style={{
-            flex: '0 0 auto',
-            background: 'none',
-            border: 'none',
-            color: t.accent,
-            opacity: 0.5,
-            cursor: 'pointer',
-            padding: 2,
-          }}
+          className={styles.close}
         >
           <svg
             width="16"

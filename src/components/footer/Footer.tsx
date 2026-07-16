@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from '@/i18n/navigation';
 import { STORE_IDENTITY } from '@/config/store-identity';
 import { NewsletterSignup } from './NewsletterSignup';
+import styles from './Footer.module.css';
 
 interface FooterLink {
   label: string;
@@ -51,24 +52,6 @@ const COLUMNS: FooterColumn[] = [
 // Payment methods shown as labeled badges in the brand block.
 const PAYMENT_METHODS = ['iDEAL', 'Visa', 'Mastercard', 'PayPal'];
 
-const headingStyle: React.CSSProperties = {
-  font: '700 13px/1 var(--font-brand)',
-  color: '#fff',
-  margin: '0 0 12px',
-  letterSpacing: 'var(--type-tag-tracking)',
-};
-
-const linkStyle: React.CSSProperties = {
-  // Full-width row so the tap target spans the column (>= 44px in both axes),
-  // not just the text glyphs.
-  display: 'flex',
-  alignItems: 'center',
-  minHeight: 'var(--tap-target-min)',
-  font: '400 14px/1 var(--font-brand)',
-  color: 'var(--color-text-on-brand)',
-  textDecoration: 'none',
-};
-
 /**
  * Site footer, shared across every page. A brand block (wordmark, tagline,
  * payment badges) sits beside three static link columns and the newsletter
@@ -80,79 +63,21 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{
-        background: 'var(--color-brand-ink)',
-        color: '#fff',
-      }}
-    >
-      <style>{`
-        .ftr-cols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; }
-        .ftr-newsletter { grid-column: 1 / -1; }
-        @media (max-width: 900px) {
-          .ftr-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-          .ftr-brand { grid-column: 1 / -1; }
-        }
-      `}</style>
-
-      <div
-        style={{
-          maxWidth: 'var(--layout-maxw)',
-          margin: '0 auto',
-          padding: '40px 20px 28px',
-        }}
-      >
-        <div className="ftr-cols">
-          <div className="ftr-brand">
+    <footer className={styles.footer}>
+      <div className={styles.inner}>
+        <div className={styles.cols}>
+          <div className={styles.brand}>
             <Link
               href="/"
               aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                minHeight: 'var(--tap-target-min)',
-                font: '800 22px/1 var(--font-brand)',
-                color: '#fff',
-                textDecoration: 'none',
-              }}
+              className={styles.wordmark}
             >
               {STORE_IDENTITY.name}
             </Link>
-            <p
-              style={{
-                margin: '12px 0 16px',
-                maxWidth: 320,
-                font: '400 14px/1.6 var(--font-brand)',
-                color: 'var(--color-text-on-brand)',
-              }}
-            >
-              {STORE_IDENTITY.tagline}
-            </p>
-            <ul
-              aria-label="Betaalmethoden"
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0,
-                display: 'flex',
-                gap: 8,
-                flexWrap: 'wrap',
-              }}
-            >
+            <p className={styles.tagline}>{STORE_IDENTITY.tagline}</p>
+            <ul aria-label="Betaalmethoden" className={styles.payments}>
               {PAYMENT_METHODS.map((method) => (
-                <li
-                  key={method}
-                  aria-label={method}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '6px 10px',
-                    background: 'var(--color-surface)',
-                    color: 'var(--color-brand-ink)',
-                    borderRadius: 'var(--radius-sm)',
-                    font: '700 11px/1 var(--font-brand)',
-                  }}
-                >
+                <li key={method} aria-label={method} className={styles.payment}>
                   {method}
                 </li>
               ))}
@@ -161,11 +86,11 @@ export function Footer() {
 
           {COLUMNS.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
-              <h2 style={headingStyle}>{col.heading}</h2>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <h2 className={styles.heading}>{col.heading}</h2>
+              <ul className={styles.list}>
                 {col.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} style={linkStyle}>
+                    <Link href={link.href} className={styles.link}>
                       {link.label}
                     </Link>
                   </li>
@@ -174,30 +99,14 @@ export function Footer() {
             </nav>
           ))}
 
-          <div className="ftr-newsletter">
+          <div className={styles.newsletter}>
             <NewsletterSignup />
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          borderTop: 'var(--border-width-default) solid var(--color-surface-on-brand)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 'var(--layout-maxw)',
-            margin: '0 auto',
-            padding: '16px 20px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 12,
-            justifyContent: 'space-between',
-            font: '400 12px/1.5 var(--font-brand)',
-            color: 'var(--color-text-on-brand)',
-          }}
-        >
+      <div className={styles.legal}>
+        <div className={styles.legalInner}>
           <span>
             © {year} {STORE_IDENTITY.legalEntity} · {STORE_IDENTITY.registrationNumber}
           </span>

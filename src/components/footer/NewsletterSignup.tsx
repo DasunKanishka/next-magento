@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { Button, TextField } from '@/components/ui';
+import styles from './NewsletterSignup.module.css';
 
 type SubmitState = 'idle' | 'submitting' | 'subscribed' | 'error';
 
@@ -18,7 +19,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * button. Posts to the first-party newsletter route, which proxies the backend
  * subscribe; the double opt-in confirmation email is handled entirely by the
  * backend. Renders a subscribed/error result to the visitor. Consent must be
- * given before the request is sent.
+ * given before the request is sent. Styling lives in the co-located CSS module
+ * (see src/components/STYLING.md).
  */
 export function NewsletterSignup({
   endpoint = '/api/bff/newsletter',
@@ -68,30 +70,20 @@ export function NewsletterSignup({
 
   if (state === 'subscribed') {
     return (
-      <div
-        role="status"
-        style={{ font: '500 13px/1.5 var(--font-brand)', color: '#fff' }}
-      >
-        <strong style={{ display: 'block', marginBottom: 4 }}>Gelukt ✓</strong>
+      <div role="status" className={styles.status}>
+        <strong className={styles.statusStrong}>Gelukt ✓</strong>
         {message}
       </div>
     );
   }
 
   return (
-    <form
-      onSubmit={onSubmit}
-      noValidate
-      style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
-    >
-      <label
-        htmlFor={`${consentId}-email`}
-        style={{ font: '600 13px/1 var(--font-brand)', color: '#fff' }}
-      >
+    <form onSubmit={onSubmit} noValidate className={styles.form}>
+      <label htmlFor={`${consentId}-email`} className={styles.label}>
         Blijf op de hoogte van aanbiedingen
       </label>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 180 }}>
+      <div className={styles.row}>
+        <div className={styles.field}>
           <TextField
             id={`${consentId}-email`}
             type="email"
@@ -106,38 +98,18 @@ export function NewsletterSignup({
           {state === 'submitting' ? 'Bezig…' : 'Inschrijven'}
         </Button>
       </div>
-      <label
-        htmlFor={`${consentId}-consent`}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          // Full 44px tap target for the consent toggle (the whole label row is
-          // clickable and toggles the checkbox).
-          minHeight: 'var(--tap-target-min)',
-          font: '400 12px/1.4 var(--font-brand)',
-          color: 'var(--color-text-on-brand)',
-          cursor: 'pointer',
-        }}
-      >
+      <label htmlFor={`${consentId}-consent`} className={styles.consent}>
         <input
           id={`${consentId}-consent`}
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          style={{ width: 24, height: 24, flex: '0 0 auto' }}
+          className={styles.checkbox}
         />
         Ja, ik wil de nieuwsbrief ontvangen en ga akkoord met dubbele opt-in bevestiging.
       </label>
       {state === 'error' && message ? (
-        <p
-          role="alert"
-          style={{
-            margin: 0,
-            font: '500 12px/1.4 var(--font-brand)',
-            color: 'var(--color-urgency)',
-          }}
-        >
+        <p role="alert" className={styles.error}>
           {message}
         </p>
       ) : null}

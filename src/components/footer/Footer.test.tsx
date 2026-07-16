@@ -1,10 +1,19 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { STORE_IDENTITY } from '@/config/store-identity';
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectModuleCssReferencesRealTokens,
+} from '../ui/test-utils/tokenAssertions';
 import { Footer } from './Footer';
+import styles from './Footer.module.css';
+
+const MODULE_CSS_PATH = join(process.cwd(), 'src/components/footer/Footer.module.css');
 
 vi.mock('@/i18n/navigation', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -59,5 +68,14 @@ describe('Footer', () => {
   it('emits only real contract tokens', () => {
     const { container } = render(<Footer />);
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('carries its module class on the contentinfo root', () => {
+    render(<Footer />);
+    expect(screen.getByRole('contentinfo').className).toContain(styles.footer);
+  });
+
+  it('the co-located stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

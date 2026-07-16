@@ -1,0 +1,181 @@
+/*
+ * Shared styles for the i18n selectors (CountrySelector / LanguageSelector).
+ * One module, consumed by both, so the trigger / panel / option / code-chip
+ * literals live in a single place and are never duplicated across the two
+ * selectors. See src/components/STYLING.md for the convention. Fully static —
+ * no value varies per render, so there is no --local-* bridge.
+ */
+
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  /* 12px padding matches --space-3. */
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: var(--border-width-emphasis) solid var(--color-border-field);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  cursor: pointer;
+}
+
+.triggerStack {
+  display: flex;
+  flex-direction: column;
+  /* 2px gap snapped to --space-1 (4px, +2px). */
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.triggerLabel {
+  font-family: var(--font-brand);
+  /* 11px snapped to --type-eyebrow-size (12px, +1px) — matches the rest of the
+     eyebrow triplet (weight 600, line-height 1, tracked uppercase). */
+  font-size: var(--type-eyebrow-size);
+  font-weight: var(--type-eyebrow-weight);
+  line-height: var(--type-eyebrow-line-height);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--type-eyebrow-tracking);
+}
+
+.triggerValue {
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-brand);
+}
+
+.panel {
+  position: absolute;
+  /* 6px offset snapped to --space-2 (8px, +2px). */
+  top: calc(100% + var(--space-2));
+  z-index: 50;
+  background: var(--color-surface);
+  border: var(--border-width-default) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+  padding: var(--space-2);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.panelLeft {
+  left: 0;
+}
+
+.panelRight {
+  right: 0;
+}
+
+/* Language dropdown panel min-width (single column). */
+.panelLang {
+  min-width: var(--selector-panel-w);
+}
+
+.column {
+  width: 100%;
+}
+
+/* Country dropdown's delivery-country column min-width. */
+.columnCountry {
+  min-width: var(--selector-country-w);
+}
+
+/* Country dropdown's language column min-width, divided from the country
+   column by a hairline. */
+.columnLang {
+  min-width: var(--selector-lang-w);
+  border-left: var(--border-width-default) solid var(--color-border-card);
+  padding-left: var(--space-2);
+}
+
+.columnHeading {
+  font-family: var(--font-brand);
+  font-size: var(--type-eyebrow-size);
+  font-weight: var(--type-eyebrow-weight);
+  line-height: var(--type-eyebrow-line-height);
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--type-eyebrow-tracking);
+  /* 4px/12px/6px padding: --space-1 / --space-3 / --space-2 (6px→8px, +2px). */
+  padding: var(--space-1) var(--space-3) var(--space-2);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  /* 10px gap snapped to --space-3 (12px, +2px). */
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Active/selected delivery-country option — a teal tint. */
+.optionActiveTeal {
+  background: var(--color-trust-tint);
+  border: var(--border-width-default) solid var(--color-trust-tint-border);
+  color: var(--color-trust);
+}
+
+.optionGrow {
+  flex: 1;
+}
+
+.codeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 26px min-width snapped to --space-7 (28px, +2px). */
+  min-width: var(--space-7);
+  /* 3px/6px padding: --space-1 (4px, +1px) / --space-2 (8px, +2px). */
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-meta-line-height);
+  background: var(--color-surface-inset-b);
+  color: var(--color-text-muted);
+}
+
+/* Active code chip — navy fill with on-brand text. */
+.codeChipActive {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.checkIcon {
+  color: var(--color-brand);
+  display: inline-flex;
+}
+
+.flag {
+  flex: 0 0 auto;
+  border-radius: var(--radius-2xs);
+  object-fit: cover;
+  display: block;
+}

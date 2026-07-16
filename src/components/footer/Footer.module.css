@@ -1,0 +1,139 @@
+/*
+ * Footer styles. See src/components/STYLING.md for the convention. Fully static
+ * — no value varies per render, so there is no --local-* bridge. The responsive
+ * column grid (a rule set inline styles cannot express) lives here as a media
+ * query.
+ */
+
+.footer {
+  background: var(--color-brand-ink);
+  color: var(--color-on-brand);
+}
+
+.inner {
+  max-width: var(--layout-maxw);
+  margin: 0 auto;
+  /* 40px top / 20px sides / 28px bottom: --footer-pad-top / --space-5 / --space-7. */
+  padding: var(--footer-pad-top) var(--space-5) var(--space-7);
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: var(--space-8);
+}
+
+.newsletter {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+  .cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .brand {
+    grid-column: 1 / -1;
+  }
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  /* 22px matches --type-h3-size exactly (reused for its numeric value — a
+     wordmark, not a heading step). */
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-weight-heavy);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-on-brand);
+  text-decoration: none;
+}
+
+.tagline {
+  /* 12px top / 16px bottom margin: --space-3 / --space-4. */
+  margin: var(--space-3) 0 var(--space-4);
+  max-width: var(--footer-tagline-w);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-body-weight);
+  /* No type-step line-height matches 1.6 (body is 1.65); raw ratio (no token). */
+  line-height: 1.6;
+  color: var(--color-text-on-brand);
+}
+
+.payments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.payment {
+  display: inline-flex;
+  align-items: center;
+  /* 6px/10px padding: --space-2 (8px, +2px) / --space-3 (12px, +2px). */
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-brand-ink);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-meta-line-height);
+}
+
+.heading {
+  /* 12px bottom margin matches --space-3. */
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-brand);
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-ui-line-height);
+  letter-spacing: var(--type-tag-tracking);
+  color: var(--color-on-brand);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  /* Full-width row so the tap target spans the column (>= 44px in both axes),
+     not just the text glyphs. */
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-on-brand);
+  text-decoration: none;
+}
+
+.legal {
+  border-top: var(--border-width-default) solid var(--color-surface-on-brand);
+}
+
+.legalInner {
+  max-width: var(--layout-maxw);
+  margin: 0 auto;
+  /* 16px/20px padding: --space-4 / --space-5. */
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: space-between;
+  font-family: var(--font-brand);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-body-weight);
+  /* No type-step line-height matches 1.5; raw structural ratio (no token). */
+  line-height: 1.5;
+  color: var(--color-text-on-brand);
+}

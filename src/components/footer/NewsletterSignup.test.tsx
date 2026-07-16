@@ -1,8 +1,20 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectModuleCssReferencesRealTokens,
+} from '../ui/test-utils/tokenAssertions';
 import { NewsletterSignup } from './NewsletterSignup';
+import styles from './NewsletterSignup.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/footer/NewsletterSignup.module.css',
+);
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -77,5 +89,14 @@ describe('NewsletterSignup', () => {
   it('emits only real contract tokens', () => {
     const { container } = render(<NewsletterSignup />);
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('carries its module class on the form', () => {
+    const { container } = render(<NewsletterSignup />);
+    expect(container.querySelector('form')?.className).toContain(styles.form);
+  });
+
+  it('the co-located stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

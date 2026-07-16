@@ -2,7 +2,7 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 154 contract keys (see `../contract`
+ * shipping today. Every one of the 166 contract keys (see `../contract`
  * for the reconciliation note on why 154 — the source palette's 93, the
  * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
  * by the token-scale-coverage addendum, the standalone caption-size
@@ -152,6 +152,9 @@ export const defaultTokens: TokenSheet = {
   // Same base ink (4,12,28) as --shadow-overlay's shadow color, at the
   // drawer-scrim alpha.
   '--color-scrim': 'rgba(4,12,28,.45)',
+  // Entry-gate backdrop — the same base ink as --color-scrim at a heavier
+  // alpha (the full-screen gate overlay reads stronger than the compact drawer).
+  '--color-scrim-strong': 'rgba(4,12,28,.55)',
   // Chip's outline `spec` pill border — promoted 1:1 from Chip.tsx's former
   // literal exception. Neither --color-border-field (#D8D3CA) nor
   // --color-border-card (#EFE9DE) sits close enough to force-map onto.
@@ -252,6 +255,8 @@ export const defaultTokens: TokenSheet = {
   '--space-8': '32px',
   '--space-section': '44px',
   '--layout-maxw': '1240px',
+  // Smallest corner rounding — the inline flag-image corners; a step below xs.
+  '--radius-2xs': '2px',
   '--radius-xs': '5px',
   '--radius-sm': '6px',
   '--radius-md': '9px',
@@ -314,6 +319,27 @@ export const defaultTokens: TokenSheet = {
   // QuantityStepper's `lg` numeral-column width — promoted 1:1. No existing
   // token sits within 2px of 40px (nearest is --space-8 at 32px, 8px away).
   '--stepper-num-w-lg': '40px',
+  // Footer content block's deeper top padding (side/bottom map to the space
+  // scale; only the top sits off-scale).
+  '--footer-pad-top': '40px',
+  // Footer brand tagline's max line measure.
+  '--footer-tagline-w': '320px',
+  // Minimum width a wrapping form field keeps before dropping to its own row
+  // (the footer newsletter email input).
+  '--field-min-w': '180px',
+  // i18n dropdown widths — the language panel min-width and the country
+  // dropdown's two column min-widths.
+  '--selector-panel-w': '180px',
+  '--selector-country-w': '190px',
+  '--selector-lang-w': '170px',
+  // Entry-gate card max-width and its body-copy max line measure.
+  '--gate-card-w': '560px',
+  '--gate-copy-w': '380px',
+  // Site-search row heights — default and the compact header variant (the
+  // latter also the border-box floor keeping stretched controls at the tap
+  // target minimum).
+  '--search-row-h': '50px',
+  '--search-row-h-compact': '48px',
   '--border-width-default': '1px',
   '--border-width-emphasis': '1.5px',
   '--border-width-cta': '2px',

@@ -1,0 +1,44 @@
+/*
+ * Toast styles. See src/components/STYLING.md for the convention.
+ * The tinted icon circle (fill + glyph stroke) varies by `tone`, bridged as
+ * --local-tint / --local-accent set on the root and inherited by the icon;
+ * the pill chrome is all static tokens.
+ */
+
+.toast {
+  display: inline-flex;
+  align-items: center;
+  /* 11px gap snapped to --space-3 (12px, +1px). */
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: var(--border-width-default) solid var(--color-border-card);
+  /* 12px radius snapped to --radius-lg (13px, +1px). */
+  border-radius: var(--radius-lg);
+  /* 13px/15px padding: --space-3 (12px, -1px) / --space-4 (16px, +1px). */
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-raised);
+}
+
+.icon {
+  flex: 0 0 auto;
+  /* 28px circle matches --space-7 exactly (reused for its numeric value —
+     a fixed icon-circle size, not spacing). */
+  width: var(--space-7);
+  height: var(--space-7);
+  border-radius: var(--radius-full);
+  background: var(--local-tint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--local-accent);
+}
+
+.message {
+  font-family: var(--font-brand);
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  /* No type-step line-height matches 1.35; raw structural ratio (no token). */
+  line-height: 1.35;
+  color: var(--color-brand-ink);
+}

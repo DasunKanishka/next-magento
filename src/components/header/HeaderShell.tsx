@@ -239,11 +239,7 @@ export function HeaderShell({
         </div>
 
         <div className={styles.mobileSearchWrap}>
-          <SearchBar
-            height={44}
-            placeholder="Zoek merk, soort of product…"
-            buttonLabel="⌕"
-          />
+          <SearchBar compact placeholder="Zoek merk, soort of product…" buttonLabel="⌕" />
         </div>
       </div>
     </header>

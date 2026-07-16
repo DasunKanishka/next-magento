@@ -1,0 +1,100 @@
+/*
+ * SearchBar styles. See src/components/STYLING.md for the convention.
+ * The focus ring is a :focus-within state, the invalid frame a data-attribute
+ * variant, and the compact height another data-attribute variant — all rule
+ * sets an inline style cannot express — so the component drives them by
+ * state/attribute rather than a --local-* bridge.
+ */
+
+.wrap {
+  display: block;
+}
+
+.row {
+  display: flex;
+  /* Stretch the input + button to the full row height so each stays a >=44px
+     tap target (the border makes a fixed-height row's content box fall short). */
+  align-items: stretch;
+  border: var(--border-width-cta) solid var(--color-brand);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  min-height: var(--search-row-h);
+  transition: box-shadow 0.15s ease;
+}
+
+/* Compact header row — its height is also the border-box floor that keeps the
+   stretched controls at the tap-target minimum. */
+.row[data-compact='true'] {
+  min-height: var(--search-row-h-compact);
+}
+
+.row[data-invalid='true'] {
+  border-color: var(--color-urgency);
+}
+
+.row:focus-within {
+  box-shadow: var(--focus-ring);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  /* 18px padding snapped to --space-5 (20px, +2px). */
+  padding: 0 var(--space-5);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-ui-line-height);
+  background: transparent;
+  color: var(--color-brand);
+}
+
+.input::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+.submit {
+  align-self: stretch;
+  min-width: var(--tap-target-min);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* 26px padding snapped to --space-7 (28px, +2px). */
+  padding: 0 var(--space-7);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  background: var(--color-cta);
+  color: var(--color-text-on-fill);
+  border: none;
+  cursor: pointer;
+}
+
+.error {
+  /* 6px top margin snapped to --space-2 (8px, +2px). */
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-brand);
+  /* 12px matches --type-label-size exactly. */
+  font-size: var(--type-label-size);
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.3; raw structural ratio (no token). */
+  line-height: 1.3;
+  color: var(--color-urgency);
+}
+
+/* Screen-reader-only label — the standard visually-hidden clip mechanic; the
+   1px/-1px values are the accessibility hack, not themeable design values. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

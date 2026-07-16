@@ -17,37 +17,84 @@ export interface AgeGateProps {
   recordConsentAction: (formData: FormData) => void | Promise<void>;
 }
 
-/**
- * Role-map literals — the ONLY place non-token values live in this file
- * (mirrors the component library's brand-neutrality convention, e.g.
- * `Button`'s `PALETTE`). Everything else references `var(--contract-name)`.
- *
- * `SCRIM` is the entry-gate overlay color; there is no contract
- * token for a modal scrim, so it is a documented literal here. `#fff` is the
- * on-`--color-cta` check glyph color (navy/green have no on-fill text token,
- * same as `Button`'s `#fff` on the CTA fill).
- */
-const SCRIM = 'rgba(4,12,28,.55)';
-const CHECK_ON_CTA = '#fff';
-
 /** EXACT legal fine-print string — do not alter wording or the middot separator. */
 const LEGAL_NOTICE =
   'Geen verkoop van alcohol onder de 18 jaar · Geniet, maar drink met mate';
 
 /**
- * Scoped stylesheet for the gate. Class-based (not inline) styling is used for
- * the pieces that inline styles cannot express: responsive grid columns and
- * selector placement (4-col/top-right desktop vs 3-col/top-left mobile), and
- * the `:has(:checked)` selection state — which reflects the native radio/checkbox
- * state so the selected-tile border + check badge appear WITH OR WITHOUT client
- * JS. Every `var(--*)` below is a real contract key.
+ * Scoped stylesheet for the gate. Class-based (not co-located CSS-module)
+ * styling is deliberate here: the gate is rendered server-side in place of the
+ * storefront and its class names are a stable contract for the compliance E2E,
+ * so they must not be hashed. Every declared value below is a design token —
+ * this stylesheet carries no raw literal. Classes express the pieces an inline
+ * style cannot: responsive grid columns and selector placement (4-col/top-right
+ * desktop vs 3-col/top-left mobile), and the `:has(:checked)` selection state,
+ * which reflects the native radio/checkbox state so the selected-tile border +
+ * check badge appear WITH OR WITHOUT client JS.
  */
 const GATE_CSS = `
-.agegate__card { border-radius: var(--radius-2xl); }
-@media (min-width: 768px) { .agegate__card { border-radius: var(--radius-lg); } }
+.agegate__dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--color-scrim-strong);
+  overflow-y: auto;
+}
+
+.agegate__card {
+  position: relative;
+  width: 100%;
+  max-width: var(--gate-card-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  background: var(--color-surface);
+  border-radius: var(--radius-gate-card);
+  box-shadow: var(--shadow-overlay);
+  text-align: center;
+}
 
 .agegate__lang { position: absolute; top: var(--space-4); left: var(--space-4); z-index: 1; }
 @media (min-width: 768px) { .agegate__lang { left: auto; right: var(--space-4); } }
+
+.agegate__title {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-weight-bold);
+  line-height: 1.2;
+  color: var(--color-brand);
+}
+
+.agegate__copy {
+  margin: 0;
+  max-width: var(--gate-copy-w);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-body-weight);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.agegate__fieldset { width: 100%; margin: 0; padding: 0; border: none; }
+
+.agegate__legend {
+  width: 100%;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-brand);
+  font-size: var(--type-eyebrow-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-eyebrow-line-height);
+  letter-spacing: var(--type-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+  text-align: left;
+}
 
 .agegate__grid {
   display: grid;
@@ -72,7 +119,10 @@ const GATE_CSS = `
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text-primary);
-  font: 600 13px/1.2 var(--font-brand);
+  font-family: var(--font-brand);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: 1.2;
   text-align: center;
   cursor: pointer;
 }
@@ -93,15 +143,22 @@ const GATE_CSS = `
   margin: 0;
   opacity: 0;
 }
+.agegate__flag {
+  width: var(--space-7);
+  height: var(--space-4);
+  border-radius: var(--radius-2xs);
+  object-fit: cover;
+  display: block;
+}
 .agegate__badge {
   position: absolute;
   top: var(--space-1);
   right: var(--space-1);
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
   border-radius: var(--radius-full);
   background: var(--color-cta);
-  color: ${CHECK_ON_CTA};
+  color: var(--color-text-on-fill);
   display: none;
   align-items: center;
   justify-content: center;
@@ -119,7 +176,10 @@ const GATE_CSS = `
   border-radius: var(--radius-md);
   background: var(--color-surface-inset-a);
   color: var(--color-text-primary);
-  font: 600 14px/1.3 var(--font-brand);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: 1.3;
   cursor: pointer;
 }
 .agegate__age:has(.agegate__checkbox:checked) {
@@ -127,13 +187,25 @@ const GATE_CSS = `
   background: var(--color-cta-tint);
 }
 .agegate__checkbox {
-  width: 24px;
-  height: 24px;
+  width: var(--space-6);
+  height: var(--space-6);
   flex: 0 0 auto;
   accent-color: var(--color-cta);
   cursor: pointer;
 }
+
+.agegate__legal {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-body-weight);
+  line-height: 1.5;
+  color: var(--color-text-subtle);
+}
 `;
+
+/** Exposed for the styling test to assert this stylesheet references only tokens. */
+export const AGE_GATE_CSS = GATE_CSS;
 
 /** Selected-tile check badge glyph. */
 function BadgeCheck() {
@@ -205,36 +277,11 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="agegate-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        display: 'grid',
-        placeItems: 'center',
-        padding: 'var(--space-4)',
-        background: SCRIM,
-        overflowY: 'auto',
-      }}
+      className="agegate__dialog"
     >
       <style dangerouslySetInnerHTML={{ __html: GATE_CSS }} />
 
-      <form
-        action={recordConsentAction}
-        className="agegate__card"
-        style={{
-          position: 'relative',
-          width: '100%',
-          maxWidth: 560,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 'var(--space-4)',
-          padding: 'var(--space-8) var(--space-6) var(--space-6)',
-          background: 'var(--color-surface)',
-          boxShadow: 'var(--shadow-overlay)',
-          textAlign: 'center',
-        }}
-      >
+      <form action={recordConsentAction} className="agegate__card">
         <input type="hidden" name="locale" value={locale} />
 
         <div className="agegate__lang">
@@ -250,49 +297,16 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
 
         <GateMark />
 
-        <h1
-          id="agegate-title"
-          style={{
-            margin: 0,
-            font: '700 22px/1.2 var(--font-brand)',
-            color: 'var(--color-brand)',
-          }}
-        >
+        <h1 id="agegate-title" className="agegate__title">
           Waar mogen we naartoe bezorgen?
         </h1>
 
-        <p
-          style={{
-            margin: 0,
-            maxWidth: 380,
-            font: '400 14px/1.55 var(--font-brand)',
-            color: 'var(--color-text-muted)',
-          }}
-        >
+        <p className="agegate__copy">
           Kies je bezorgland en bevestig je leeftijd om de winkel te betreden.
         </p>
 
-        <fieldset
-          style={{
-            width: '100%',
-            margin: 0,
-            padding: 0,
-            border: 'none',
-          }}
-        >
-          <legend
-            style={{
-              width: '100%',
-              marginBottom: 'var(--space-2)',
-              font: '600 11px/1 var(--font-brand)',
-              letterSpacing: 'var(--type-eyebrow-tracking)',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-subtle)',
-              textAlign: 'left',
-            }}
-          >
-            Bezorgland
-          </legend>
+        <fieldset className="agegate__fieldset">
+          <legend className="agegate__legend">Bezorgland</legend>
 
           <div className="agegate__grid">
             {countries.map((c) => (
@@ -306,14 +320,7 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
                   onChange={() => setCountry(c.code)}
                 />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={c.flag}
-                  alt=""
-                  aria-hidden="true"
-                  width={26}
-                  height={17}
-                  style={{ borderRadius: 2, objectFit: 'cover', display: 'block' }}
-                />
+                <img src={c.flag} alt="" aria-hidden="true" className="agegate__flag" />
                 <span>{c.name}</span>
                 <span className="agegate__badge" aria-hidden="true">
                   <BadgeCheck />
@@ -345,15 +352,7 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
           De winkel betreden →
         </Button>
 
-        <p
-          style={{
-            margin: 0,
-            font: '400 12px/1.5 var(--font-brand)',
-            color: 'var(--color-text-subtle)',
-          }}
-        >
-          {LEGAL_NOTICE}
-        </p>
+        <p className="agegate__legal">{LEGAL_NOTICE}</p>
       </form>
     </div>
   );

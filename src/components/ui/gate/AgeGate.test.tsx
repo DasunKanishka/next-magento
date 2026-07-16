@@ -5,8 +5,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { buildBrandStyleBlock } from '@/theme/css';
 import { defaultTokens } from '@/theme/brands/default';
 import { countries } from '@/i18n/countries';
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
-import { AgeGate } from './AgeGate';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectModuleCssReferencesRealTokens,
+} from '../test-utils/tokenAssertions';
+import { AGE_GATE_CSS, AgeGate } from './AgeGate';
 
 // The gate embeds a LanguageSelector wired to next-intl navigation; stub the
 // navigation hooks so the component renders standalone in jsdom.
@@ -88,6 +91,10 @@ describe('AgeGate', () => {
   it('every var(--*) the gate emits is a real contract token', () => {
     const { container } = renderGate();
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('the gate stylesheet references only real tokens (zero raw literals)', () => {
+    expectModuleCssReferencesRealTokens(AGE_GATE_CSS);
   });
 
   it('axe-core reports zero critical/serious violations on the rendered gate', async () => {

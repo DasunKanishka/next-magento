@@ -170,6 +170,27 @@
  * token); and `--type-star-tracking` (1px), Rating's star-glyph
  * letter-spacing (px-based, unlike the em-based `--type-eyebrow-tracking`/
  * `--type-tag-tracking` pair, which style unrelated uppercase-label text).
+ *
+ * Footer/i18n/forms/feedback/gate literal-closure addendum (total now 166,
+ * color 63, spacing/radius/sizing 61): the final component-styling pass closed
+ * the last raw literals across the footer, the i18n country/language selectors,
+ * the form controls (search + text field), the feedback banners (alert + toast),
+ * and the entry gate. One color: `--color-scrim-strong`, the entry-gate backdrop
+ * ink — a heavier-opacity sibling of `--color-scrim` (named as a family with
+ * it). One radius: `--radius-2xs` (2px), the smallest corner rounding, a step
+ * below `--radius-xs`, for the inline flag-image corners. Ten structural
+ * width/height/padding roles, each a component-level measure with no existing
+ * token within snap tolerance (extend-vs-snap rule below): `--footer-pad-top`
+ * (40px, the footer block's deeper top padding — side/bottom map to the space
+ * scale); `--footer-tagline-w` (320px); `--field-min-w` (180px, a wrapping
+ * form field's minimum width); `--selector-panel-w` (180px),
+ * `--selector-country-w` (190px), `--selector-lang-w` (170px) — the i18n
+ * dropdown panel/column min-widths; `--gate-card-w` (560px) and `--gate-copy-w`
+ * (380px) — the entry-gate card + copy measures; and `--search-row-h` (50px) /
+ * `--search-row-h-compact` (48px) — the site-search row heights. Each promotes
+ * the exact literal already shipping (no rendered-value change), except the
+ * entry-gate card radius, now the existing `--radius-gate-card` at both
+ * breakpoints (retiring a prior cosmetic radius compromise).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -237,6 +258,9 @@ export const COLOR_CONTRACT_KEYS = [
   // alpha/emphasis suffix so a stronger sibling (e.g. a full-screen overlay)
   // can be added later without renaming this one.
   '--color-scrim',
+  // Stronger-alpha sibling of --color-scrim — the entry-gate backdrop sits at a
+  // heavier opacity than the compact-drawer scrim; named as a family with it.
+  '--color-scrim-strong',
   // Chip's outline `spec` pill border — retired literal exception; neither
   // --color-border-field nor --color-border-card sits close enough to force-map.
   '--color-border-chip-spec',
@@ -327,6 +351,9 @@ export const SPACING_CONTRACT_KEYS = [
   '--space-8',
   '--space-section',
   '--layout-maxw',
+  // Smallest corner rounding — a step below --radius-xs, for the inline
+  // flag-image corners in the i18n selectors and the entry gate.
+  '--radius-2xs',
   '--radius-xs',
   '--radius-sm',
   '--radius-md',
@@ -383,6 +410,27 @@ export const SPACING_CONTRACT_KEYS = [
   // snaps to the existing --space-8 (32px, -2px); `lg` (40px) sits 8px from
   // --space-8, well past the snap tolerance, so it earns its own token.
   '--stepper-num-w-lg',
+  // Footer content block's deeper top padding (its side/bottom paddings map to
+  // the existing space scale; only the top sits off-scale).
+  '--footer-pad-top',
+  // Footer brand tagline's max line measure.
+  '--footer-tagline-w',
+  // Minimum width a wrapping form field keeps before dropping to its own row
+  // (the footer newsletter email input).
+  '--field-min-w',
+  // i18n dropdown widths: the language panel min-width, and the country
+  // dropdown's two column min-widths (country column / language column).
+  '--selector-panel-w',
+  '--selector-country-w',
+  '--selector-lang-w',
+  // Entry-gate card max-width and its body-copy max line measure.
+  '--gate-card-w',
+  '--gate-copy-w',
+  // Site-search row heights: default and the compact header variant. The
+  // compact value is also the border-box floor that keeps the stretched
+  // controls at the minimum tap target.
+  '--search-row-h',
+  '--search-row-h-compact',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',
