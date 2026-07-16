@@ -255,6 +255,9 @@ export const defaultTokens: TokenSheet = {
   '--space-8': '32px',
   '--space-section': '44px',
   '--layout-maxw': '1240px',
+  // Home section-stack vertical-padding clamp max (min + inline padding are
+  // --space-5); off the space scale, so a dedicated layout token.
+  '--layout-section-pad-y': '40px',
   // Smallest corner rounding — the inline flag-image corners; a step below xs.
   '--radius-2xs': '2px',
   '--radius-xs': '5px',

@@ -52,7 +52,7 @@ export function AddToCartCard({ product }: AddToCartCardProps) {
         reviews={product.reviewCount ?? null}
         saleBadge={discountBadge(product)}
         onAdd={handleAdd}
-        style={{ height: '100%' }}
+        className={styles.card}
       />
       <div aria-live="polite" className={styles.status} style={bridge}>
         {!inStock ? 'Tijdelijk uitverkocht' : acknowledged ? 'Toegevoegd ✓' : ''}

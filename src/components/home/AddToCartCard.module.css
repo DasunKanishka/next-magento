@@ -10,6 +10,17 @@
   flex-direction: column;
 }
 
+/*
+ * Forwarded to the wrapped ProductCard so it fills the flex column (replacing a
+ * former inline `height: 100%` style prop — the bridge hard rule forbids an
+ * inline literal even for a layout keyword). `flex: 1 1 auto` grows the card to
+ * consume the cell height above the status line, so the card still fills its
+ * grid cell.
+ */
+.card {
+  flex: 1 1 auto;
+}
+
 .status {
   /* 18px snapped to --space-4 (16px, -2px). */
   min-height: var(--space-4);

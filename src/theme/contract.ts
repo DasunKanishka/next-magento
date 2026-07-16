@@ -351,6 +351,12 @@ export const SPACING_CONTRACT_KEYS = [
   '--space-8',
   '--space-section',
   '--layout-maxw',
+  // Fluid max of the home section-stack's vertical padding. Its min + inline
+  // padding snap exactly to --space-5 (20px); the 40px clamp max sits 4px from
+  // the nearest scale token (--space-section, 44px), past the 2px snap
+  // tolerance, so per the extend-vs-snap rule it earns its own structural
+  // (layout-role) token rather than absorbing a 4px drift.
+  '--layout-section-pad-y',
   // Smallest corner rounding — a step below --radius-xs, for the inline
   // flag-image corners in the i18n selectors and the entry gate.
   '--radius-2xs',

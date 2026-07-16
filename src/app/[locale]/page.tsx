@@ -37,7 +37,7 @@ const srOnly: React.CSSProperties = {
 const sectionStack: React.CSSProperties = {
   maxWidth: 'var(--layout-maxw)',
   margin: '0 auto',
-  padding: 'clamp(20px, 4vw, 40px) 20px',
+  padding: 'clamp(var(--space-5), 4vw, var(--layout-section-pad-y)) var(--space-5)',
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--space-section)',

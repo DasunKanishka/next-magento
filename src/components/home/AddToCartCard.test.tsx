@@ -70,6 +70,14 @@ describe('AddToCartCard', () => {
     expect(screen.getByTestId('product-card').className).toContain(styles.wrap);
   });
 
+  it('forwards its fill class to the wrapped card so it fills the grid cell', () => {
+    render(<AddToCartCard product={product()} />);
+    // The ProductCard root is the first child of the wrapper; it must carry the
+    // forwarded fill class (replacing the former inline height:100% style prop).
+    const card = screen.getByTestId('product-card').firstElementChild;
+    expect(card?.className).toContain(styles.card);
+  });
+
   it('the co-located stylesheet references only bridge properties and real tokens', () => {
     expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });

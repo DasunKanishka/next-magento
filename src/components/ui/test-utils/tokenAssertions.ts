@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { expect } from 'vitest';
 
 import { CONTRACT_TOKEN_NAMES } from '@/theme/contract';
@@ -66,6 +69,54 @@ export function expectModuleCssReferencesRealTokens(cssText: string): void {
   expect(
     unknown,
     `module CSS references unknown token(s): ${unknown.join(', ')}`,
+  ).toEqual([]);
+}
+
+/** Recursively lists every `*.module.css` file under a directory. */
+function findModuleCssFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name === '.next') continue;
+      out.push(...findModuleCssFiles(full));
+    } else if (entry.name.endsWith('.module.css')) {
+      out.push(full);
+    }
+  }
+  return out;
+}
+
+/**
+ * Repo-wide companion to `expectAllVarTokensAreContractKeys` (which checks a
+ * single rendered-HTML chunk): sweeps EVERY `*.module.css` under `root`
+ * (shared and per-component modules alike) and asserts that every `var(--*)`
+ * each one references is either a `--local-*` bridge property or a real,
+ * currently-declared contract key. A typo'd/removed token anywhere in the
+ * stylesheet layer fails loudly, naming the file and the offending token,
+ * rather than silently rendering unstyled.
+ */
+export function expectAllModuleCssReferencesRealTokens(root = 'src'): void {
+  const files = findModuleCssFiles(root);
+  expect(
+    files.length,
+    `expected to find *.module.css files under ${root}`,
+  ).toBeGreaterThan(0);
+
+  const offenders: string[] = [];
+  for (const file of files) {
+    const withoutComments = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const unknown = extractVarTokenNames(withoutComments).filter(
+      (name) => !name.startsWith('--local-') && !KNOWN_TOKENS.has(name),
+    );
+    if (unknown.length > 0) {
+      offenders.push(`${file}: ${[...new Set(unknown)].join(', ')}`);
+    }
+  }
+
+  expect(
+    offenders,
+    `module CSS references unknown contract token(s):\n${offenders.join('\n')}`,
   ).toEqual([]);
 }
 

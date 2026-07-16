@@ -52,6 +52,7 @@ export function ProductCard({
   onAdd,
   wishlist = true,
   style = {},
+  className,
   ...rest
 }: ProductCardProps) {
   const onSale = oldPrice != null;
@@ -62,7 +63,11 @@ export function ProductCard({
   } as React.CSSProperties;
 
   return (
-    <div className={styles.card} style={style} {...rest}>
+    <div
+      className={[styles.card, className].filter(Boolean).join(' ')}
+      style={style}
+      {...rest}
+    >
       {saleBadge ? (
         <span className={styles.saleBadgeSlot}>
           <Badge variant="sale">{saleBadge}</Badge>
