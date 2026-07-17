@@ -1,10 +1,14 @@
 import 'server-only';
 
+import { cacheLife, cacheTag } from 'next/cache';
+
 import { resolveSlotCategoryId } from '@/config/merchandising-slots';
-import type { DataSource } from '@/lib/data-source/types';
+import { STORE_IDENTITY_CONTENT_IDENTIFIERS } from '@/config/store-identity-content';
+import type { CmsBlock, DataSource, StoreConfig } from '@/lib/data-source/types';
 
 import { getMagentoClient } from './client';
 import {
+  composeStoreIdentity,
   mapCategories,
   mapCmsBlocks,
   mapNewsletterStatus,
@@ -42,6 +46,48 @@ export const magentoGraphQLAdapter: DataSource = {
     const client = getMagentoClient({ storeCode });
     const data = await client.request(StoreConfigDocument);
     return mapStoreConfig(data.storeConfig ?? {});
+  },
+
+  async getStoreIdentity({ storeCode }) {
+    'use cache';
+    // Cache key is Store (`storeCode`) only — `Content-Currency` is
+    // intentionally omitted. Every field this read returns (name, logo, legal
+    // fields, tagline, payment badges, footer columns, delivery copy) is
+    // currency-invariant: none carries a price or any currency-dependent value,
+    // so the same store view yields identical identity regardless of display
+    // currency and a currency-scoped key would only fragment the cache. This
+    // invariance is the precondition for the store-only key: if a future
+    // price/currency-varying field is ever added to this read, `Content-Currency`
+    // has to be reinstated in the key (and passed to `getMagentoClient` below).
+    cacheTag('store-identity');
+    cacheLife('minutes');
+
+    const client = getMagentoClient({ storeCode });
+
+    // Each source is fetched independently and any transport failure is
+    // contained here: an unreachable source degrades to an empty config/block
+    // set rather than leaking a raw backend error, so the fail-closed check in
+    // `composeStoreIdentity` uniformly handles "unreachable" and "missing
+    // value" as the same outcome (and logs the same field-naming marker).
+    let storeConfig: StoreConfig;
+    try {
+      const data = await client.request(StoreConfigDocument);
+      storeConfig = mapStoreConfig(data.storeConfig ?? {});
+    } catch {
+      storeConfig = mapStoreConfig({});
+    }
+
+    let blocks: CmsBlock[];
+    try {
+      const data = await client.request(EditorialBlocksDocument, {
+        identifiers: STORE_IDENTITY_CONTENT_IDENTIFIERS,
+      });
+      blocks = mapCmsBlocks((data.cmsBlocks?.items ?? []).filter(notNull));
+    } catch {
+      blocks = [];
+    }
+
+    return composeStoreIdentity({ storeConfig, blocks });
   },
 
   async getNavigationCategories({ storeCode, currency, rootCategoryId }) {

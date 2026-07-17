@@ -1,6 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { CmsBlock, StoreConfig } from '@/lib/data-source/types';
+import {
+  STORE_DELIVERY_PROMISE_BLOCK,
+  STORE_FOOTER_COLUMNS_BLOCK,
+  STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+  STORE_IDENTITY_LEGAL_BLOCK,
+  STORE_IDENTITY_TAGLINE_BLOCK,
+} from '@/config/store-identity-content';
 
 import {
+  composeStoreIdentity,
   mapCategories,
   mapCmsBlocks,
   mapNewsletterStatus,
@@ -296,5 +306,264 @@ describe('mapNewsletterStatus', () => {
     expect(mapNewsletterStatus('SOMETHING_ELSE')).toBe('error');
     expect(mapNewsletterStatus(null)).toBe('error');
     expect(mapNewsletterStatus(undefined)).toBe('error');
+  });
+});
+
+describe('composeStoreIdentity', () => {
+  const validStoreConfig: StoreConfig = {
+    storeCode: 'default',
+    locale: 'nl_NL',
+    currencyCode: 'EUR',
+    mediaBaseUrl: 'https://249.magento.default/media/',
+    cmsHomePage: 'home',
+    headerLogoSrc: 'logo/default/logo.svg',
+    logoAlt: 'TopDrinks logo',
+    copyright: '© 2026 TopDrinks B.V.',
+    storeName: 'TopDrinks',
+  };
+
+  function block(identifier: string, content: string): CmsBlock {
+    return { identifier, title: '', content };
+  }
+
+  const validBlocks: CmsBlock[] = [
+    block(
+      STORE_IDENTITY_LEGAL_BLOCK,
+      '<p class="legal-entity">TopDrinks B.V.</p><p class="registration-number">KvK 87654321</p>',
+    ),
+    block(STORE_IDENTITY_TAGLINE_BLOCK, '<p>Jouw online drankspeciaalzaak.</p>'),
+    block(
+      STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+      '<ul><li>iDEAL</li><li>Mastercard</li><li>Visa</li></ul>',
+    ),
+    block(
+      STORE_FOOTER_COLUMNS_BLOCK,
+      '<div class="footer-column"><h3>Klantenservice</h3><ul>' +
+        '<li><a href="/verzending">Verzending</a></li>' +
+        '<li><a href="/retour">Retourneren</a></li>' +
+        '</ul></div>' +
+        '<div class="footer-column"><h3>Over ons</h3><ul>' +
+        '<li><a href="/over-ons">Over ons</a></li>' +
+        '</ul></div>',
+    ),
+    block(
+      STORE_DELIVERY_PROMISE_BLOCK,
+      '<p class="delivery-copy">Voor 22:00 besteld, morgen in huis</p>' +
+        '<p class="delivery-cutoff-hour">22</p>',
+    ),
+  ];
+
+  it('composes every field from mocked storeConfig + block data', () => {
+    const result = composeStoreIdentity({
+      storeConfig: validStoreConfig,
+      blocks: validBlocks,
+    });
+    expect(result).toStrictEqual({
+      name: 'TopDrinks',
+      logo: {
+        src: 'https://249.magento.default/media/logo/default/logo.svg',
+        alt: 'TopDrinks logo',
+        fallbackText: 'TopDrinks',
+      },
+      tagline: 'Jouw online drankspeciaalzaak.',
+      registrationNumber: 'KvK 87654321',
+      legalEntity: 'TopDrinks B.V.',
+      copyright: '© 2026 TopDrinks B.V.',
+      paymentMethods: ['iDEAL', 'Mastercard', 'Visa'],
+      footerColumns: [
+        {
+          heading: 'Klantenservice',
+          links: [
+            { label: 'Verzending', href: '/verzending' },
+            { label: 'Retourneren', href: '/retour' },
+          ],
+        },
+        { heading: 'Over ons', links: [{ label: 'Over ons', href: '/over-ons' }] },
+      ],
+      deliveryPromise: { copy: 'Voor 22:00 besteld, morgen in huis', cutoffHour: 22 },
+    });
+  });
+
+  describe('logo URL resolution', () => {
+    it('resolves headerLogoSrc to an absolute URL against mediaBaseUrl when a logo is configured', () => {
+      const result = composeStoreIdentity({
+        storeConfig: validStoreConfig,
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBe(
+        'https://249.magento.default/media/logo/default/logo.svg',
+      );
+    });
+
+    it('is null when no logo is configured', () => {
+      const result = composeStoreIdentity({
+        storeConfig: { ...validStoreConfig, headerLogoSrc: null },
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBeNull();
+    });
+
+    it('does not double-prefix an already-absolute headerLogoSrc', () => {
+      const result = composeStoreIdentity({
+        storeConfig: {
+          ...validStoreConfig,
+          headerLogoSrc: 'https://cdn.example.com/logo.svg',
+        },
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBe('https://cdn.example.com/logo.svg');
+    });
+
+    it('falls back logo.alt to an empty string when logoAlt is null', () => {
+      const result = composeStoreIdentity({
+        storeConfig: { ...validStoreConfig, logoAlt: null },
+        blocks: validBlocks,
+      });
+      expect(result.logo.alt).toBe('');
+    });
+  });
+
+  describe('fail-closed legal/identity fields', () => {
+    it('throws + logs the marker when name (storeName) is unsourceable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: { ...validStoreConfig, storeName: null },
+          blocks: validBlocks,
+        }),
+      ).toThrow('store-identity:fail-closed field=name');
+      expect(errorSpy).toHaveBeenCalledWith('store-identity:fail-closed field=name');
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs the marker when copyright is unsourceable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: { ...validStoreConfig, copyright: null },
+          blocks: validBlocks,
+        }),
+      ).toThrow('store-identity:fail-closed field=copyright');
+      expect(errorSpy).toHaveBeenCalledWith('store-identity:fail-closed field=copyright');
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs the marker when legalEntity is unsourceable (block missing the class)', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const blocksWithoutLegalEntity = validBlocks.map((b) =>
+        b.identifier === STORE_IDENTITY_LEGAL_BLOCK
+          ? block(
+              STORE_IDENTITY_LEGAL_BLOCK,
+              '<p class="registration-number">KvK 87654321</p>',
+            )
+          : b,
+      );
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: validStoreConfig,
+          blocks: blocksWithoutLegalEntity,
+        }),
+      ).toThrow('store-identity:fail-closed field=legalEntity');
+      expect(errorSpy).toHaveBeenCalledWith(
+        'store-identity:fail-closed field=legalEntity',
+      );
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs field=legalEntity when the whole legal block is missing (legalEntity is required before registrationNumber)', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const blocksWithoutLegalBlock = validBlocks.filter(
+        (b) => b.identifier !== STORE_IDENTITY_LEGAL_BLOCK,
+      );
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: validStoreConfig,
+          blocks: blocksWithoutLegalBlock,
+        }),
+      ).toThrow('store-identity:fail-closed field=legalEntity');
+      expect(errorSpy).toHaveBeenCalledWith(
+        'store-identity:fail-closed field=legalEntity',
+      );
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs the marker when registrationNumber alone is unsourceable (legalEntity present)', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      // legalEntity IS authored so it passes; only registrationNumber is missing,
+      // isolating registrationNumber's own fail-closed throw.
+      const blocksWithoutRegistration = validBlocks.map((b) =>
+        b.identifier === STORE_IDENTITY_LEGAL_BLOCK
+          ? block(
+              STORE_IDENTITY_LEGAL_BLOCK,
+              '<p class="legal-entity">TopDrinks B.V.</p>',
+            )
+          : b,
+      );
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: validStoreConfig,
+          blocks: blocksWithoutRegistration,
+        }),
+      ).toThrow('store-identity:fail-closed field=registrationNumber');
+      expect(errorSpy).toHaveBeenCalledWith(
+        'store-identity:fail-closed field=registrationNumber',
+      );
+      errorSpy.mockRestore();
+    });
+
+    it('treats an entirely unreachable source (empty storeConfig + no blocks) the same as a missing value', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({ storeConfig: mapStoreConfig({}), blocks: [] }),
+      ).toThrow('store-identity:fail-closed field=name');
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('non-legal graceful degradation', () => {
+    it('tagline degrades to "" when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_IDENTITY_TAGLINE_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.tagline).toBe('');
+    });
+
+    it('paymentMethods degrades to [] when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.paymentMethods).toStrictEqual([]);
+    });
+
+    it('footerColumns degrades to [] when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_FOOTER_COLUMNS_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.footerColumns).toStrictEqual([]);
+    });
+
+    it('deliveryPromise degrades to the empty default when entirely unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_DELIVERY_PROMISE_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.deliveryPromise).toStrictEqual({ copy: '', cutoffHour: 0 });
+    });
+
+    it('deliveryPromise degrades atomically (copy without a valid cutoffHour → the empty default, no throw)', () => {
+      const blocks = validBlocks.map((b) =>
+        b.identifier === STORE_DELIVERY_PROMISE_BLOCK
+          ? block(
+              STORE_DELIVERY_PROMISE_BLOCK,
+              '<p class="delivery-copy">Voor 22:00 besteld, morgen in huis</p>',
+            )
+          : b,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.deliveryPromise).toStrictEqual({ copy: '', cutoffHour: 0 });
+    });
   });
 });
