@@ -44,16 +44,15 @@
 }
 
 .nav {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this drawer's own anchor + layout. */
+  composes: panelSurface from '../ui/core/panelSurface.module.css';
   position: absolute;
   top: calc(100% + var(--space-2));
   left: 0;
   z-index: 80;
   width: var(--menu-drawer-w);
   max-width: 90vw;
-  background: var(--color-surface);
-  border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-overlay);
   /* 10px padding snapped to --space-3 (12px, +2px). */
   padding: var(--space-3);
 }

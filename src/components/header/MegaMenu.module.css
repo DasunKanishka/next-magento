@@ -6,15 +6,14 @@
  */
 
 .panel {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this panel's own anchor + layout. */
+  composes: panelSurface from '../ui/core/panelSurface.module.css';
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
   z-index: 60;
-  background: var(--color-surface);
-  border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-overlay);
   overflow: hidden;
 }
 

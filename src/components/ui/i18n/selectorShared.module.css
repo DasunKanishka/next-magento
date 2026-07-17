@@ -59,14 +59,13 @@
 }
 
 .panel {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this dropdown's own anchor + layout. */
+  composes: panelSurface from '../core/panelSurface.module.css';
   position: absolute;
   /* 6px offset snapped to --space-2 (8px, +2px). */
   top: calc(100% + var(--space-2));
   z-index: 50;
-  background: var(--color-surface);
-  border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-overlay);
   padding: var(--space-2);
   display: flex;
   gap: var(--space-2);

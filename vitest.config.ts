@@ -19,6 +19,13 @@ export default defineConfig({
     },
   },
   test: {
+    // Needed for CSS Modules `composes: ... from '<file>'` (cross-file
+    // composition, e.g. the shared panel-surface class) to actually merge
+    // into the consuming module's exported class string. Left off, Vitest's
+    // default CSS handling still hashes each module's own classes correctly
+    // but skips the full composition pass, so a composed class silently goes
+    // missing only in tests — the real Next.js build always resolves it.
+    css: true,
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
