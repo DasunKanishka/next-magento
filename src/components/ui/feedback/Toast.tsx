@@ -1,8 +1,9 @@
 import React from 'react';
 
 import styles from './Toast.module.css';
+import { FEEDBACK_TONE_FAMILIES, FEEDBACK_TONE_ICONS, type FeedbackTone } from './tone';
 
-export type ToastTone = 'success' | 'info' | 'error';
+export type ToastTone = FeedbackTone;
 
 export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
   tone?: ToastTone;
@@ -10,32 +11,24 @@ export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Per-tone icon-circle colors fed to the module through the `--local-*` bridge.
- * Every value is a `var(--token)` reference (the same tint/accent families
- * Alert uses), so each tone stays brand-overridable.
+ * Per-tone icon-circle colors fed to the module through the `--local-*` bridge,
+ * projected from the shared tint/accent families (see ./tone) — the same
+ * families Alert uses. Every value is a `var(--token)` reference, so each tone
+ * stays brand-overridable.
  */
 const TONES: Record<ToastTone, { tint: string; accent: string }> = {
-  success: { tint: 'var(--color-cta-tint)', accent: 'var(--color-cta)' },
-  info: { tint: 'var(--color-trust-tint)', accent: 'var(--color-trust)' },
-  error: { tint: 'var(--color-urgency-tint)', accent: 'var(--color-urgency)' },
-};
-
-const ICONS: Record<ToastTone, React.ReactNode> = {
-  success: <polyline points="20 6 9 17 4 12" />,
-  info: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v5" />
-      <path d="M12 7.5h.01" />
-    </>
-  ),
-  error: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7.5v5" />
-      <path d="M12 16.5h.01" />
-    </>
-  ),
+  success: {
+    tint: FEEDBACK_TONE_FAMILIES.success.tint,
+    accent: FEEDBACK_TONE_FAMILIES.success.accent,
+  },
+  info: {
+    tint: FEEDBACK_TONE_FAMILIES.info.tint,
+    accent: FEEDBACK_TONE_FAMILIES.info.accent,
+  },
+  error: {
+    tint: FEEDBACK_TONE_FAMILIES.error.tint,
+    accent: FEEDBACK_TONE_FAMILIES.error.accent,
+  },
 };
 
 /**
@@ -71,7 +64,7 @@ export function Toast({ tone = 'success', children, style = {}, ...rest }: Toast
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          {ICONS[tone]}
+          {FEEDBACK_TONE_ICONS[tone]}
         </svg>
       </div>
       <div className={styles.message}>{children}</div>

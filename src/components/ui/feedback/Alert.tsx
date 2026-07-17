@@ -1,8 +1,9 @@
 import React from 'react';
 
 import styles from './Alert.module.css';
+import { FEEDBACK_TONE_FAMILIES, FEEDBACK_TONE_ICONS, type FeedbackTone } from './tone';
 
-export type AlertTone = 'success' | 'info' | 'error';
+export type AlertTone = FeedbackTone;
 
 export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /** success (cta-tinted) · info (trust-tinted) · error (urgency-tinted — soft, never alarm red). */
@@ -24,50 +25,32 @@ interface ToneColors {
 /**
  * Per-tone color values fed to the module through the `--local-*` bridge. Every
  * value is a `var(--token)` reference, so each tone stays brand-overridable — no
- * raw color literal lives here or in the module. The tint/border/accent tokens
- * are the shared semantic families; the title/body inks are the dedicated
- * per-tone alert-ink tokens.
+ * raw color literal lives here or in the module. `bg`/`border`/`accent` are
+ * projected from the shared tone families (see ./tone); `title`/`body` are the
+ * dedicated per-tone alert-ink tokens, Alert-only (no Toast equivalent).
  */
 const TONES: Record<AlertTone, ToneColors> = {
   success: {
-    bg: 'var(--color-cta-tint)',
-    border: 'var(--color-cta-tint-border)',
-    accent: 'var(--color-cta)',
+    bg: FEEDBACK_TONE_FAMILIES.success.tint,
+    border: FEEDBACK_TONE_FAMILIES.success.border,
+    accent: FEEDBACK_TONE_FAMILIES.success.accent,
     title: 'var(--color-alert-success-title)',
     body: 'var(--color-alert-success-ink)',
   },
   info: {
-    bg: 'var(--color-trust-tint)',
-    border: 'var(--color-trust-tint-border)',
-    accent: 'var(--color-trust)',
+    bg: FEEDBACK_TONE_FAMILIES.info.tint,
+    border: FEEDBACK_TONE_FAMILIES.info.border,
+    accent: FEEDBACK_TONE_FAMILIES.info.accent,
     title: 'var(--color-alert-info-title)',
     body: 'var(--color-alert-info-ink)',
   },
   error: {
-    bg: 'var(--color-urgency-tint)',
-    border: 'var(--color-urgency-tint-border)',
-    accent: 'var(--color-urgency)',
+    bg: FEEDBACK_TONE_FAMILIES.error.tint,
+    border: FEEDBACK_TONE_FAMILIES.error.border,
+    accent: FEEDBACK_TONE_FAMILIES.error.accent,
     title: 'var(--color-alert-error-title)',
     body: 'var(--color-alert-error-ink)',
   },
-};
-
-const ICONS: Record<AlertTone, React.ReactNode> = {
-  success: <polyline points="20 6 9 17 4 12" />,
-  info: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11v5" />
-      <path d="M12 7.5h.01" />
-    </>
-  ),
-  error: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7.5v5" />
-      <path d="M12 16.5h.01" />
-    </>
-  ),
 };
 
 /**
@@ -109,7 +92,7 @@ export function Alert({
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          {ICONS[tone]}
+          {FEEDBACK_TONE_ICONS[tone]}
         </svg>
       </div>
       <div className={styles.body}>
