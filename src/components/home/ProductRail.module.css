@@ -28,10 +28,6 @@
 }
 
 .heading {
-  margin: 0 0 var(--space-4);
-  font-family: var(--font-brand);
-  font-weight: var(--type-weight-bold);
-  font-size: var(--type-h3-size);
-  line-height: var(--type-h3-line-height);
-  color: var(--color-brand-ink);
+  /* Byte-identical shared h2 block — see ui/core/SectionHeading.module.css. */
+  composes: heading from '../ui/core/SectionHeading.module.css';
 }

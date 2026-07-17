@@ -54,14 +54,9 @@
 }
 
 .middleEyebrow {
-  font-family: var(--font-brand);
-  /* 11px snapped to --type-eyebrow-size (12px, +1px), matching the rest of
-     the eyebrow triplet (weight 600, line-height 1, tracked uppercase). */
-  font-size: var(--type-eyebrow-size);
-  font-weight: var(--type-eyebrow-weight);
-  line-height: var(--type-eyebrow-line-height);
-  letter-spacing: var(--type-eyebrow-tracking);
-  text-transform: uppercase;
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     + margin stay local. */
+  composes: eyebrow from '../ui/core/Eyebrow.module.css';
   color: var(--color-text-subtle);
   margin-bottom: var(--space-3);
 }

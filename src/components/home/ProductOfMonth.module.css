@@ -15,15 +15,14 @@
 }
 
 .section {
+  /* Tinted band shape (radius + fluid padding) + inset-b background come
+     from the shared SectionBand primitive; everything below is this
+     section's own layout. */
+  composes: insetB from '../ui/core/SectionBand.module.css';
   display: grid;
   gap: var(--space-7);
   grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-lg), 1fr));
   align-items: center;
-  background: var(--color-surface-inset-b);
-  border-radius: var(--radius-2xl);
-  /* Fluid clamp; both endpoints are tokens — the fluid middle term (vw) is
-     an allowed viewport mechanic. */
-  padding: clamp(var(--space-6), 4vw, var(--space-section));
 }
 
 .copy {
@@ -33,12 +32,9 @@
 }
 
 .eyebrow {
-  font-family: var(--font-brand);
-  font-weight: var(--type-eyebrow-weight);
-  font-size: var(--type-eyebrow-size);
-  line-height: var(--type-eyebrow-line-height);
-  letter-spacing: var(--type-eyebrow-tracking);
-  text-transform: uppercase;
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     stays local: this eyebrow is the only one on the premium-accent tone. */
+  composes: eyebrow from '../ui/core/Eyebrow.module.css';
   color: var(--color-premium-accent-ink);
 }
 

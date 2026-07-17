@@ -7,12 +7,12 @@
  */
 
 .section {
-  background: var(--color-surface-inset-a);
+  /* Tinted band shape (radius + fluid padding) + inset-a background come
+     from the shared SectionBand primitive; the border is unique to this
+     section (SeoContent is the only band with one), and the layout below
+     stays local. */
+  composes: insetA from '../ui/core/SectionBand.module.css';
   border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-2xl);
-  /* Fluid clamp; both endpoints are tokens — shared with ProductOfMonth and
-     BusinessReviews' identical section-padding idiom. */
-  padding: clamp(var(--space-6), 4vw, var(--space-section));
   display: flex;
   flex-direction: column;
   gap: var(--space-7);

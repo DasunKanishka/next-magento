@@ -5,12 +5,11 @@
  */
 
 .section {
-  background: var(--color-brand);
+  /* Tinted band shape (radius + fluid padding) + brand background come from
+     the shared SectionBand primitive; everything below is this section's
+     own layout. */
+  composes: brand from '../ui/core/SectionBand.module.css';
   color: var(--color-text-on-brand);
-  border-radius: var(--radius-2xl);
-  /* Fluid clamp; both endpoints are tokens — shared with ProductOfMonth and
-     SeoContent's identical section-padding idiom. */
-  padding: clamp(var(--space-6), 4vw, var(--space-section));
   display: grid;
   gap: var(--space-6);
   grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-md), 1fr));

@@ -39,15 +39,10 @@
 }
 
 .triggerLabel {
-  font-family: var(--font-brand);
-  /* 11px snapped to --type-eyebrow-size (12px, +1px) — matches the rest of the
-     eyebrow triplet (weight 600, line-height 1, tracked uppercase). */
-  font-size: var(--type-eyebrow-size);
-  font-weight: var(--type-eyebrow-weight);
-  line-height: var(--type-eyebrow-line-height);
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     stays local. */
+  composes: eyebrow from '../core/Eyebrow.module.css';
   color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--type-eyebrow-tracking);
 }
 
 .triggerValue {
@@ -102,13 +97,10 @@
 }
 
 .columnHeading {
-  font-family: var(--font-brand);
-  font-size: var(--type-eyebrow-size);
-  font-weight: var(--type-eyebrow-weight);
-  line-height: var(--type-eyebrow-line-height);
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     + padding stay local. */
+  composes: eyebrow from '../core/Eyebrow.module.css';
   color: var(--color-text-subtle);
-  text-transform: uppercase;
-  letter-spacing: var(--type-eyebrow-tracking);
   /* 4px/12px/6px padding: --space-1 / --space-3 / --space-2 (6px→8px, +2px). */
   padding: var(--space-1) var(--space-3) var(--space-2);
 }
