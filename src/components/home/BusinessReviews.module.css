@@ -53,11 +53,10 @@
 }
 
 .testimonial {
+  composes: onBrand from '../ui/core/Surface.module.css';
   margin: 0;
   /* 20px matches --space-5 exactly. */
   padding: var(--space-5);
-  background: var(--color-surface-on-brand);
-  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);

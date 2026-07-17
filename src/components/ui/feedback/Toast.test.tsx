@@ -16,6 +16,10 @@ const MODULE_CSS_PATH = join(
   process.cwd(),
   'src/components/ui/feedback/Toast.module.css',
 );
+const SURFACE_MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/core/Surface.module.css',
+);
 
 describe('Toast', () => {
   it('renders all three documented tones', () => {
@@ -47,11 +51,15 @@ describe('Toast', () => {
     expect(el().style.getPropertyValue('--local-tint')).toBe('var(--color-trust-tint)');
   });
 
-  it('uses --shadow-raised and the --color-border-card frame via the module', () => {
+  it('uses --shadow-raised locally and composes the shared on-surface border/bg/radius shell', () => {
     const css = readFileSync(MODULE_CSS_PATH, 'utf8');
     expect(css).toMatch(/\.toast\s*\{[\s\S]*?box-shadow:\s*var\(--shadow-raised\)/);
     expect(css).toMatch(
-      /\.toast\s*\{[\s\S]*?border:\s*var\(--border-width-default\) solid var\(--color-border-card\)/,
+      /\.toast\s*\{[\s\S]*?composes:\s*onSurface from '..\/core\/Surface\.module\.css'/,
+    );
+    const surfaceCss = readFileSync(SURFACE_MODULE_CSS_PATH, 'utf8');
+    expect(surfaceCss).toMatch(
+      /\.onSurface\s*\{[\s\S]*?border:\s*var\(--border-width-default\) solid var\(--color-border-card\)/,
     );
   });
 

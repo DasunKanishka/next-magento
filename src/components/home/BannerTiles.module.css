@@ -17,15 +17,13 @@
 }
 
 .card {
+  composes: onSurface from '../ui/core/Surface.module.css';
   display: flex;
   flex-direction: column;
   min-height: var(--tap-target-min);
   height: 100%;
   /* 20px matches --space-5 exactly. */
   padding: var(--space-5);
-  background: var(--color-surface);
-  border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
   text-decoration: none;
 }
 

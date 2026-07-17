@@ -32,7 +32,11 @@ describe('ProductCard', () => {
     expect(screen.getByText('Tanqueray No. TEN 1L')).toBeInTheDocument();
     expect(screen.getByText('€34,95')).toBeInTheDocument();
     expect(screen.getByText('412 reviews')).toBeInTheDocument();
-    expect(container.querySelector(`.${styles.card}`)).not.toBeNull();
+    // styles.card composes the shared Surface on-surface shell (see
+    // Surface.module.css), so its exported value is a multi-class string —
+    // assert containment on the rendered className rather than using it as a
+    // (single-class) CSS selector.
+    expect(container.firstElementChild?.className).toContain(styles.card);
     expect(container.querySelector(`.${styles.brand}`)?.className).toContain(
       styles.brand,
     );

@@ -30,13 +30,11 @@
 }
 
 .statItem {
+  composes: onSurface from '../ui/core/Surface.module.css';
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   padding: var(--space-4) var(--space-5);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: var(--border-width-default) solid var(--color-border-card);
 }
 
 .statValue {

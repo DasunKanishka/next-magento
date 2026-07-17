@@ -6,14 +6,11 @@
  */
 
 .toast {
+  composes: onSurface from '../core/Surface.module.css';
   display: inline-flex;
   align-items: center;
   /* 11px gap snapped to --space-3 (12px, +1px). */
   gap: var(--space-3);
-  background: var(--color-surface);
-  border: var(--border-width-default) solid var(--color-border-card);
-  /* 12px radius snapped to --radius-lg (13px, +1px). */
-  border-radius: var(--radius-lg);
   /* 13px/15px padding: --space-3 (12px, -1px) / --space-4 (16px, +1px). */
   padding: var(--space-3) var(--space-4);
   box-shadow: var(--shadow-raised);

@@ -5,11 +5,9 @@
  */
 
 .card {
-  border: var(--border-width-default) solid var(--color-border-card);
-  border-radius: var(--radius-lg);
+  composes: onSurface from '../core/Surface.module.css';
   /* 16px matches --space-4 exactly. */
   padding: var(--space-4);
-  background: var(--color-surface);
   display: flex;
   flex-direction: column;
   position: relative;
