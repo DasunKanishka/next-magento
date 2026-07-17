@@ -18,13 +18,17 @@ import {
  */
 
 describe('mapStoreConfig', () => {
-  it('maps every storeConfig field, including cms_home_page', () => {
+  it('maps every storeConfig field, including cms_home_page and the identity fields', () => {
     const result = mapStoreConfig({
       store_code: 'default',
       locale: 'nl_NL',
       base_currency_code: 'EUR',
       secure_base_media_url: 'https://249.magento.default/media/',
       cms_home_page: 'home',
+      header_logo_src: 'logo/default/logo.svg',
+      logo_alt: 'VampireCave',
+      copyright: '© VampireCave',
+      store_name: 'Default Store View',
     });
     expect(result).toStrictEqual({
       storeCode: 'default',
@@ -32,16 +36,24 @@ describe('mapStoreConfig', () => {
       currencyCode: 'EUR',
       mediaBaseUrl: 'https://249.magento.default/media/',
       cmsHomePage: 'home',
+      headerLogoSrc: 'logo/default/logo.svg',
+      logoAlt: 'VampireCave',
+      copyright: '© VampireCave',
+      storeName: 'Default Store View',
     });
   });
 
-  it('coalesces null leaves to empty strings (never undefined)', () => {
+  it('coalesces null leaves to empty strings (never undefined), and identity fields to null', () => {
     const result = mapStoreConfig({
       store_code: null,
       locale: null,
       base_currency_code: null,
       secure_base_media_url: null,
       cms_home_page: null,
+      header_logo_src: null,
+      logo_alt: null,
+      copyright: null,
+      store_name: null,
     });
     expect(result).toStrictEqual({
       storeCode: '',
@@ -49,11 +61,51 @@ describe('mapStoreConfig', () => {
       currencyCode: '',
       mediaBaseUrl: '',
       cmsHomePage: '',
+      headerLogoSrc: null,
+      logoAlt: null,
+      copyright: null,
+      storeName: null,
     });
-    // No field is undefined.
+    // No field is undefined (identity fields are legitimately null, not undefined).
     for (const value of Object.values(result)) {
       expect(value).not.toBeUndefined();
     }
+  });
+
+  it('maps identity fields to null when the raw fields are absent (not just null)', () => {
+    const result = mapStoreConfig({
+      store_code: 'default',
+      locale: 'nl_NL',
+      base_currency_code: 'EUR',
+      secure_base_media_url: 'https://249.magento.default/media/',
+      cms_home_page: 'home',
+    });
+    expect(result.headerLogoSrc).toBeNull();
+    expect(result.logoAlt).toBeNull();
+    expect(result.copyright).toBeNull();
+    expect(result.storeName).toBeNull();
+  });
+
+  it('maps a backend-returned empty string identity field to null (not "")', () => {
+    const result = mapStoreConfig({
+      store_code: 'default',
+      locale: 'nl_NL',
+      base_currency_code: 'EUR',
+      secure_base_media_url: 'https://249.magento.default/media/',
+      cms_home_page: 'home',
+      header_logo_src: '',
+      logo_alt: '',
+      copyright: '© VampireCave',
+      store_name: 'Default Store View',
+    });
+    // '' means "unset" for these optional display strings → normalized to null.
+    expect(result.headerLogoSrc).toBeNull();
+    expect(result.logoAlt).toBeNull();
+    // Non-empty identity values are preserved.
+    expect(result.copyright).toBe('© VampireCave');
+    expect(result.storeName).toBe('Default Store View');
+    // The existing required fields keep their empty-string coalescing contract.
+    expect(result.storeCode).toBe('default');
   });
 });
 

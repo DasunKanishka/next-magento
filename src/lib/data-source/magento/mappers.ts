@@ -56,6 +56,10 @@ interface RawStoreConfig {
   base_currency_code?: string | null;
   secure_base_media_url?: string | null;
   cms_home_page?: string | null;
+  header_logo_src?: string | null;
+  logo_alt?: string | null;
+  copyright?: string | null;
+  store_name?: string | null;
 }
 
 interface RawCmsBlock {
@@ -73,6 +77,16 @@ export function mapStoreConfig(raw: RawStoreConfig): StoreConfig {
     currencyCode: raw.base_currency_code ?? '',
     mediaBaseUrl: raw.secure_base_media_url ?? '',
     cmsHomePage: raw.cms_home_page ?? '',
+    // Store-identity fields: `null` (not '') when Magento returns the field
+    // empty/absent — these are optional display scalars, not required for the
+    // cache-key/home-page-resolution role the existing fields above play, so
+    // no fabricated default is appropriate here. `|| null` (not `?? null`)
+    // normalizes a backend-returned empty string '' to null too — for these
+    // optional strings '' is the only falsy value and it means "unset".
+    headerLogoSrc: raw.header_logo_src || null,
+    logoAlt: raw.logo_alt || null,
+    copyright: raw.copyright || null,
+    storeName: raw.store_name || null,
   };
 }
 

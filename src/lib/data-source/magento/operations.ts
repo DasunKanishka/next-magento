@@ -20,6 +20,10 @@ export const StoreConfigDocument = graphql(`
       base_currency_code
       secure_base_media_url
       cms_home_page
+      header_logo_src
+      logo_alt
+      copyright
+      store_name
     }
   }
 `);

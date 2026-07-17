@@ -48,6 +48,13 @@ export interface CanonicalCategory {
  *
  * Extended with `cmsHomePage` — the frontend resolves the home page from
  * Magento's store-view-scoped `cms_home_page` rather than pinning it in code.
+ *
+ * Further extended with the Magento-native store-identity fields
+ * (`headerLogoSrc`, `logoAlt`, `copyright`, `storeName`) so the store's
+ * identity scalars are backend-sourced rather than hardcoded. These are `null`
+ * when Magento returns the field empty/absent — no fabricated default.
+ * `headerLogoSrc` is the RAW path Magento returns; resolving it to an absolute
+ * URL is out of scope here (owned by `getStoreIdentity`).
  */
 export interface StoreConfig {
   storeCode: string;
@@ -55,6 +62,10 @@ export interface StoreConfig {
   currencyCode: string;
   mediaBaseUrl: string;
   cmsHomePage: string;
+  headerLogoSrc: string | null;
+  logoAlt: string | null;
+  copyright: string | null;
+  storeName: string | null;
 }
 
 /**
