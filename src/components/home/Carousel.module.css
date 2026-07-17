@@ -6,8 +6,10 @@
  * prop, bridged through --local-item-min-w (a caller-supplied layout
  * parameter, not a design token — mirrors FreeShippingProgress's
  * --local-fill-width precedent for non-token business/business-layout
- * values). The `z-index` integer and the `@media` breakpoint are structural
- * mechanics, not themeable values (see STYLING.md).
+ * values). The `@media` breakpoint is a structural mechanic, not a themeable
+ * value (see STYLING.md). The paging arrows' round shell + placement now
+ * live in `ui/core/PagerButton` (extracted from this file's former
+ * duplicate-with-HeroSlider `.arrow`/`.arrowPrev`/`.arrowNext` rules).
  */
 
 .wrap {
@@ -33,42 +35,4 @@
 
 .track > * {
   scroll-snap-align: start;
-}
-
-.arrow {
-  display: none;
-  min-width: var(--tap-target-min);
-  min-height: var(--tap-target-min);
-  border-radius: var(--radius-full);
-  border: var(--border-width-default) solid var(--color-border-card);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  font-family: var(--font-brand);
-  font-weight: var(--type-weight-bold);
-  /* 18px matches --type-price-size exactly; reused for its numeric value
-     only — this is an arrow glyph, not a price. */
-  font-size: var(--type-price-size);
-  line-height: var(--type-ui-line-height);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-}
-
-@media (min-width: 901px) {
-  .arrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 3;
-  }
-
-  .arrowPrev {
-    left: calc(var(--space-2) * -1);
-  }
-
-  .arrowNext {
-    right: calc(var(--space-2) * -1);
-  }
 }

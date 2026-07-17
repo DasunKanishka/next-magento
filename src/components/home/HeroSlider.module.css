@@ -1,7 +1,10 @@
 /*
  * HeroSlider styles. See src/components/STYLING.md for the convention. The
  * only per-render values are the dot indicator's active/inactive width and
- * fill color, bridged through --local-dot-width/--local-dot-bg.
+ * fill color, bridged through --local-dot-width/--local-dot-bg. The paging
+ * arrows' round shell + placement now live in `ui/core/PagerButton`
+ * (extracted from this file's former duplicate-with-Carousel
+ * `.arrow`/`.arrowPrev`/`.arrowNext` rules).
  */
 
 .stage {
@@ -76,32 +79,6 @@
   line-height: var(--type-ui-line-height);
   text-decoration: none;
   box-shadow: var(--shadow-cta);
-}
-
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  min-width: var(--tap-target-min);
-  min-height: var(--tap-target-min);
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--color-surface-on-brand);
-  color: var(--color-text-on-fill);
-  font-family: var(--font-brand);
-  font-weight: var(--type-weight-bold);
-  /* 20px snapped to --type-h3-size (22px, +2px). */
-  font-size: var(--type-h3-size);
-  line-height: var(--type-ui-line-height);
-  cursor: pointer;
-}
-
-.arrowPrev {
-  left: var(--space-3);
-}
-
-.arrowNext {
-  right: var(--space-3);
 }
 
 .tablist {

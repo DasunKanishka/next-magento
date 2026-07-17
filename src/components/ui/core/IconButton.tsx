@@ -40,6 +40,7 @@ export function IconButton({
   onClick,
   children,
   style = {},
+  className,
   ...rest
 }: IconButtonProps) {
   const bridge = {
@@ -57,7 +58,13 @@ export function IconButton({
   return (
     <button
       type="button"
-      className={styles.iconButton}
+      // A consumer-supplied className is APPENDED to the module's own class
+      // rather than replacing it, so a caller can layer additional structural
+      // classes (e.g. PagerButton's placement/shadow rules) onto the shared
+      // round shell without losing it. No existing consumer passes className
+      // today (verified against ProductCard, the a11y harness, and every
+      // other call site), so this is additive and changes no current output.
+      className={className ? `${styles.iconButton} ${className}` : styles.iconButton}
       data-shape={shape}
       onClick={onClick}
       style={{ ...bridge, ...style }}

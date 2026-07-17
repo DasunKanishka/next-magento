@@ -2,13 +2,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   expectBridgePropsConsistent,
   expectModuleCssReferencesRealTokens,
 } from '../ui/test-utils/tokenAssertions';
+import pagerButtonStyles from '../ui/core/PagerButton.module.css';
 import { Carousel } from './Carousel';
 import styles from './Carousel.module.css';
 
@@ -41,6 +42,58 @@ describe('Carousel', () => {
     expect(
       container.querySelector<HTMLElement>('button[aria-label="Volgende"]'),
     ).not.toBeNull();
+  });
+
+  it('paging controls are the on-surface PagerButton variant', () => {
+    const { container } = render(
+      <Carousel label="Weekdeals">
+        <div>Item</div>
+      </Carousel>,
+    );
+    const prev = container.querySelector<HTMLElement>('button[aria-label="Vorige"]')!;
+    const next = container.querySelector<HTMLElement>('button[aria-label="Volgende"]')!;
+    expect(prev.className).toContain(pagerButtonStyles.onSurface);
+    expect(prev.className).toContain(pagerButtonStyles.prev);
+    expect(next.className).toContain(pagerButtonStyles.onSurface);
+    expect(next.className).toContain(pagerButtonStyles.next);
+  });
+
+  it('clicking prev/next scrolls the track in the matching direction', () => {
+    // jsdom does not implement scrollBy natively (the property doesn't exist
+    // on the prototype, so vi.spyOn can't wrap it) — stub it directly to
+    // assert the direction Carousel's page() callback requests, preserving
+    // the click-driven scroll/advance behavior across the PagerButton
+    // extraction, then restore the prototype so no other test file inherits
+    // the stub.
+    const originalScrollBy = HTMLElement.prototype.scrollBy;
+    const scrollBySpy = vi.fn();
+    HTMLElement.prototype.scrollBy = scrollBySpy;
+
+    try {
+      const { container } = render(
+        <Carousel label="Weekdeals">
+          <div>Item</div>
+        </Carousel>,
+      );
+      const prev = container.querySelector<HTMLElement>('button[aria-label="Vorige"]')!;
+      const next = container.querySelector<HTMLElement>('button[aria-label="Volgende"]')!;
+      // jsdom always reports 0 layout metrics; stub a non-zero clientWidth so
+      // page()'s `track.clientWidth * 0.9` produces a distinguishable
+      // non-zero scroll distance.
+      const track = screen.getByRole('group', { name: 'Weekdeals' });
+      Object.defineProperty(track, 'clientWidth', { value: 500, configurable: true });
+
+      fireEvent.click(next);
+      expect(scrollBySpy).toHaveBeenCalledTimes(1);
+      expect(scrollBySpy.mock.calls[0][0]).toMatchObject({ behavior: 'smooth' });
+      expect((scrollBySpy.mock.calls[0][0] as ScrollToOptions).left).toBeGreaterThan(0);
+
+      fireEvent.click(prev);
+      expect(scrollBySpy).toHaveBeenCalledTimes(2);
+      expect((scrollBySpy.mock.calls[1][0] as ScrollToOptions).left).toBeLessThan(0);
+    } finally {
+      HTMLElement.prototype.scrollBy = originalScrollBy;
+    }
   });
 
   it('carries its module class on the track', () => {

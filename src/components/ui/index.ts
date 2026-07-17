@@ -4,6 +4,13 @@ export type { ButtonProps, ButtonVariant, ButtonSize } from './core/Button';
 export { IconButton } from './core/IconButton';
 export type { IconButtonProps, IconButtonShape } from './core/IconButton';
 
+export { PagerButton } from './core/PagerButton';
+export type {
+  PagerButtonProps,
+  PagerButtonVariant,
+  PagerButtonDirection,
+} from './core/PagerButton';
+
 export { Badge } from './core/Badge';
 export type { BadgeProps, BadgeVariant } from './core/Badge';
 

@@ -3,6 +3,7 @@
 import React from 'react';
 
 import type { HeroSlide } from '@/lib/home/editorial';
+import { PagerButton } from '@/components/ui/core/PagerButton';
 import styles from './HeroSlider.module.css';
 
 export interface HeroSliderProps {
@@ -39,22 +40,18 @@ export function HeroSlider({ slides }: HeroSliderProps) {
 
         {slides.length > 1 ? (
           <>
-            <button
-              type="button"
-              aria-label="Vorige campagne"
+            <PagerButton
+              variant="on-brand"
+              direction="prev"
+              label="Vorige campagne"
               onClick={() => go(index - 1)}
-              className={`${styles.arrow} ${styles.arrowPrev}`}
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              aria-label="Volgende campagne"
+            />
+            <PagerButton
+              variant="on-brand"
+              direction="next"
+              label="Volgende campagne"
               onClick={() => go(index + 1)}
-              className={`${styles.arrow} ${styles.arrowNext}`}
-            >
-              ›
-            </button>
+            />
           </>
         ) : null}
       </div>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 
+import { PagerButton } from '@/components/ui/core/PagerButton';
 import styles from './Carousel.module.css';
 
 export interface CarouselProps {
@@ -39,14 +40,12 @@ export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps)
 
   return (
     <div className={styles.wrap}>
-      <button
-        type="button"
-        aria-label="Vorige"
-        className={`${styles.arrow} ${styles.arrowPrev}`}
+      <PagerButton
+        variant="on-surface"
+        direction="prev"
+        label="Vorige"
         onClick={() => page(-1)}
-      >
-        ‹
-      </button>
+      />
 
       <div
         ref={trackRef}
@@ -59,14 +58,12 @@ export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps)
         {children}
       </div>
 
-      <button
-        type="button"
-        aria-label="Volgende"
-        className={`${styles.arrow} ${styles.arrowNext}`}
+      <PagerButton
+        variant="on-surface"
+        direction="next"
+        label="Volgende"
         onClick={() => page(1)}
-      >
-        ›
-      </button>
+      />
     </div>
   );
 }

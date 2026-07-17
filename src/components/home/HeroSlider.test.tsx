@@ -12,6 +12,7 @@ import {
   expectModuleCssReferencesRealTokens,
 } from '../ui/test-utils/tokenAssertions';
 import { renderWithBrandTokens, resolvedToken } from '../ui/test-utils/brandRender';
+import pagerButtonStyles from '../ui/core/PagerButton.module.css';
 import { HeroSlider } from './HeroSlider';
 import styles from './HeroSlider.module.css';
 import type { HeroSlide } from '@/lib/home/editorial';
@@ -51,6 +52,27 @@ describe('HeroSlider', () => {
     expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
   });
 
+  it('advances/retreats via the PagerButton prev/next arrows, wrapping at the ends', async () => {
+    const user = userEvent.setup();
+    render(<HeroSlider slides={slides} />);
+    await user.click(screen.getByRole('button', { name: 'Volgende campagne' }));
+    expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Volgende campagne' }));
+    expect(screen.getByRole('heading', { name: 'Eerste campagne' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Vorige campagne' }));
+    expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
+  });
+
+  it('paging controls are the on-brand PagerButton variant', () => {
+    render(<HeroSlider slides={slides} />);
+    const prev = screen.getByRole('button', { name: 'Vorige campagne' });
+    const next = screen.getByRole('button', { name: 'Volgende campagne' });
+    expect(prev.className).toContain(pagerButtonStyles.onBrand);
+    expect(prev.className).toContain(pagerButtonStyles.prev);
+    expect(next.className).toContain(pagerButtonStyles.onBrand);
+    expect(next.className).toContain(pagerButtonStyles.next);
+  });
+
   it('emits only real contract tokens', () => {
     const { container } = render(<HeroSlider slides={slides} />);
     expectAllVarTokensAreContractKeys(container.innerHTML);
@@ -70,7 +92,14 @@ describe('HeroSlider', () => {
 
   it('bridge is consistent across the active/inactive dot surface (both states render together)', () => {
     const { container } = renderWithBrandTokens(<HeroSlider slides={slides} />);
-    const elements = Array.from(container.querySelectorAll('button, a, div, span'));
+    // Scoped to the dot tabs (`[role="tab"]`) rather than a bare `button`
+    // selector: the paging arrows are now `PagerButton` (composing
+    // `IconButton`), which sets its own --local-* bridge consumed by
+    // IconButton.module.css, not this stylesheet — including those buttons
+    // here would flag their bridge props as "dead" against HeroSlider's own
+    // module CSS. See PagerButton.test.tsx for its own bridge-consistency
+    // check, cross-referenced against IconButton.module.css.
+    const elements = Array.from(container.querySelectorAll('[role="tab"], a, div, span'));
     expectBridgePropsConsistent(elements, readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 

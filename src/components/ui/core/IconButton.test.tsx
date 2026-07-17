@@ -116,6 +116,17 @@ describe('IconButton', () => {
     );
   });
 
+  it('appends a consumer-supplied className to the module class rather than replacing it', () => {
+    const { getByRole } = render(
+      <IconButton aria-label="Composed" className="extra-class">
+        +
+      </IconButton>,
+    );
+    const btn = getByRole('button');
+    expect(btn.className).toContain(styles.iconButton);
+    expect(btn.className).toContain('extra-class');
+  });
+
   it('fires onClick', () => {
     let clicked = false;
     const { getByRole } = render(
