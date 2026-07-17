@@ -5,8 +5,8 @@ import React from 'react';
 import { Link } from '@/i18n/navigation';
 import { languages } from '@/i18n/languages';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import codeChipStyles from '@/components/ui/core/codeChip.module.css';
 import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
-import selectorStyles from '@/components/ui/i18n/selectorShared.module.css';
 import { DEALS_HREF, DEALS_LABEL } from './navConfig';
 import styles from './MobileMenu.module.css';
 import type { NavCategory } from './types';
@@ -146,8 +146,8 @@ export function MobileMenu({
                           className={`${styles.drawerItem} ${styles.langItem}`}
                         >
                           <span
-                            className={`${selectorStyles.codeChip} ${
-                              active ? selectorStyles.codeChipActive : ''
+                            className={`${codeChipStyles.codeChip} ${
+                              active ? codeChipStyles.codeChipActive : ''
                             }`}
                           >
                             {l.code}

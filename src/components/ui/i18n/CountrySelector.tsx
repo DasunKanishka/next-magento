@@ -10,6 +10,7 @@ import {
 } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { languages } from '@/i18n/languages';
+import codeChipStyles from '../core/codeChip.module.css';
 import { useDismissMenu } from '../core/useDismissMenu';
 import { Checkmark, Chevron, Flag, styles } from './selectorShared';
 
@@ -128,7 +129,9 @@ export function CountrySelector({
                   className={styles.option}
                 >
                   <span
-                    className={`${styles.codeChip} ${active ? styles.codeChipActive : ''}`}
+                    className={`${codeChipStyles.codeChip} ${
+                      active ? codeChipStyles.codeChipActive : ''
+                    }`}
                   >
                     {l.code}
                   </span>

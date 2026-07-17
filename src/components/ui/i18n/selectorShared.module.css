@@ -1,9 +1,12 @@
 /*
  * Shared styles for the i18n selectors (CountrySelector / LanguageSelector).
- * One module, consumed by both, so the trigger / panel / option / code-chip
- * literals live in a single place and are never duplicated across the two
- * selectors. See src/components/STYLING.md for the convention. Fully static —
- * no value varies per render, so there is no --local-* bridge.
+ * One module, consumed by both, so the trigger / panel / option literals live
+ * in a single place and are never duplicated across the two selectors. The
+ * code-chip badge has been promoted to `ui/core/codeChip.module.css` — a
+ * header component (MobileMenu) also needs it, and that primitive must not
+ * live inside an i18n component's internals. See src/components/STYLING.md
+ * for the convention. Fully static — no value varies per render, so there is
+ * no --local-* bridge.
  */
 
 .root {
@@ -134,29 +137,6 @@
 
 .optionGrow {
   flex: 1;
-}
-
-.codeChip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* 26px min-width snapped to --space-7 (28px, +2px). */
-  min-width: var(--space-7);
-  /* 3px/6px padding: --space-1 (4px, +1px) / --space-2 (8px, +2px). */
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-brand);
-  font-size: var(--type-meta-size);
-  font-weight: var(--type-weight-bold);
-  line-height: var(--type-meta-line-height);
-  background: var(--color-surface-inset-b);
-  color: var(--color-text-muted);
-}
-
-/* Active code chip — navy fill with on-brand text. */
-.codeChipActive {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
 }
 
 .checkIcon {
