@@ -1,23 +1,14 @@
 /**
- * Delivery-promise + free-shipping configuration.
+ * Free-shipping configuration + the cut-off-countdown math.
  *
- * These values back three surfaces that must stay in lockstep: the trust
- * micro-copy under the search bar, the desktop delivery-urgency countdown, and
- * the mobile utility strip. The single deadline string is defined ONCE here so
- * every surface renders the identical promise — there is no per-surface copy
- * and no separate config schema in this version (global, environment-scoped,
- * not per-country).
+ * The delivery-promise copy and its order cut-off hour are backend-sourced
+ * content — `getStoreIdentity().deliveryPromise` (see
+ * `src/lib/data-source/types.ts`) — NOT configured here. The header
+ * components that render the promise/countdown receive the sourced `copy` +
+ * `cutoffHour` as props and pass `cutoffHour` into `timeUntilCutoff` /
+ * `deliveryCountdownLabel` below, which stay pure cut-off-hour-parametric
+ * helpers with no store-identity value of their own.
  */
-
-/** Order cut-off hour (24h, store-local). Orders placed before this ship for next-day delivery. */
-export const ORDER_CUTOFF_HOUR = 22;
-
-/**
- * The single unified delivery-promise string, shown identically on every
- * surface that carries it (search trust line, mobile utility strip, and the
- * source of truth the countdown counts down to).
- */
-export const DELIVERY_DEADLINE_COPY = 'Voor 22:00 besteld, morgen in huis';
 
 /** Free-shipping threshold in EUR. */
 export const FREE_SHIPPING_THRESHOLD_EUR = 150;
@@ -38,10 +29,7 @@ export interface CutoffRemaining {
  * clock. Once the cut-off has passed, returns `{ past: true }` with a zero
  * remainder rather than a negative duration.
  */
-export function timeUntilCutoff(
-  now: Date,
-  cutoffHour: number = ORDER_CUTOFF_HOUR,
-): CutoffRemaining {
+export function timeUntilCutoff(now: Date, cutoffHour: number): CutoffRemaining {
   const cutoff = new Date(now);
   cutoff.setHours(cutoffHour, 0, 0, 0);
   const diffMs = cutoff.getTime() - now.getTime();
@@ -61,10 +49,7 @@ export function timeUntilCutoff(
  * morgen". After the cut-off it falls back to the plain next-day promise so the
  * line never shows a stale or negative countdown.
  */
-export function deliveryCountdownLabel(
-  now: Date,
-  cutoffHour: number = ORDER_CUTOFF_HOUR,
-): string {
+export function deliveryCountdownLabel(now: Date, cutoffHour: number): string {
   const remaining = timeUntilCutoff(now, cutoffHour);
   const cutoffLabel = `${String(cutoffHour).padStart(2, '0')}:00`;
   if (remaining.past) {

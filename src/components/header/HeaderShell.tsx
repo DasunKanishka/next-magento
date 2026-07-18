@@ -7,8 +7,8 @@ import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { defaultCountryCode, findCountry, type CountryCode } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
-import { DELIVERY_DEADLINE_COPY, REVIEW_RATING_COPY } from '@/config/delivery';
-import { STORE_IDENTITY } from '@/config/store-identity';
+import { REVIEW_RATING_COPY } from '@/config/delivery';
+import type { StoreIdentityDeliveryPromise } from '@/lib/data-source';
 import { CartPill } from './CartPill';
 import { DeliveryCountdown } from './DeliveryCountdown';
 import { FreeShippingProgress } from './FreeShippingProgress';
@@ -27,6 +27,10 @@ export interface HeaderShellProps {
   cartCount?: number;
   /** Running cart total in EUR. */
   cartTotal?: number;
+  /** Backend-sourced store name (`identity.name`) — the header wordmark text + its aria-label. */
+  storeName: string;
+  /** Backend-sourced delivery promise (`identity.deliveryPromise`) — the trust-row copy + the countdown's cut-off hour. */
+  deliveryPromise: StoreIdentityDeliveryPromise;
 }
 
 /**
@@ -43,6 +47,8 @@ export function HeaderShell({
   megaPromoHtml = '',
   cartCount = 0,
   cartTotal = 0,
+  storeName,
+  deliveryPromise,
 }: HeaderShellProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -84,10 +90,10 @@ export function HeaderShell({
   const logo = (
     <Link
       href="/"
-      aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
+      aria-label={`${storeName} — naar de homepagina`}
       className={styles.logo}
     >
-      {STORE_IDENTITY.name}
+      {storeName}
     </Link>
   );
 
@@ -112,7 +118,7 @@ export function HeaderShell({
           <div className={styles.searchCol}>
             <SearchBar />
             <div className={styles.trustRow}>
-              <span className={styles.trustDelivery}>✓ {DELIVERY_DEADLINE_COPY}</span>
+              <span className={styles.trustDelivery}>✓ {deliveryPromise.copy}</span>
               <span className={styles.trustRating}>★ {REVIEW_RATING_COPY}</span>
             </div>
           </div>
@@ -181,7 +187,10 @@ export function HeaderShell({
                 </button>
               ) : null}
               <span className={styles.countdownSlot}>
-                <DeliveryCountdown />
+                <DeliveryCountdown
+                  copy={deliveryPromise.copy}
+                  cutoffHour={deliveryPromise.cutoffHour}
+                />
               </span>
             </nav>
 
@@ -201,7 +210,7 @@ export function HeaderShell({
       {/* ---------- Mobile ---------- */}
       <div className={styles.mobile}>
         <div className={styles.mobileTrustBar}>
-          <span>✓ {DELIVERY_DEADLINE_COPY}</span>
+          <span>✓ {deliveryPromise.copy}</span>
           <span className={styles.mobileTrustRating}>★ {REVIEW_RATING_COPY}</span>
         </div>
 

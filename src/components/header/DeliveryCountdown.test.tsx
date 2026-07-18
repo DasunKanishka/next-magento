@@ -14,7 +14,9 @@ const MODULE_CSS_PATH = join(
 
 describe('DeliveryCountdown', () => {
   it('renders a polite live region referencing the next-day promise', () => {
-    render(<DeliveryCountdown />);
+    render(
+      <DeliveryCountdown copy="Voor 22:00 besteld, morgen in huis" cutoffHour={22} />,
+    );
     const region = screen.getByText(/morgen/);
     expect(region).toHaveAttribute('aria-live', 'polite');
   });

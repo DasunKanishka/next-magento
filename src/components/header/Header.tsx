@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getDataSource } from '@/lib/data-source';
+import { getDataSource, type StoreIdentity } from '@/lib/data-source';
 import { resolveStoreContext } from '@/lib/data-source/store-context';
 import { allSlotCategoryIds } from '@/config/merchandising-slots';
 import { sanitizeCmsHtml } from '@/lib/sanitize/cms-html';
@@ -11,6 +11,8 @@ import type { NavCategory } from './types';
 
 export interface HeaderProps {
   locale?: SupportedLocale;
+  /** Store identity resolved ONCE by the caller (`getStoreIdentity()`) and threaded down — never re-fetched here. */
+  identity: StoreIdentity;
 }
 
 /**
@@ -23,7 +25,7 @@ export interface HeaderProps {
  * fetched defensively: a missing block is expected (it is optional editorial),
  * so its absence degrades to a category-only mega-menu rather than an error.
  */
-export async function Header({ locale = defaultLocale }: HeaderProps) {
+export async function Header({ locale = defaultLocale, identity }: HeaderProps) {
   const dataSource = getDataSource();
   const { storeCode, currency } = await resolveStoreContext();
 
@@ -60,6 +62,12 @@ export async function Header({ locale = defaultLocale }: HeaderProps) {
   }
 
   return (
-    <HeaderShell locale={locale} categories={categories} megaPromoHtml={megaPromoHtml} />
+    <HeaderShell
+      locale={locale}
+      categories={categories}
+      megaPromoHtml={megaPromoHtml}
+      storeName={identity.name}
+      deliveryPromise={identity.deliveryPromise}
+    />
   );
 }

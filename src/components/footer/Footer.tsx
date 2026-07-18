@@ -1,65 +1,24 @@
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
-import { STORE_IDENTITY } from '@/config/store-identity';
+import type { StoreIdentity } from '@/lib/data-source';
 import { NewsletterSignup } from './NewsletterSignup';
 import styles from './Footer.module.css';
 
-interface FooterLink {
-  label: string;
-  href: string;
+export interface FooterProps {
+  /** Store identity resolved by the caller (`getStoreIdentity()`) and threaded down — Footer never fetches it itself. */
+  identity: StoreIdentity;
 }
-
-interface FooterColumn {
-  heading: string;
-  links: FooterLink[];
-}
-
-// Static footer link columns for this version. Admin-managed columns are a later
-// version's authoring surface; here they are fixed content.
-const COLUMNS: FooterColumn[] = [
-  {
-    heading: 'Assortiment',
-    links: [
-      { label: 'Whisky', href: '/whisky' },
-      { label: 'Gin', href: '/gin' },
-      { label: 'Rum', href: '/rum' },
-      { label: 'Wijn', href: '/wijn' },
-      { label: 'Champagne', href: '/champagne' },
-      { label: 'Aanbiedingen', href: '/aanbiedingen' },
-    ],
-  },
-  {
-    heading: 'Klantenservice',
-    links: [
-      { label: 'Contact', href: '/contact' },
-      { label: 'Verzending & retour', href: '/verzending' },
-      { label: 'Veelgestelde vragen', href: '/faq' },
-      { label: 'Bezorgstatus', href: '/bezorgstatus' },
-    ],
-  },
-  {
-    heading: `Over ${STORE_IDENTITY.name}`,
-    links: [
-      { label: 'Over ons', href: '/over-ons' },
-      { label: 'Verantwoord genieten', href: '/verantwoord-genieten' },
-      { label: 'Zakelijk bestellen', href: '/zakelijk' },
-      { label: 'Vacatures', href: '/vacatures' },
-    ],
-  },
-];
-
-// Payment methods shown as labeled badges in the brand block.
-const PAYMENT_METHODS = ['iDEAL', 'Visa', 'Mastercard', 'PayPal'];
 
 /**
  * Site footer, shared across every page. A brand block (wordmark, tagline,
- * payment badges) sits beside three static link columns and the newsletter
- * signup; the columns collapse to a two-column grid on mobile. A legal bottom
- * bar carries the copyright, the company registration number, and the explicit
- * 18+ / drink-responsibly notice. All links are real, keyboard-operable anchors.
+ * payment badges) sits beside the backend-authored link columns and the
+ * newsletter signup; the columns collapse to a two-column grid on mobile. A
+ * legal bottom bar carries the copyright, the company registration number,
+ * and the explicit 18+ / drink-responsibly notice. All links are real,
+ * keyboard-operable anchors.
  */
-export function Footer() {
+export function Footer({ identity }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
@@ -69,14 +28,14 @@ export function Footer() {
           <div className={styles.brand}>
             <Link
               href="/"
-              aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
+              aria-label={`${identity.name} — naar de homepagina`}
               className={styles.wordmark}
             >
-              {STORE_IDENTITY.name}
+              {identity.name}
             </Link>
-            <p className={styles.tagline}>{STORE_IDENTITY.tagline}</p>
+            <p className={styles.tagline}>{identity.tagline}</p>
             <ul aria-label="Betaalmethoden" className={styles.payments}>
-              {PAYMENT_METHODS.map((method) => (
+              {identity.paymentMethods.map((method) => (
                 <li key={method} aria-label={method} className={styles.payment}>
                   {method}
                 </li>
@@ -84,7 +43,7 @@ export function Footer() {
             </ul>
           </div>
 
-          {COLUMNS.map((col) => (
+          {identity.footerColumns.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
               <h2 className={styles.heading}>{col.heading}</h2>
               <ul className={styles.list}>
@@ -108,7 +67,7 @@ export function Footer() {
       <div className={styles.legal}>
         <div className={styles.legalInner}>
           <span>
-            © {year} {STORE_IDENTITY.legalEntity} · {STORE_IDENTITY.registrationNumber}
+            © {year} {identity.copyright} · {identity.registrationNumber}
           </span>
           <span>
             18+ Verkoop van alcohol alleen aan personen van 18 jaar en ouder · Geniet,

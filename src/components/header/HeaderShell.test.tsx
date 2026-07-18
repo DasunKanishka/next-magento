@@ -5,7 +5,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DELIVERY_DEADLINE_COPY } from '@/config/delivery';
+import type { StoreIdentityDeliveryPromise } from '@/lib/data-source';
 import { renderWithBrandTokens, resolvedToken } from '../ui/test-utils/brandRender';
 import {
   expectAllVarTokensAreContractKeys,
@@ -47,22 +47,44 @@ const categories: NavCategory[] = [
   { id: '20', name: 'Vrouwen', urlPath: 'vrouwen', children: [] },
 ];
 
+// Fixture stand-ins for `getStoreIdentity()` output — HeaderShell is a pure
+// client component that receives these as props, never fetches them itself.
+const TEST_STORE_NAME = 'Test Store';
+const TEST_DELIVERY_PROMISE: StoreIdentityDeliveryPromise = {
+  copy: 'Voor 22:00 besteld, morgen in huis',
+  cutoffHour: 22,
+};
+
 describe('HeaderShell', () => {
   it('renders the logo link home, the search bar, the trust promise, and the account entry point', () => {
-    render(<HeaderShell locale="nl" categories={categories} />);
+    render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
     expect(
       screen.getAllByRole('link', { name: /naar de homepagina/ }).length,
     ).toBeGreaterThan(0);
     expect(screen.getAllByRole('search').length).toBeGreaterThan(0);
     expect(
-      screen.getAllByText(new RegExp(DELIVERY_DEADLINE_COPY)).length,
+      screen.getAllByText(new RegExp(TEST_DELIVERY_PROMISE.copy)).length,
     ).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Inloggen' })).toBeInTheDocument();
   });
 
   it('leads the nav with the accent Deals shortcut and shows the free-shipping progress + cart', () => {
     render(
-      <HeaderShell locale="nl" categories={categories} cartCount={0} cartTotal={0} />,
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        cartCount={0}
+        cartTotal={0}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
     );
     expect(screen.getByRole('link', { name: /Deals/ })).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
@@ -72,7 +94,15 @@ describe('HeaderShell', () => {
   });
 
   it('opens the mega-menu for a category and closes it on Escape', () => {
-    render(<HeaderShell locale="nl" categories={categories} megaPromoHtml="" />);
+    render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        megaPromoHtml=""
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Mannen' }));
     expect(screen.getByRole('region', { name: /Categoriemenu/ })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -84,14 +114,28 @@ describe('HeaderShell', () => {
   it('includes the mobile hamburger trigger in the markup', () => {
     // The mobile layout is display:none under the desktop-width jsdom viewport
     // (the responsive switch is media-query driven), so query it as hidden.
-    render(<HeaderShell locale="nl" categories={categories} />);
+    render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
     expect(
       screen.getByRole('button', { name: 'Menu openen', hidden: true }),
     ).toBeInTheDocument();
   });
 
   it('emits only real contract tokens', () => {
-    const { container } = render(<HeaderShell locale="nl" categories={categories} />);
+    const { container } = render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
     expectAllVarTokensAreContractKeys(container.innerHTML);
   });
 
@@ -101,7 +145,12 @@ describe('HeaderShell', () => {
 
   it('bridge is consistent both ways across the full scrolled/active state surface', () => {
     const { container, getByRole } = render(
-      <HeaderShell locale="nl" categories={categories} />,
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
     );
     const header = container.querySelector('header') as HTMLElement;
 
@@ -130,7 +179,12 @@ describe('HeaderShell', () => {
     Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
 
     const { container, getByRole } = renderWithBrandTokens(
-      <HeaderShell locale="nl" categories={categories} />,
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        storeName={TEST_STORE_NAME}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
       { '--shadow-card': overrideShadow, '--color-surface-inset-b': overrideInsetB },
     );
     const header = container.querySelector('header') as HTMLElement;

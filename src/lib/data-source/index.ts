@@ -32,4 +32,9 @@ export type {
   MerchandisingSlot,
   Money,
   StoreConfig,
+  StoreIdentity,
+  StoreIdentityDeliveryPromise,
+  StoreIdentityFooterColumn,
+  StoreIdentityFooterLink,
+  StoreIdentityLogo,
 } from './types';

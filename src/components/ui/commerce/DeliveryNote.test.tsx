@@ -13,23 +13,27 @@ const MODULE_CSS_PATH = join(
   'src/components/ui/commerce/DeliveryNote.module.css',
 );
 
+// `title` has no default (the store's actual promise is backend-sourced
+// content, see `DeliveryNoteProps.title`) — every render call supplies one
+// explicitly, as a real caller would.
+const TEST_TITLE = 'Voor 22:00 besteld, morgen in huis';
+
 describe('DeliveryNote', () => {
-  it('defaults the title to the authoritative phrasing, not the off-spec mockup default', () => {
-    render(<DeliveryNote />);
-    expect(screen.getByText('Voor 22:00 besteld, morgen in huis')).toBeInTheDocument();
-    expect(
-      screen.queryByText('Besteld vóór 22:00, morgen in huis'),
-    ).not.toBeInTheDocument();
+  it('renders the supplied title', () => {
+    render(<DeliveryNote title={TEST_TITLE} />);
+    expect(screen.getByText(TEST_TITLE)).toBeInTheDocument();
   });
 
   it('renders the countdown and threshold by default', () => {
-    render(<DeliveryNote />);
+    render(<DeliveryNote title={TEST_TITLE} />);
     expect(screen.getByText('5u 42m')).toBeInTheDocument();
     expect(screen.getByText(/Gratis vanaf €150/)).toBeInTheDocument();
   });
 
   it('omits the countdown clause entirely when countdown is null', () => {
-    render(<DeliveryNote countdown={null} threshold="Gratis vanaf €150" />);
+    render(
+      <DeliveryNote title={TEST_TITLE} countdown={null} threshold="Gratis vanaf €150" />,
+    );
     expect(screen.queryByText(/om vandaag te bestellen/)).not.toBeInTheDocument();
     expect(screen.getByText('Gratis vanaf €150')).toBeInTheDocument();
   });
@@ -48,12 +52,10 @@ describe('DeliveryNote', () => {
   });
 
   it('wires the module classes for the wrap, icon, title and body', () => {
-    const { container } = render(<DeliveryNote />);
+    const { container } = render(<DeliveryNote title={TEST_TITLE} />);
     expect(container.querySelector(`.${styles.wrap}`)).not.toBeNull();
     expect(container.querySelector('svg')?.getAttribute('class')).toContain(styles.icon);
-    expect(container.querySelector(`.${styles.title}`)?.textContent).toBe(
-      'Voor 22:00 besteld, morgen in huis',
-    );
+    expect(container.querySelector(`.${styles.title}`)?.textContent).toBe(TEST_TITLE);
     expect(container.querySelector(`.${styles.body}`)).not.toBeNull();
   });
 

@@ -3,7 +3,13 @@ import React from 'react';
 import styles from './DeliveryNote.module.css';
 
 export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string;
+  /**
+   * The delivery-promise headline. No default — the store's actual promise is
+   * backend-sourced content (`getStoreIdentity().deliveryPromise.copy`), so a
+   * caller must supply it explicitly rather than this component fabricating
+   * one.
+   */
+  title: string;
   /** Countdown to the same-day order deadline, e.g. "5u 42m". Omit/null to hide. */
   countdown?: string | null;
   /** Free-shipping threshold line. */
@@ -11,16 +17,9 @@ export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> 
   style?: React.CSSProperties;
 }
 
-/**
- * The default `title` is the authoritative phrasing "Voor 22:00 besteld, morgen
- * in huis" — deliberately NOT the source mockup's default "Besteld vóór 22:00,
- * morgen in huis", which is off-spec and intentionally not reproduced here.
- */
-const DEFAULT_TITLE = 'Voor 22:00 besteld, morgen in huis';
-
 /** Blue delivery-reassurance block for the buy box (deadline + countdown). */
 export function DeliveryNote({
-  title = DEFAULT_TITLE,
+  title,
   countdown = '5u 42m',
   threshold = 'Gratis vanaf €150',
   style = {},
