@@ -36,8 +36,8 @@ describe('mapStoreConfig', () => {
       secure_base_media_url: 'https://249.magento.default/media/',
       cms_home_page: 'home',
       header_logo_src: 'logo/default/logo.svg',
-      logo_alt: 'VampireCave',
-      copyright: '© VampireCave',
+      logo_alt: 'Example Store',
+      copyright: '© Example Store',
       store_name: 'Default Store View',
     });
     expect(result).toStrictEqual({
@@ -47,8 +47,8 @@ describe('mapStoreConfig', () => {
       mediaBaseUrl: 'https://249.magento.default/media/',
       cmsHomePage: 'home',
       headerLogoSrc: 'logo/default/logo.svg',
-      logoAlt: 'VampireCave',
-      copyright: '© VampireCave',
+      logoAlt: 'Example Store',
+      copyright: '© Example Store',
       storeName: 'Default Store View',
     });
   });
@@ -105,14 +105,14 @@ describe('mapStoreConfig', () => {
       cms_home_page: 'home',
       header_logo_src: '',
       logo_alt: '',
-      copyright: '© VampireCave',
+      copyright: '© Example Store',
       store_name: 'Default Store View',
     });
     // '' means "unset" for these optional display strings → normalized to null.
     expect(result.headerLogoSrc).toBeNull();
     expect(result.logoAlt).toBeNull();
     // Non-empty identity values are preserved.
-    expect(result.copyright).toBe('© VampireCave');
+    expect(result.copyright).toBe('© Example Store');
     expect(result.storeName).toBe('Default Store View');
     // The existing required fields keep their empty-string coalescing contract.
     expect(result.storeCode).toBe('default');
@@ -317,9 +317,9 @@ describe('composeStoreIdentity', () => {
     mediaBaseUrl: 'https://249.magento.default/media/',
     cmsHomePage: 'home',
     headerLogoSrc: 'logo/default/logo.svg',
-    logoAlt: 'TopDrinks logo',
-    copyright: '© 2026 TopDrinks B.V.',
-    storeName: 'TopDrinks',
+    logoAlt: 'Example Store logo',
+    copyright: '© 2026 Example Store B.V.',
+    storeName: 'Example Store',
   };
 
   function block(identifier: string, content: string): CmsBlock {
@@ -327,8 +327,8 @@ describe('composeStoreIdentity', () => {
   }
 
   const validBlocks: CmsBlock[] = [
-    block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="registration-number">KvK 87654321</p>'),
-    block(STORE_IDENTITY_TAGLINE_BLOCK, '<p>Jouw online drankspeciaalzaak.</p>'),
+    block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="registration-number">Reg. 00000000</p>'),
+    block(STORE_IDENTITY_TAGLINE_BLOCK, '<p>Jouw online specialiteitenwinkel.</p>'),
     block(
       STORE_FOOTER_PAYMENT_METHODS_BLOCK,
       '<ul><li>iDEAL</li><li>Mastercard</li><li>Visa</li></ul>',
@@ -356,15 +356,15 @@ describe('composeStoreIdentity', () => {
       blocks: validBlocks,
     });
     expect(result).toStrictEqual({
-      name: 'TopDrinks',
+      name: 'Example Store',
       logo: {
         src: 'https://249.magento.default/media/logo/default/logo.svg',
-        alt: 'TopDrinks logo',
-        fallbackText: 'TopDrinks',
+        alt: 'Example Store logo',
+        fallbackText: 'Example Store',
       },
-      tagline: 'Jouw online drankspeciaalzaak.',
-      registrationNumber: 'KvK 87654321',
-      copyright: '© 2026 TopDrinks B.V.',
+      tagline: 'Jouw online specialiteitenwinkel.',
+      registrationNumber: 'Reg. 00000000',
+      copyright: '© 2026 Example Store B.V.',
       paymentMethods: ['iDEAL', 'Mastercard', 'Visa'],
       footerColumns: [
         {

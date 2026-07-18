@@ -66,6 +66,15 @@ jobs:
       - name: No hardcoded style literals
         run: pnpm check:no-hardcoded-style-literals
 
+      # Content-sourcing rule (constitution Principle 5): every user-facing
+      # store-identity string (name, tagline, registration number, legal
+      # entity, payment methods, footer columns, delivery promise) must come
+      # from getStoreIdentity(), never be hardcoded back into the frontend —
+      # plus a brand-token grep of the shipped frontend/docs for zero brand
+      # references.
+      - name: No hardcoded content
+        run: pnpm check:no-hardcoded-content
+
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
       - name: Typecheck
