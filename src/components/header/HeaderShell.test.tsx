@@ -5,7 +5,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { StoreIdentityDeliveryPromise } from '@/lib/data-source';
+import type { StoreIdentityDeliveryPromise, StoreIdentityLogo } from '@/lib/data-source';
 import { renderWithBrandTokens, resolvedToken } from '../ui/test-utils/brandRender';
 import {
   expectAllVarTokensAreContractKeys,
@@ -50,6 +50,16 @@ const categories: NavCategory[] = [
 // Fixture stand-ins for `getStoreIdentity()` output — HeaderShell is a pure
 // client component that receives these as props, never fetches them itself.
 const TEST_STORE_NAME = 'Test Store';
+const TEST_LOGO: StoreIdentityLogo = {
+  src: null,
+  alt: '',
+  fallbackText: TEST_STORE_NAME,
+};
+const TEST_LOGO_IMAGE: StoreIdentityLogo = {
+  src: 'https://249.magento.default/media/logo/stores/1/logo.png',
+  alt: 'Test Store logo',
+  fallbackText: TEST_STORE_NAME,
+};
 const TEST_DELIVERY_PROMISE: StoreIdentityDeliveryPromise = {
   copy: 'Voor 22:00 besteld, morgen in huis',
   cutoffHour: 22,
@@ -61,7 +71,7 @@ describe('HeaderShell', () => {
       <HeaderShell
         locale="nl"
         categories={categories}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -82,7 +92,7 @@ describe('HeaderShell', () => {
         categories={categories}
         cartCount={0}
         cartTotal={0}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -99,7 +109,7 @@ describe('HeaderShell', () => {
         locale="nl"
         categories={categories}
         megaPromoHtml=""
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -118,7 +128,7 @@ describe('HeaderShell', () => {
       <HeaderShell
         locale="nl"
         categories={categories}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -132,7 +142,7 @@ describe('HeaderShell', () => {
       <HeaderShell
         locale="nl"
         categories={categories}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -148,7 +158,7 @@ describe('HeaderShell', () => {
       <HeaderShell
         locale="nl"
         categories={categories}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
@@ -182,7 +192,7 @@ describe('HeaderShell', () => {
       <HeaderShell
         locale="nl"
         categories={categories}
-        storeName={TEST_STORE_NAME}
+        logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
       { '--shadow-card': overrideShadow, '--color-surface-inset-b': overrideInsetB },
@@ -209,5 +219,45 @@ describe('HeaderShell', () => {
       'var(--color-surface-inset-b)',
     );
     expect(resolvedToken(trigger, '--color-surface-inset-b')).toBe(overrideInsetB);
+  });
+
+  it('falls back to the text wordmark when logo.src is null, carrying the .logo class + home-link aria-label', () => {
+    render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        logo={TEST_LOGO}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
+    const links = screen.getAllByRole('link', {
+      name: `${TEST_STORE_NAME} — naar de homepagina`,
+    });
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      expect(link).toHaveTextContent(TEST_STORE_NAME);
+      expect(link.querySelector('img')).not.toBeInTheDocument();
+    }
+  });
+
+  it('renders the logo IMAGE when logo.src is configured, with the alt text and the home-link aria-label preserved', () => {
+    render(
+      <HeaderShell
+        locale="nl"
+        categories={categories}
+        logo={TEST_LOGO_IMAGE}
+        deliveryPromise={TEST_DELIVERY_PROMISE}
+      />,
+    );
+    const links = screen.getAllByRole('link', {
+      name: `${TEST_STORE_NAME} — naar de homepagina`,
+    });
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      const img = link.querySelector('img');
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', TEST_LOGO_IMAGE.src as string);
+      expect(img).toHaveAttribute('alt', TEST_LOGO_IMAGE.alt);
+    }
   });
 });

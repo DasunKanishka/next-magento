@@ -3,12 +3,13 @@
 import React from 'react';
 
 import { CountrySelector, SearchBar } from '@/components/ui';
+import { Logo } from '@/components/ui/core/Logo';
 import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { defaultCountryCode, findCountry, type CountryCode } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { REVIEW_RATING_COPY } from '@/config/delivery';
-import type { StoreIdentityDeliveryPromise } from '@/lib/data-source';
+import type { StoreIdentityDeliveryPromise, StoreIdentityLogo } from '@/lib/data-source';
 import { CartPill } from './CartPill';
 import { DeliveryCountdown } from './DeliveryCountdown';
 import { FreeShippingProgress } from './FreeShippingProgress';
@@ -27,8 +28,8 @@ export interface HeaderShellProps {
   cartCount?: number;
   /** Running cart total in EUR. */
   cartTotal?: number;
-  /** Backend-sourced store name (`identity.name`) — the header wordmark text + its aria-label. */
-  storeName: string;
+  /** Backend-sourced logo (`identity.logo`) — image-with-text-fallback wordmark + its aria-label. */
+  logo: StoreIdentityLogo;
   /** Backend-sourced delivery promise (`identity.deliveryPromise`) — the trust-row copy + the countdown's cut-off hour. */
   deliveryPromise: StoreIdentityDeliveryPromise;
 }
@@ -47,7 +48,7 @@ export function HeaderShell({
   megaPromoHtml = '',
   cartCount = 0,
   cartTotal = 0,
-  storeName,
+  logo,
   deliveryPromise,
 }: HeaderShellProps) {
   const router = useRouter();
@@ -87,15 +88,7 @@ export function HeaderShell({
     </Link>
   );
 
-  const logo = (
-    <Link
-      href="/"
-      aria-label={`${storeName} — naar de homepagina`}
-      className={styles.logo}
-    >
-      {storeName}
-    </Link>
-  );
+  const logoEl = <Logo logo={logo} className={styles.logo} />;
 
   const accountButton = (
     <button type="button" aria-label="Inloggen" className={styles.accountButton}>
@@ -113,7 +106,7 @@ export function HeaderShell({
       {/* ---------- Desktop ---------- */}
       <div className={styles.desktop}>
         <div className={`${styles.maxwRow} ${styles.topRow}`}>
-          <div className={styles.logoWrap}>{logo}</div>
+          <div className={styles.logoWrap}>{logoEl}</div>
 
           <div className={styles.searchCol}>
             <SearchBar />
@@ -216,7 +209,7 @@ export function HeaderShell({
 
         <div className={styles.mobileTopRow}>
           <MobileMenu categories={categories} locale={locale} onLanguageChange={goTo} />
-          <div className={styles.mobileLogoWrap}>{logo}</div>
+          <div className={styles.mobileLogoWrap}>{logoEl}</div>
           <CountrySelector
             compact
             alignLeft

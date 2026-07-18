@@ -109,4 +109,34 @@ describe('Footer', () => {
   it('the co-located stylesheet references only real tokens', () => {
     expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
+
+  it('falls back to the text wordmark carrying the .wordmark class when logo.src is null', () => {
+    render(<Footer identity={TEST_IDENTITY} />);
+    const link = screen.getByRole('link', {
+      name: `${TEST_IDENTITY.name} — naar de homepagina`,
+    });
+    expect(link).toHaveTextContent(TEST_IDENTITY.name);
+    expect(link.className).toContain(styles.wordmark);
+    expect(link.querySelector('img')).not.toBeInTheDocument();
+  });
+
+  it('renders the logo IMAGE when logo.src is configured, keeping the .wordmark class + home-link aria-label', () => {
+    const identityWithImage: StoreIdentity = {
+      ...TEST_IDENTITY,
+      logo: {
+        src: 'https://249.magento.default/media/logo/stores/1/logo.png',
+        alt: 'Test Store logo',
+        fallbackText: TEST_IDENTITY.name,
+      },
+    };
+    render(<Footer identity={identityWithImage} />);
+    const link = screen.getByRole('link', {
+      name: `${TEST_IDENTITY.name} — naar de homepagina`,
+    });
+    expect(link.className).toContain(styles.wordmark);
+    const img = link.querySelector('img');
+    expect(img).toBeInTheDocument();
+    expect(img).toHaveAttribute('src', identityWithImage.logo.src as string);
+    expect(img).toHaveAttribute('alt', identityWithImage.logo.alt);
+  });
 });

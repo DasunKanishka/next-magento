@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
+import { Logo } from '@/components/ui/core/Logo';
 import type { StoreIdentity } from '@/lib/data-source';
 import { NewsletterSignup } from './NewsletterSignup';
 import styles from './Footer.module.css';
@@ -26,13 +27,7 @@ export function Footer({ identity }: FooterProps) {
       <div className={styles.inner}>
         <div className={styles.cols}>
           <div className={styles.brand}>
-            <Link
-              href="/"
-              aria-label={`${identity.name} — naar de homepagina`}
-              className={styles.wordmark}
-            >
-              {identity.name}
-            </Link>
+            <Logo logo={identity.logo} className={styles.wordmark} />
             <p className={styles.tagline}>{identity.tagline}</p>
             <ul aria-label="Betaalmethoden" className={styles.payments}>
               {identity.paymentMethods.map((method) => (

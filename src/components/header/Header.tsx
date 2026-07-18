@@ -66,7 +66,7 @@ export async function Header({ locale = defaultLocale, identity }: HeaderProps) 
       locale={locale}
       categories={categories}
       megaPromoHtml={megaPromoHtml}
-      storeName={identity.name}
+      logo={identity.logo}
       deliveryPromise={identity.deliveryPromise}
     />
   );
