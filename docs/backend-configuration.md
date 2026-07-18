@@ -152,9 +152,40 @@ can never present an incorrect company identity.
 
 ## 4. Propagating content updates
 
-Content is cached (under the `store-identity` cache tag) and served fast. Edits
-made in the Magento admin appear on the storefront when the cache entry next
-refreshes — a time-based safety window. Immediate on-demand invalidation
-(refreshing the moment content is edited, by invalidating the `store-identity`
-tag) is a planned capability; until it is enabled, admin edits surface within
-the safety window.
+Content is cached (under the `store-identity` cache tag) and served fast. Two
+mechanisms bound how long an admin edit takes to surface — one requires no
+setup at all, the other is optional and immediate:
+
+- **Time-based safety window (baseline, zero setup).** The cache entry
+  refreshes on its own within **1 hour**. This applies with nothing configured
+  — it is the worst-case staleness bound if no trigger below is ever wired up.
+- **On-demand revalidation (optional, immediate).** `POST /api/revalidate`
+  invalidates the `store-identity` cache tag on demand, so the next request
+  re-fetches fresh content immediately instead of waiting out the window.
+  Nothing on the Magento side needs to call this — it's entirely
+  operator-configured. Wire ANY trigger you like at it: a cron job on a
+  schedule shorter than 1h, a manual/CI call after a content deploy, or (only
+  if your Magento platform happens to support outbound webhooks) a webhook
+  from the admin save action. None of these is required; the storefront ships
+  and works correctly with the safety window alone.
+
+  **Request**
+
+  ```
+  POST /api/revalidate
+  Header: x-revalidate-secret: <REVALIDATE_SECRET>
+  Body (JSON, optional):
+    { "tag": "store-identity", "storeCode": "default" }
+  ```
+
+  - `tag` defaults to `store-identity` (currently the only allow-listed tag —
+    any other value is rejected).
+  - `storeCode` is optional bookkeeping for the caller; it does not change
+    which cache entries are invalidated (the tag is global across stores).
+  - Set the `REVALIDATE_SECRET` env var (server-only — never `NEXT_PUBLIC_`)
+    to a long random value and send the same value in the header. Missing or
+    wrong secret, or an unset `REVALIDATE_SECRET` on the server, → `401` and
+    nothing is invalidated. A malformed body or disallowed `tag` → `400`. Any
+    method other than `POST` → `405`.
+  - The call is safe to repeat (idempotent) — a scheduler or CI step can call
+    it liberally without needing to track whether a previous call landed.

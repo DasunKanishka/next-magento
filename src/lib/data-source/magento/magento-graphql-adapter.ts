@@ -60,7 +60,17 @@ export const magentoGraphQLAdapter: DataSource = {
     // price/currency-varying field is ever added to this read, `Content-Currency`
     // has to be reinstated in the key (and passed to `getMagentoClient` below).
     cacheTag('store-identity');
-    cacheLife('minutes');
+    // 1h safety window (the built-in 'hours' profile: stale 5min / revalidate
+    // 1h / expire 1day — no custom profile is defined in next.config.ts, so
+    // this named profile is the project's existing convention for a
+    // non-default window). This is the ZERO-COUPLING baseline: it bounds
+    // worst-case staleness with no Magento-side trigger required at all. The
+    // on-demand `POST /api/revalidate` endpoint (`revalidateTag('store-identity')`)
+    // is the OPTIONAL fast path — when an operator wires any authed trigger at
+    // it, edits surface immediately and this window never gets a chance to
+    // matter; when none is wired, this 1h window is what actually bounds
+    // staleness.
+    cacheLife('hours');
 
     const client = getMagentoClient({ storeCode });
 
