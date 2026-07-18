@@ -104,18 +104,19 @@ export interface StoreIdentityDeliveryPromise {
  * (see `composeStoreIdentity` in the Magento adapter's mapper module for the
  * exact per-field source).
  *
- * `name`, `legalEntity`, `registrationNumber`, and `copyright` are the four
- * legal/identity fields: `getStoreIdentity` throws rather than return this
- * shape with any of them missing or defaulted — there is no hardcoded
- * fallback for a legal fact anywhere in this codebase. Every other field
- * degrades to a documented empty value when unauthored.
+ * `name`, `registrationNumber`, and `copyright` are the three legal/identity
+ * fields: `getStoreIdentity` throws rather than return this shape with any of
+ * them missing or defaulted — there is no hardcoded fallback for a legal fact
+ * anywhere in this codebase. Every other field degrades to a documented empty
+ * value when unauthored. (The footer legal line is sourced from `copyright`,
+ * the native store-config field, so a separate `legalEntity` value was
+ * redundant and has been removed.)
  */
 export interface StoreIdentity {
   name: string;
   logo: StoreIdentityLogo;
   tagline: string;
   registrationNumber: string;
-  legalEntity: string;
   copyright: string;
   paymentMethods: string[];
   footerColumns: StoreIdentityFooterColumn[];
@@ -167,9 +168,9 @@ export interface DataSource {
    * knows whether a field came from a native store-config scalar or an
    * admin-authored content source.
    *
-   * THROWS when a legal/identity field (`name`, `legalEntity`,
-   * `registrationNumber`, `copyright`) cannot be sourced — no partial or
-   * defaulted identity is ever returned for those four fields.
+   * THROWS when a legal/identity field (`name`, `registrationNumber`,
+   * `copyright`) cannot be sourced — no partial or defaulted identity is ever
+   * returned for those three fields.
    */
   getStoreIdentity(args: { storeCode: string }): Promise<StoreIdentity>;
 

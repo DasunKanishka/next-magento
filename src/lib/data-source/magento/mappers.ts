@@ -14,7 +14,6 @@ import {
   STORE_FOOTER_COLUMN_CLASS,
   STORE_FOOTER_PAYMENT_METHODS_BLOCK,
   STORE_IDENTITY_LEGAL_BLOCK,
-  STORE_IDENTITY_LEGAL_ENTITY_CLASS,
   STORE_IDENTITY_REGISTRATION_NUMBER_CLASS,
   STORE_IDENTITY_TAGLINE_BLOCK,
 } from '@/config/store-identity-content';
@@ -216,11 +215,14 @@ export function mapNewsletterStatus(raw?: string | null): 'subscribed' | 'error'
 // --- Store identity composition ---------------------------------------
 
 /**
- * The four legal/identity fields `getStoreIdentity` must never return
+ * The three legal/identity fields `getStoreIdentity` must never return
  * defaulted or missing. Kept as a literal union so every call site to
- * `requireLegalField` is checked against this exact set.
+ * `requireLegalField` is checked against this exact set. (`legalEntity` was
+ * dropped from this set: the footer legal line is sourced from the native
+ * `copyright` store-config field, so a separate fail-closed legal-entity value
+ * was redundant and rendered nowhere.)
  */
-type LegalIdentityField = 'name' | 'legalEntity' | 'registrationNumber' | 'copyright';
+type LegalIdentityField = 'name' | 'registrationNumber' | 'copyright';
 
 /**
  * Enforce the fail-closed rule for a legal/identity field: throw (with a
@@ -288,8 +290,8 @@ function toText(fragment: string): string {
  * Match `className` as a WHOLE space-delimited token inside a `class="…"`
  * attribute value: it must sit at the start of the value or be preceded by
  * whitespace, and end at the closing quote or be followed by whitespace. This
- * avoids a superset-class false match (e.g. `legal-entity` must not match
- * `legal-entity-x`), which the previous `\b…\b` form allowed because `-` is a
+ * avoids a superset-class false match (e.g. `registration-number` must not
+ * match `registration-number-x`), which the previous `\b…\b` form allowed because `-` is a
  * regex word boundary. Emitted as a non-capturing group so surrounding capture
  * indices are unchanged.
  */
@@ -322,21 +324,13 @@ function firstHeading(block: string): string {
 }
 
 /**
- * Extract `legalEntity` + `registrationNumber` from the legal-identity block.
- * Plain-text-only extraction (sanitize, then strip markup) — these are short
- * legal facts, never rendered as markup.
+ * Extract `registrationNumber` from the legal-identity block. Plain-text-only
+ * extraction (sanitize, then strip markup) — a short legal fact, never
+ * rendered as markup.
  */
-function parseLegalIdentity(raw: string): {
-  legalEntity: string;
-  registrationNumber: string;
-} {
+function parseRegistrationNumber(raw: string): string {
   const clean = sanitizeCmsHtml(raw);
-  return {
-    legalEntity: toText(firstByClass(clean, STORE_IDENTITY_LEGAL_ENTITY_CLASS)),
-    registrationNumber: toText(
-      firstByClass(clean, STORE_IDENTITY_REGISTRATION_NUMBER_CLASS),
-    ),
-  };
+  return toText(firstByClass(clean, STORE_IDENTITY_REGISTRATION_NUMBER_CLASS));
 }
 
 /** The tagline block's whole sanitized text content. `''` when unauthored. */
@@ -398,8 +392,8 @@ function parseDeliveryPromise(raw: string): StoreIdentity['deliveryPromise'] {
  * `STORE_IDENTITY_CONTENT_IDENTIFIERS`). Pure — no I/O, no adapter/network
  * awareness — so it is directly unit-testable with plain fixtures.
  *
- * THROWS (fail-closed) when `name`, `legalEntity`, `registrationNumber`, or
- * `copyright` is missing/empty — whether because the source was unreachable
+ * THROWS (fail-closed) when `name`, `registrationNumber`, or `copyright` is
+ * missing/empty — whether because the source was unreachable
  * (the caller passes an empty `StoreConfig`/`blocks` on a transport failure)
  * or because the value itself is absent. Every other field degrades to its
  * documented empty value and never throws.
@@ -413,12 +407,9 @@ export function composeStoreIdentity(args: {
   const name = requireLegalField('name', storeConfig.storeName ?? '');
   const copyright = requireLegalField('copyright', storeConfig.copyright ?? '');
 
-  const { legalEntity: rawLegalEntity, registrationNumber: rawRegistrationNumber } =
-    parseLegalIdentity(findBlockContent(blocks, STORE_IDENTITY_LEGAL_BLOCK));
-  const legalEntity = requireLegalField('legalEntity', rawLegalEntity);
   const registrationNumber = requireLegalField(
     'registrationNumber',
-    rawRegistrationNumber,
+    parseRegistrationNumber(findBlockContent(blocks, STORE_IDENTITY_LEGAL_BLOCK)),
   );
 
   return {
@@ -430,7 +421,6 @@ export function composeStoreIdentity(args: {
     },
     tagline: parseTagline(findBlockContent(blocks, STORE_IDENTITY_TAGLINE_BLOCK)),
     registrationNumber,
-    legalEntity,
     copyright,
     paymentMethods: parsePaymentMethods(
       findBlockContent(blocks, STORE_FOOTER_PAYMENT_METHODS_BLOCK),

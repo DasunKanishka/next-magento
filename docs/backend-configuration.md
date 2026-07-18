@@ -78,20 +78,19 @@ Create each block under **Content → Elements → Blocks** with the exact
 view(s). The frontend sanitizes all block HTML (allow-list) before reading it —
 author content, not scripts.
 
-| Block identifier               | Provides                           | Expected content shape                                                                                                                                                |
-| ------------------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `store_identity_legal`         | Legal entity + registration number | One element with `class="legal-entity"` and one with `class="registration-number"`. **Both required.**                                                                |
-| `store_identity_tagline`       | Brand tagline                      | The block's plain text is the tagline.                                                                                                                                |
-| `store_footer_payment_methods` | Accepted payment methods           | A `<li>` per method name.                                                                                                                                             |
-| `store_footer_columns`         | Footer link columns                | One `<div class="footer-column">` per column, each with a heading (`<h2>`–`<h6>`) and a list of `<a href="…">` links. Do **not** nest a `<div>` inside a column.      |
-| `store_delivery_promise`       | Delivery promise                   | One element with `class="delivery-copy"` (the message) and one with `class="delivery-cutoff-hour"` (an integer 0–23). Both must be present or the promise is omitted. |
+| Block identifier               | Provides                       | Expected content shape                                                                                                                                                |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `store_identity_legal`         | Registration number (e.g. KvK) | One element with `class="registration-number"`. **Required.** (The legal-entity / copyright-holder name is the native `copyright` config above, not this block.)      |
+| `store_identity_tagline`       | Brand tagline                  | The block's plain text is the tagline.                                                                                                                                |
+| `store_footer_payment_methods` | Accepted payment methods       | A `<li>` per method name.                                                                                                                                             |
+| `store_footer_columns`         | Footer link columns            | One `<div class="footer-column">` per column, each with a heading (`<h2>`–`<h6>`) and a list of `<a href="…">` links. Do **not** nest a `<div>` inside a column.      |
+| `store_delivery_promise`       | Delivery promise               | One element with `class="delivery-copy"` (the message) and one with `class="delivery-cutoff-hour"` (an integer 0–23). Both must be present or the promise is omitted. |
 
 Example block contents (replace the placeholder text with your own):
 
 `store_identity_legal`
 
 ```html
-<span class="legal-entity">Your Company B.V.</span>
 <span class="registration-number">Reg. 00000000</span>
 ```
 
@@ -139,13 +138,13 @@ Example block contents (replace the placeholder text with your own):
 
 ## 3. Missing-content behavior
 
-| Field                                                          | When unauthored / unreachable                                                                                                    |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `store_name`, `copyright`, `legalEntity`, `registrationNumber` | **Fail-closed** — the storefront throws rather than render a blank or wrong legal identity. Author these before serving traffic. |
-| Logo image (`header_logo_src`)                                 | Falls back to the store name as a text wordmark.                                                                                 |
-| Tagline                                                        | Renders empty.                                                                                                                   |
-| Payment methods / footer columns                               | Render as an empty list.                                                                                                         |
-| Delivery promise                                               | Omitted unless both the copy and a valid integer cut-off hour are present.                                                       |
+| Field                                           | When unauthored / unreachable                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `store_name`, `copyright`, `registrationNumber` | **Fail-closed** — the storefront throws rather than render a blank or wrong legal identity. Author these before serving traffic. |
+| Logo image (`header_logo_src`)                  | Falls back to the store name as a text wordmark.                                                                                 |
+| Tagline                                         | Renders empty.                                                                                                                   |
+| Payment methods / footer columns                | Render as an empty list.                                                                                                         |
+| Delivery promise                                | Omitted unless both the copy and a valid integer cut-off hour are present.                                                       |
 
 The four legal/identity fields are fail-closed on purpose: there is no hardcoded
 fallback for a legal fact anywhere in this codebase, so a misconfigured backend

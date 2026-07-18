@@ -327,10 +327,7 @@ describe('composeStoreIdentity', () => {
   }
 
   const validBlocks: CmsBlock[] = [
-    block(
-      STORE_IDENTITY_LEGAL_BLOCK,
-      '<p class="legal-entity">TopDrinks B.V.</p><p class="registration-number">KvK 87654321</p>',
-    ),
+    block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="registration-number">KvK 87654321</p>'),
     block(STORE_IDENTITY_TAGLINE_BLOCK, '<p>Jouw online drankspeciaalzaak.</p>'),
     block(
       STORE_FOOTER_PAYMENT_METHODS_BLOCK,
@@ -367,7 +364,6 @@ describe('composeStoreIdentity', () => {
       },
       tagline: 'Jouw online drankspeciaalzaak.',
       registrationNumber: 'KvK 87654321',
-      legalEntity: 'TopDrinks B.V.',
       copyright: '© 2026 TopDrinks B.V.',
       paymentMethods: ['iDEAL', 'Mastercard', 'Visa'],
       footerColumns: [
@@ -448,29 +444,7 @@ describe('composeStoreIdentity', () => {
       errorSpy.mockRestore();
     });
 
-    it('throws + logs the marker when legalEntity is unsourceable (block missing the class)', () => {
-      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      const blocksWithoutLegalEntity = validBlocks.map((b) =>
-        b.identifier === STORE_IDENTITY_LEGAL_BLOCK
-          ? block(
-              STORE_IDENTITY_LEGAL_BLOCK,
-              '<p class="registration-number">KvK 87654321</p>',
-            )
-          : b,
-      );
-      expect(() =>
-        composeStoreIdentity({
-          storeConfig: validStoreConfig,
-          blocks: blocksWithoutLegalEntity,
-        }),
-      ).toThrow('store-identity:fail-closed field=legalEntity');
-      expect(errorSpy).toHaveBeenCalledWith(
-        'store-identity:fail-closed field=legalEntity',
-      );
-      errorSpy.mockRestore();
-    });
-
-    it('throws + logs field=legalEntity when the whole legal block is missing (legalEntity is required before registrationNumber)', () => {
+    it('throws + logs field=registrationNumber when the whole legal block is missing', () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const blocksWithoutLegalBlock = validBlocks.filter(
         (b) => b.identifier !== STORE_IDENTITY_LEGAL_BLOCK,
@@ -480,23 +454,18 @@ describe('composeStoreIdentity', () => {
           storeConfig: validStoreConfig,
           blocks: blocksWithoutLegalBlock,
         }),
-      ).toThrow('store-identity:fail-closed field=legalEntity');
+      ).toThrow('store-identity:fail-closed field=registrationNumber');
       expect(errorSpy).toHaveBeenCalledWith(
-        'store-identity:fail-closed field=legalEntity',
+        'store-identity:fail-closed field=registrationNumber',
       );
       errorSpy.mockRestore();
     });
 
-    it('throws + logs the marker when registrationNumber alone is unsourceable (legalEntity present)', () => {
+    it('throws + logs the marker when the registration-number class is missing from the legal block', () => {
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      // legalEntity IS authored so it passes; only registrationNumber is missing,
-      // isolating registrationNumber's own fail-closed throw.
       const blocksWithoutRegistration = validBlocks.map((b) =>
         b.identifier === STORE_IDENTITY_LEGAL_BLOCK
-          ? block(
-              STORE_IDENTITY_LEGAL_BLOCK,
-              '<p class="legal-entity">TopDrinks B.V.</p>',
-            )
+          ? block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="other">irrelevant</p>')
           : b,
       );
       expect(() =>

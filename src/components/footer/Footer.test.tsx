@@ -32,7 +32,6 @@ const TEST_IDENTITY: StoreIdentity = {
   logo: { src: null, alt: '', fallbackText: 'Test Store' },
   tagline: 'Test tagline copy.',
   registrationNumber: 'KvK 12345678',
-  legalEntity: 'Test Store B.V.',
   copyright: 'Test Store B.V.',
   paymentMethods: ['iDEAL', 'Visa', 'Mastercard', 'PayPal'],
   footerColumns: [

@@ -40,7 +40,7 @@ describe('LocaleError', () => {
   it('invokes reset when the retry button is activated', () => {
     const reset = vi.fn();
     const error = Object.assign(
-      new Error('store-identity:fail-closed field=legalEntity'),
+      new Error('store-identity:fail-closed field=registrationNumber'),
       {
         digest: 'test-digest',
       },
