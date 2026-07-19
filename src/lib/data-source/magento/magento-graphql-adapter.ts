@@ -4,7 +4,12 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { resolveSlotCategoryId } from '@/config/merchandising-slots';
 import { STORE_IDENTITY_CONTENT_IDENTIFIERS } from '@/config/store-identity-content';
-import type { CmsBlock, DataSource, StoreConfig } from '@/lib/data-source/types';
+import type {
+  CmsBlock,
+  DataSource,
+  StoreConfig,
+  StoreIdentity,
+} from '@/lib/data-source/types';
 
 import { getMagentoClient } from './client';
 import {
@@ -41,6 +46,74 @@ function notNull<T>(value: T): value is NonNullable<T> {
   return value != null;
 }
 
+/**
+ * The cached store-identity read. Extracted to a MODULE-LEVEL `async function`
+ * deliberately: Next's `'use cache'` compiler transform applies to file-level
+ * and top-level function declarations, NOT to object-method shorthand. When the
+ * directive lived inside `magentoGraphQLAdapter.getStoreIdentity` (a method) it
+ * was a silent no-op — the read never cached, so `cacheTag`/`cacheLife` had no
+ * effect and on-demand `revalidateTag('store-identity')` could never bound or
+ * flip staleness (an edit surfaced on the very next request regardless). This
+ * mirrors the working `getHomeShellData` cached read in `@/lib/home/home-data`.
+ * The adapter method below is a thin delegator so the DataSource surface is
+ * unchanged.
+ */
+export async function loadStoreIdentity({
+  storeCode,
+}: {
+  storeCode: string;
+}): Promise<StoreIdentity> {
+  'use cache';
+  // Cache key is Store (`storeCode`) only — `Content-Currency` is
+  // intentionally omitted. Every field this read returns (name, logo, legal
+  // fields, tagline, payment badges, footer columns, delivery copy) is
+  // currency-invariant: none carries a price or any currency-dependent value,
+  // so the same store view yields identical identity regardless of display
+  // currency and a currency-scoped key would only fragment the cache. This
+  // invariance is the precondition for the store-only key: if a future
+  // price/currency-varying field is ever added to this read, `Content-Currency`
+  // has to be reinstated in the key (and passed to `getMagentoClient` below).
+  cacheTag('store-identity');
+  // 1h safety window (the built-in 'hours' profile: stale 5min / revalidate
+  // 1h / expire 1day — no custom profile is defined in next.config.ts, so
+  // this named profile is the project's existing convention for a
+  // non-default window). This is the ZERO-COUPLING baseline: it bounds
+  // worst-case staleness with no Magento-side trigger required at all. The
+  // on-demand `POST /api/revalidate` endpoint (`revalidateTag('store-identity')`)
+  // is the OPTIONAL fast path — when an operator wires any authed trigger at
+  // it, edits surface immediately and this window never gets a chance to
+  // matter; when none is wired, this 1h window is what actually bounds
+  // staleness.
+  cacheLife('hours');
+
+  const client = getMagentoClient({ storeCode });
+
+  // Each source is fetched independently and any transport failure is
+  // contained here: an unreachable source degrades to an empty config/block
+  // set rather than leaking a raw backend error, so the fail-closed check in
+  // `composeStoreIdentity` uniformly handles "unreachable" and "missing
+  // value" as the same outcome (and logs the same field-naming marker).
+  let storeConfig: StoreConfig;
+  try {
+    const data = await client.request(StoreConfigDocument);
+    storeConfig = mapStoreConfig(data.storeConfig ?? {});
+  } catch {
+    storeConfig = mapStoreConfig({});
+  }
+
+  let blocks: CmsBlock[];
+  try {
+    const data = await client.request(EditorialBlocksDocument, {
+      identifiers: STORE_IDENTITY_CONTENT_IDENTIFIERS,
+    });
+    blocks = mapCmsBlocks((data.cmsBlocks?.items ?? []).filter(notNull));
+  } catch {
+    blocks = [];
+  }
+
+  return composeStoreIdentity({ storeConfig, blocks });
+}
+
 export const magentoGraphQLAdapter: DataSource = {
   async getStoreConfig({ storeCode }) {
     const client = getMagentoClient({ storeCode });
@@ -48,56 +121,12 @@ export const magentoGraphQLAdapter: DataSource = {
     return mapStoreConfig(data.storeConfig ?? {});
   },
 
+  // Thin delegator to the module-level cached `loadStoreIdentity`. The
+  // `'use cache'` directive MUST live on that top-level function, not here — a
+  // directive inside this method shorthand is not transformed by Next and would
+  // silently disable caching (and with it, on-demand revalidation).
   async getStoreIdentity({ storeCode }) {
-    'use cache';
-    // Cache key is Store (`storeCode`) only — `Content-Currency` is
-    // intentionally omitted. Every field this read returns (name, logo, legal
-    // fields, tagline, payment badges, footer columns, delivery copy) is
-    // currency-invariant: none carries a price or any currency-dependent value,
-    // so the same store view yields identical identity regardless of display
-    // currency and a currency-scoped key would only fragment the cache. This
-    // invariance is the precondition for the store-only key: if a future
-    // price/currency-varying field is ever added to this read, `Content-Currency`
-    // has to be reinstated in the key (and passed to `getMagentoClient` below).
-    cacheTag('store-identity');
-    // 1h safety window (the built-in 'hours' profile: stale 5min / revalidate
-    // 1h / expire 1day — no custom profile is defined in next.config.ts, so
-    // this named profile is the project's existing convention for a
-    // non-default window). This is the ZERO-COUPLING baseline: it bounds
-    // worst-case staleness with no Magento-side trigger required at all. The
-    // on-demand `POST /api/revalidate` endpoint (`revalidateTag('store-identity')`)
-    // is the OPTIONAL fast path — when an operator wires any authed trigger at
-    // it, edits surface immediately and this window never gets a chance to
-    // matter; when none is wired, this 1h window is what actually bounds
-    // staleness.
-    cacheLife('hours');
-
-    const client = getMagentoClient({ storeCode });
-
-    // Each source is fetched independently and any transport failure is
-    // contained here: an unreachable source degrades to an empty config/block
-    // set rather than leaking a raw backend error, so the fail-closed check in
-    // `composeStoreIdentity` uniformly handles "unreachable" and "missing
-    // value" as the same outcome (and logs the same field-naming marker).
-    let storeConfig: StoreConfig;
-    try {
-      const data = await client.request(StoreConfigDocument);
-      storeConfig = mapStoreConfig(data.storeConfig ?? {});
-    } catch {
-      storeConfig = mapStoreConfig({});
-    }
-
-    let blocks: CmsBlock[];
-    try {
-      const data = await client.request(EditorialBlocksDocument, {
-        identifiers: STORE_IDENTITY_CONTENT_IDENTIFIERS,
-      });
-      blocks = mapCmsBlocks((data.cmsBlocks?.items ?? []).filter(notNull));
-    } catch {
-      blocks = [];
-    }
-
-    return composeStoreIdentity({ storeConfig, blocks });
+    return loadStoreIdentity({ storeCode });
   },
 
   async getNavigationCategories({ storeCode, currency, rootCategoryId }) {
