@@ -1,11 +1,22 @@
 import React from 'react';
 
+import styles from './PriceBlock.module.css';
+
 export interface PriceBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Current price — number (formatted to €x,xx) or preformatted string. */
   price: number | string;
   /** Original price; when set, price turns urgency-toned and this shows struck through. */
   oldPrice?: number | string | null;
-  /** Font-size of the main price in px. */
+  /**
+   * Font-size of the main price in px; the old-price size derives
+   * proportionally (half of it). Left undefined by default so the default
+   * render stays brand-overridable: the bridge then resolves to
+   * `--type-stat-size` (34px) for the main price and `calc(... * 0.5)` for
+   * the old price, so a brand can retheme the default price size. Only an
+   * explicit caller override bakes a `${size}px` literal through the bridge
+   * — the same default-to-a-token / px-on-override pattern the Rating and
+   * IconButton `size` props follow.
+   */
   size?: number;
   /** Show the "Je bespaart €x,xx" savings flag. */
   showSavings?: boolean;
@@ -44,7 +55,7 @@ export function formatEuro(value: number | string): string {
 export function PriceBlock({
   price,
   oldPrice = null,
-  size = 34,
+  size,
   showSavings = false,
   savingsLabel = null,
   perUnit = null,
@@ -60,54 +71,24 @@ export function PriceBlock({
       : null;
   const savings = savingsLabel || computedSavings;
 
+  const bridge = {
+    '--local-price-size': size != null ? `${size}px` : 'var(--type-stat-size)',
+    '--local-old-price-size':
+      size != null ? `${Math.round(size * 0.5)}px` : 'calc(var(--type-stat-size) * 0.5)',
+    '--local-price-fg': onSale ? 'var(--color-urgency)' : 'var(--color-brand-ink)',
+  } as React.CSSProperties;
+
   return (
     <div style={style} {...rest}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-        <span
-          style={{
-            font: `700 ${size}px/1 var(--font-brand)`,
-            color: onSale ? 'var(--color-urgency)' : 'var(--color-brand-ink)',
-          }}
-        >
-          {formatEuro(price)}
-        </span>
-        {onSale ? (
-          <span
-            style={{
-              font: `500 ${Math.round(size * 0.5)}px/1 var(--font-brand)`,
-              color: 'var(--color-text-strikethrough)',
-              textDecoration: 'line-through',
-              paddingBottom: 3,
-            }}
-          >
-            {oldPriceLabel}
-          </span>
-        ) : null}
+      <div className={styles.row} style={bridge}>
+        <span className={styles.price}>{formatEuro(price)}</span>
+        {onSale ? <span className={styles.oldPrice}>{oldPriceLabel}</span> : null}
         {showSavings && savings ? (
-          <span
-            style={{
-              background: 'var(--color-urgency-chip)',
-              color: 'var(--color-urgency)',
-              font: '600 13px/1 var(--font-brand)',
-              padding: '6px 10px',
-              borderRadius: 'var(--radius-xs)',
-              marginBottom: 1,
-            }}
-          >
-            {savings}
-          </span>
+          <span className={styles.savings}>{savings}</span>
         ) : null}
       </div>
       {perUnit || note ? (
-        <div
-          style={{
-            marginTop: 7,
-            font: '500 12px/1 var(--font-brand)',
-            color: 'var(--color-text-subtle)',
-          }}
-        >
-          {[perUnit, note].filter(Boolean).join(' · ')}
-        </div>
+        <div className={styles.meta}>{[perUnit, note].filter(Boolean).join(' · ')}</div>
       ) : null}
     </div>
   );

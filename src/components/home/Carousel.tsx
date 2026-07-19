@@ -2,6 +2,9 @@
 
 import React from 'react';
 
+import { PagerButton } from '@/components/ui/core/PagerButton';
+import styles from './Carousel.module.css';
+
 export interface CarouselProps {
   /** Accessible label for the carousel region. */
   label: string;
@@ -18,9 +21,6 @@ export interface CarouselProps {
  */
 export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps) {
   const trackRef = React.useRef<HTMLDivElement>(null);
-  // A per-instance, CSS-safe class prefix so each track's scoped rules stay
-  // isolated (`useId` output contains colons, which are invalid in selectors).
-  const cls = `carousel${React.useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const page = React.useCallback((direction: 1 | -1) => {
     const track = trackRef.current;
@@ -31,90 +31,39 @@ export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps)
     });
   }, []);
 
-  return (
-    <div style={{ position: 'relative' }}>
-      <style>{`
-        .${cls}-track {
-          display: grid;
-          grid-auto-flow: column;
-          grid-auto-columns: minmax(${itemMinWidth}px, 1fr);
-          gap: 16px;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          padding-bottom: 4px;
-        }
-        .${cls}-track::-webkit-scrollbar { display: none; }
-        .${cls}-track > * { scroll-snap-align: start; }
-        .${cls}-arrow { display: none; }
-        @media (min-width: 901px) {
-          .${cls}-track { grid-auto-columns: minmax(${itemMinWidth}px, 1fr); }
-          .${cls}-arrow {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
-            z-index: 3;
-          }
-          .${cls}-arrow-prev { left: -8px; }
-          .${cls}-arrow-next { right: -8px; }
-        }
-      `}</style>
+  // itemMinWidth is a caller-supplied layout parameter (business data), not a
+  // design token — it bridges as a plain computed px value, mirroring
+  // FreeShippingProgress's --local-fill-width precedent.
+  const bridge = {
+    '--local-item-min-w': `${itemMinWidth}px`,
+  } as React.CSSProperties;
 
-      <button
-        type="button"
-        aria-label="Vorige"
-        className={`${cls}-arrow ${cls}-arrow-prev`}
+  return (
+    <div className={styles.wrap}>
+      <PagerButton
+        variant="on-surface"
+        direction="prev"
+        label="Vorige"
         onClick={() => page(-1)}
-        style={{
-          minWidth: 'var(--tap-target-min)',
-          minHeight: 'var(--tap-target-min)',
-          borderRadius: 'var(--radius-full)',
-          border: 'var(--border-width-default) solid var(--color-border-card)',
-          background: 'var(--color-surface)',
-          color: 'var(--color-text-primary)',
-          font: '700 18px/1 var(--font-brand)',
-          boxShadow: 'var(--shadow-card)',
-          cursor: 'pointer',
-        }}
-      >
-        ‹
-      </button>
+      />
 
       <div
         ref={trackRef}
-        className={`${cls}-track`}
+        className={styles.track}
         role="group"
         aria-label={label}
         tabIndex={0}
+        style={bridge}
       >
         {children}
       </div>
 
-      <button
-        type="button"
-        aria-label="Volgende"
-        className={`${cls}-arrow ${cls}-arrow-next`}
+      <PagerButton
+        variant="on-surface"
+        direction="next"
+        label="Volgende"
         onClick={() => page(1)}
-        style={{
-          minWidth: 'var(--tap-target-min)',
-          minHeight: 'var(--tap-target-min)',
-          borderRadius: 'var(--radius-full)',
-          border: 'var(--border-width-default) solid var(--color-border-card)',
-          background: 'var(--color-surface)',
-          color: 'var(--color-text-primary)',
-          font: '700 18px/1 var(--font-brand)',
-          boxShadow: 'var(--shadow-card)',
-          cursor: 'pointer',
-        }}
-      >
-        ›
-      </button>
+      />
     </div>
   );
 }

@@ -1,8 +1,13 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../ui/test-utils/tokenAssertions';
 import { CartPill } from './CartPill';
+
+const MODULE_CSS_PATH = join(process.cwd(), 'src/components/header/CartPill.module.css');
 
 describe('CartPill', () => {
   it('shows the running total and describes count + total in its label', () => {
@@ -25,15 +30,13 @@ describe('CartPill', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('meets the minimum tap target', () => {
-    render(<CartPill />);
-    const button = screen.getByRole('button');
-    expect(button.style.minHeight).toBe('var(--tap-target-min)');
-    expect(button.style.minWidth).toBe('var(--tap-target-min)');
+  it('meets the minimum tap target via the module stylesheet', () => {
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(/min-height:\s*var\(--tap-target-min\)/);
+    expect(css).toMatch(/min-width:\s*var\(--tap-target-min\)/);
   });
 
-  it('emits only real contract tokens', () => {
-    const { container } = render(<CartPill count={2} total={12.5} />);
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+  it('the co-located stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

@@ -1,0 +1,62 @@
+/*
+ * DeliveryNote styles. See src/components/STYLING.md for the convention.
+ * Fully static — title/countdown/threshold are text content, not styling
+ * props, so no value here varies per render and there is no --local-*
+ * bridge.
+ */
+
+.wrap {
+  display: flex;
+  align-items: flex-start;
+  /* 11px gap snapped to --space-3 (12px, +1px). */
+  gap: var(--space-3);
+  /* 13px vertical padding snapped to --space-3 (12px, -1px); 15px horizontal
+     snapped to --space-4 (16px, +1px). */
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-info);
+  border: var(--border-width-default) solid var(--color-info-border);
+  /* 10px radius snapped to --radius-md (9px, -1px). */
+  border-radius: var(--radius-md);
+}
+
+.icon {
+  flex: 0 0 auto;
+  /* 22px snapped to --icon-size-lg (20px, -2px) — a text-size token would be
+     semantically wrong for an icon glyph. */
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
+  stroke: var(--color-brand);
+  /* 1.6 snapped to --border-width-emphasis (1.5px, -0.1px). */
+  stroke-width: var(--border-width-emphasis);
+  /*
+   * The source literal also carried a 1px marginTop (an optical baseline
+   * nudge for the icon glyph). No spacing token sits within the 2px snap
+   * tolerance (nearest is --space-1 at 4px, 3px away) and a dedicated token
+   * for a single 1px nudge would be over-fitted, so it is dropped — a
+   * negligible, documented rendered-value change.
+   */
+}
+
+.title {
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-semibold);
+  /* 14px matches --type-ui-size exactly. */
+  font-size: var(--type-ui-size);
+  /* No type-step line-height matches 1.3 (ui is 1); kept as a raw structural
+     ratio per STYLING.md (no token applies). */
+  line-height: 1.3;
+  color: var(--color-brand);
+}
+
+.body {
+  /* 3px snapped to --space-1 (4px, +1px). */
+  margin-top: var(--space-1);
+  font-family: var(--font-brand);
+  font-weight: var(--type-ui-weight);
+  /* 12px matches --type-label-size exactly. */
+  font-size: var(--type-label-size);
+  /* No type-step line-height matches 1.4 (label is 1); kept as a raw
+     structural ratio per STYLING.md (no token applies). */
+  line-height: 1.4;
+  color: var(--color-info-ink);
+}

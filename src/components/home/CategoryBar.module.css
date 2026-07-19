@@ -1,0 +1,34 @@
+/*
+ * CategoryBar styles. See src/components/STYLING.md for the convention. Fully
+ * static — no value here varies per render, so there is no --local-* bridge.
+ */
+
+.heading {
+  /* Byte-identical shared h2 block — see ui/core/SectionHeading.module.css. */
+  composes: heading from '../ui/core/SectionHeading.module.css';
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  /* 18px padding snapped to --space-5 (20px, +2px). */
+  padding: 0 var(--space-5);
+  background: var(--color-surface-inset-b);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-semibold);
+  font-size: var(--type-ui-size);
+  line-height: var(--type-ui-line-height);
+  text-decoration: none;
+}

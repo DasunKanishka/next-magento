@@ -1,15 +1,35 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
+import { defaultTokens } from '@/theme/brands/default';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectBridgePropsConsistent,
+  expectModuleCssReferencesRealTokens,
+  pxValue,
+} from '../test-utils/tokenAssertions';
 import { QuantityStepper } from './QuantityStepper';
+import styles from './QuantityStepper.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/commerce/QuantityStepper.module.css',
+);
 
 describe('QuantityStepper', () => {
-  it('renders the current value between − and + controls', () => {
-    render(<QuantityStepper value={3} onChange={() => {}} />);
+  it('renders the current value between − and + controls, wiring the module classes', () => {
+    const { container } = render(<QuantityStepper value={3} onChange={() => {}} />);
     expect(screen.getByText('3')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aantal verlagen' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aantal verhogen' })).toBeInTheDocument();
+    expect(container.querySelector(`.${styles.wrap}`)).not.toBeNull();
+    expect(container.querySelector(`.${styles.num}`)).not.toBeNull();
+    for (const btn of Array.from(container.querySelectorAll('button'))) {
+      expect(btn.className).toContain(styles.button);
+    }
   });
 
   it('defaults to the [1,99] range', () => {
@@ -74,22 +94,55 @@ describe('QuantityStepper', () => {
     expect(next).toBe(6);
   });
 
-  it('md and lg sizes both meet the 44×44px minimum touch target', () => {
-    const { rerender } = render(
+  it('md and lg sizes both bridge to control-height tokens meeting the 44×44px minimum touch target', () => {
+    const { container, rerender } = render(
       <QuantityStepper value={1} size="md" onChange={() => {}} />,
     );
-    let minusBtn = screen.getByRole('button', { name: 'Aantal verlagen' });
-    expect(minusBtn.style.width).toBe('44px');
-    expect(minusBtn.style.height).toBe('46px');
+    const wrap = () => container.querySelector(`.${styles.wrap}`) as HTMLElement;
+    expect(wrap().style.getPropertyValue('--local-btn-w')).toBe('var(--tap-target-min)');
+    expect(wrap().style.getPropertyValue('--local-btn-h')).toBe(
+      'var(--control-height-md)',
+    );
+    expect(pxValue(defaultTokens['--tap-target-min'])).toBeGreaterThanOrEqual(44);
+    expect(pxValue(defaultTokens['--control-height-md'])).toBeGreaterThanOrEqual(44);
 
     rerender(<QuantityStepper value={1} size="lg" onChange={() => {}} />);
-    minusBtn = screen.getByRole('button', { name: 'Aantal verlagen' });
-    expect(minusBtn.style.width).toBe('46px');
-    expect(minusBtn.style.height).toBe('56px');
+    expect(wrap().style.getPropertyValue('--local-btn-w')).toBe('var(--tap-target-min)');
+    expect(wrap().style.getPropertyValue('--local-btn-h')).toBe(
+      'var(--control-height-lg)',
+    );
+    expect(pxValue(defaultTokens['--control-height-lg'])).toBeGreaterThanOrEqual(44);
+  });
+
+  it('the numeral column width bridges to a real token per size (md snaps to --space-8, lg to the dedicated --stepper-num-w-lg)', () => {
+    const { container, rerender } = render(
+      <QuantityStepper value={1} size="md" onChange={() => {}} />,
+    );
+    const wrap = () => container.querySelector(`.${styles.wrap}`) as HTMLElement;
+    expect(wrap().style.getPropertyValue('--local-num-w')).toBe('var(--space-8)');
+
+    rerender(<QuantityStepper value={1} size="lg" onChange={() => {}} />);
+    expect(wrap().style.getPropertyValue('--local-num-w')).toBe(
+      'var(--stepper-num-w-lg)',
+    );
+    expect(defaultTokens['--stepper-num-w-lg']).toBe('40px');
   });
 
   it('every var(--*) this component emits is a real contract token', () => {
     const { container } = render(<QuantityStepper value={1} onChange={() => {}} />);
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
+  });
+
+  it('bridge is consistent both ways: every property set is consumed, and vice versa', () => {
+    const { container } = render(<QuantityStepper value={1} onChange={() => {}} />);
+    const wrap = container.querySelector(`.${styles.wrap}`);
+    expectBridgePropsConsistent(
+      wrap ? [wrap] : [],
+      readFileSync(MODULE_CSS_PATH, 'utf8'),
+    );
   });
 });

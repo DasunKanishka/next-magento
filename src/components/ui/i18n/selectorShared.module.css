@@ -1,0 +1,152 @@
+/*
+ * Shared styles for the i18n selectors (CountrySelector / LanguageSelector).
+ * One module, consumed by both, so the trigger / panel / option literals live
+ * in a single place and are never duplicated across the two selectors. The
+ * code-chip badge has been promoted to `ui/core/codeChip.module.css` — a
+ * header component (MobileMenu) also needs it, and that primitive must not
+ * live inside an i18n component's internals. See src/components/STYLING.md
+ * for the convention. Fully static — no value varies per render, so there is
+ * no --local-* bridge.
+ */
+
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  /* 12px padding matches --space-3. */
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: var(--border-width-emphasis) solid var(--color-border-field);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  cursor: pointer;
+}
+
+.triggerStack {
+  display: flex;
+  flex-direction: column;
+  /* 2px gap snapped to --space-1 (4px, +2px). */
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.triggerLabel {
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     stays local. */
+  composes: eyebrow from '../core/Eyebrow.module.css';
+  color: var(--color-text-muted);
+}
+
+.triggerValue {
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-brand);
+}
+
+.panel {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this dropdown's own anchor + layout. */
+  composes: panelSurface from '../core/panelSurface.module.css';
+  position: absolute;
+  /* 6px offset snapped to --space-2 (8px, +2px). */
+  top: calc(100% + var(--space-2));
+  z-index: 50;
+  padding: var(--space-2);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.panelLeft {
+  left: 0;
+}
+
+.panelRight {
+  right: 0;
+}
+
+/* Language dropdown panel min-width (single column). */
+.panelLang {
+  min-width: var(--selector-panel-w);
+}
+
+.column {
+  width: 100%;
+}
+
+/* Country dropdown's delivery-country column min-width. */
+.columnCountry {
+  min-width: var(--selector-country-w);
+}
+
+/* Country dropdown's language column min-width, divided from the country
+   column by a hairline. */
+.columnLang {
+  min-width: var(--selector-lang-w);
+  border-left: var(--border-width-default) solid var(--color-border-card);
+  padding-left: var(--space-2);
+}
+
+.columnHeading {
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     + padding stay local. */
+  composes: eyebrow from '../core/Eyebrow.module.css';
+  color: var(--color-text-subtle);
+  /* 4px/12px/6px padding: --space-1 / --space-3 / --space-2 (6px→8px, +2px). */
+  padding: var(--space-1) var(--space-3) var(--space-2);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  /* 10px gap snapped to --space-3 (12px, +2px). */
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: var(--border-width-default) solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+/* Active/selected delivery-country option — a teal tint. */
+.optionActiveTeal {
+  background: var(--color-trust-tint);
+  border: var(--border-width-default) solid var(--color-trust-tint-border);
+  color: var(--color-trust);
+}
+
+.optionGrow {
+  flex: 1;
+}
+
+.checkIcon {
+  color: var(--color-brand);
+  display: inline-flex;
+}
+
+.flag {
+  flex: 0 0 auto;
+  border-radius: var(--radius-2xs);
+  object-fit: cover;
+  display: block;
+}

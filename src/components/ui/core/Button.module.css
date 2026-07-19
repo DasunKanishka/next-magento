@@ -1,0 +1,110 @@
+/*
+ * Button styles — the canonical CSS-module reference for this library.
+ * See src/components/STYLING.md for the full convention.
+ *
+ * Every declaration below resolves to one of exactly two kinds of value:
+ *   1. a design token, referenced as var(--token) — brand-overridable; or
+ *   2. a bridge custom property, referenced as var(--local-*) — its value is
+ *      supplied inline by the component for anything that varies by prop.
+ * No themable brand value (color, on-scale dimension, font, or shadow) is
+ * written as a literal here; the component's value map holds only token
+ * references, which arrive through the bridge. Structural constants that a
+ * brand would never re-theme (layout keywords, transition timing, and opacity)
+ * are written directly.
+ */
+
+.button {
+  /* Static design tokens — identical for every variant and size. */
+  border-radius: var(--radius-md);
+  font-family: var(--font-brand);
+  line-height: var(--type-ui-line-height);
+
+  /* Structural constants (not brand-themable). */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  /* Prop-driven values, supplied inline through the bridge. */
+  flex-direction: var(--local-direction);
+  gap: var(--local-gap);
+  width: var(--local-width);
+  height: var(--local-height);
+  min-height: var(--local-height);
+  padding: 0 var(--local-pad-x);
+  font-size: var(--local-font-size);
+  font-weight: var(--local-font-weight);
+  background-color: var(--local-bg);
+  color: var(--local-fg);
+  border: var(--local-border);
+  box-shadow: var(--local-shadow);
+}
+
+/* Interactive + disabled states live here, never inline — a rule set cannot
+   be expressed as an inline style property. */
+.button:hover:not(:disabled) {
+  background-color: var(--local-bg-hover);
+}
+
+.button:active:not(:disabled) {
+  background-color: var(--local-bg-active);
+}
+
+.button:disabled {
+  background-color: var(--local-bg-disabled);
+  color: var(--local-fg-disabled);
+  border: var(--local-border-disabled);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Keyboard focus indicator — the design token drives it so a brand controls
+   the ring. Shown only for keyboard focus, not on pointer press. */
+.button:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/*
+ * Link variant — a text-only control with no fill or box. It reuses the base
+ * class for typography and the bridge, then strips the box treatment. Declared
+ * after .button so its equal-specificity overrides win. Colors still arrive
+ * through the bridge (--local-fg / --local-fg-hover / --local-fg-disabled).
+ */
+.link {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--local-fg);
+  text-decoration: underline;
+  text-underline-offset: var(--type-underline-offset);
+}
+
+.link:hover:not(:disabled) {
+  background-color: transparent;
+  color: var(--local-fg-hover);
+}
+
+.link:disabled {
+  background-color: transparent;
+  color: var(--local-fg-disabled);
+  text-decoration: none;
+}
+
+/* Leading icon wrapper. */
+.icon {
+  display: inline-flex;
+}
+
+/* Secondary line stacked beneath the label (subLabel). */
+.subLabel {
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-meta-weight);
+  line-height: var(--type-meta-line-height);
+  opacity: 0.85;
+}

@@ -39,6 +39,7 @@ yarn-error.log*
 /test-results
 /blob-report
 /playwright/.cache
+.e2e-dev-server.log
 
 # release-gate reports (regenerated on each run)
 /lighthouse-report

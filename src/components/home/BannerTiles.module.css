@@ -1,0 +1,64 @@
+/*
+ * BannerTiles styles. See src/components/STYLING.md for the convention. Fully
+ * static — no value here varies per render, so there is no --local-* bridge.
+ */
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-sm), 1fr));
+  gap: var(--space-4);
+}
+
+.item {
+  display: flex;
+}
+
+.card {
+  composes: onSurface from '../ui/core/Surface.module.css';
+  display: flex;
+  flex-direction: column;
+  min-height: var(--tap-target-min);
+  height: 100%;
+  /* 20px matches --space-5 exactly. */
+  padding: var(--space-5);
+  text-decoration: none;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-bold);
+  /* 18px matches --type-price-size exactly; reused for its numeric value
+     only — this is a card heading, not a price. */
+  font-size: var(--type-price-size);
+  /* No type-step line-height matches 1.2 (h3 is 1.1); kept as a raw
+     structural ratio per STYLING.md (no token applies). */
+  line-height: 1.2;
+  color: var(--color-brand-ink);
+}
+
+.body {
+  /* 8px matches --space-2 exactly. */
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-brand);
+  font-weight: var(--type-body-weight);
+  font-size: var(--type-ui-size);
+  /* No type-step line-height matches 1.5 (body is 1.65); kept as a raw
+     structural ratio per STYLING.md (no token applies). */
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  margin-top: var(--space-3);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-semibold);
+  font-size: var(--type-caption-size);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-trust);
+}

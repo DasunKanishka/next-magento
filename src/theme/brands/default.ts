@@ -2,10 +2,17 @@ import type { TokenSheet } from '../contract';
 
 /**
  * Concrete design values for the `default` brand — the sole child brand
- * shipping today. Every one of the 119 contract keys (see `../contract`
- * for the reconciliation note on why 119 — the source palette's 93, the
- * accessibility-driven `--color-premium-accent-ink`, and the 25 gaps closed
- * by the token-scale-coverage addendum) has a value here. Every value is
+ * shipping today. Every one of the 166 contract keys (see `../contract`
+ * for the reconciliation note on why 154 — the source palette's 93, the
+ * accessibility-driven `--color-premium-accent-ink`, the 25 gaps closed
+ * by the token-scale-coverage addendum, the standalone caption-size
+ * addendum, the interactive-surface & disabled-pair and generic-weight
+ * button-promotion addenda, the 10 header/nav literal-closure promotions,
+ * the 10 home literal-closure promotions — 2 type-scale-gap sizes, the
+ * hero copy widths + padding pair, and the dedicated `--grid-min-*` grid-floor
+ * family — and the 5 ui-core/product literal-closure promotions: the retired
+ * Chip spec-border exception, `--icon-size-lg`, `--media-card-h`,
+ * `--stepper-num-w-lg`, and `--type-star-tracking`) has a value here. Every value is
  * sourced 1:1 from the design specification's brand token-value tables or
  * promoted 1:1 from the component source it replaces, except four adjusted
  * to clear WCAG AA contrast (the CTA green ramp, the subtle-text gray, the
@@ -29,6 +36,10 @@ export const defaultTokens: TokenSheet = {
   // Promoted 1:1 from Button.tsx PALETTE.primary.disabledBg (the CTA
   // button's disabled-state fill).
   '--color-cta-disabled-bg': '#BBE0CC',
+  // Promoted 1:1 from the button's disabled CTA label color — the foreground
+  // partner of `--color-cta-disabled-bg` above (previously a component literal
+  // because no token covered it).
+  '--color-cta-disabled-fg': '#82B098',
   '--color-urgency': '#A02C44',
   // Bright gold — reserved for on-dark accents and decorative star glyphs.
   '--color-premium-accent': '#E0982A',
@@ -47,9 +58,21 @@ export const defaultTokens: TokenSheet = {
   '--color-surface': '#FFFFFF',
   '--color-surface-inset-a': '#FBFAF7',
   '--color-surface-inset-b': '#F4F1EC',
+  // Neutral interactive-surface family — promoted 1:1 from the button's
+  // secondary/tertiary fills. The resting tint is shared: it is the tertiary
+  // fill at rest and the secondary fill on hover. `-hover`/`-active` are the
+  // tertiary fill's deepening states; `-emphasis` is the secondary fill's
+  // pressed tint.
+  '--color-surface-neutral': '#EEF1F6',
+  '--color-surface-neutral-hover': '#E1E7F0',
+  '--color-surface-neutral-active': '#D5DDEA',
+  '--color-surface-neutral-emphasis': '#DFE5EF',
   '--color-border': '#ECE7DD',
   '--color-border-card': '#EFE9DE',
   '--color-border-field': '#D8D3CA',
+  // Promoted 1:1 from the button's disabled secondary/tertiary border color —
+  // the disabled control border, sibling of `--color-disabled-bg`/`-fg`.
+  '--color-border-disabled': '#D2D8E2',
   // Promoted 1:1 from Button.tsx PALETTE.tertiary.disabledBg — the neutral
   // (non-CTA) disabled-state surface, distinct from tertiary's normal
   // `#EEF1F6` fill.
@@ -125,6 +148,17 @@ export const defaultTokens: TokenSheet = {
     'repeating-linear-gradient(40deg,#EDF3F0,#EDF3F0 7px,#DCE8E2 7px,#DCE8E2 14px)',
   // Promoted 1:1 from ProductCard.tsx's PLACEHOLDER_LABEL_COLOR constant.
   '--color-media-placeholder-label': '#B0926A',
+  // Modal/drawer backdrop ink — promoted 1:1 from the mobile drawer's scrim.
+  // Same base ink (4,12,28) as --shadow-overlay's shadow color, at the
+  // drawer-scrim alpha.
+  '--color-scrim': 'rgba(4,12,28,.45)',
+  // Entry-gate backdrop — the same base ink as --color-scrim at a heavier
+  // alpha (the full-screen gate overlay reads stronger than the compact drawer).
+  '--color-scrim-strong': 'rgba(4,12,28,.55)',
+  // Chip's outline `spec` pill border — promoted 1:1 from Chip.tsx's former
+  // literal exception. Neither --color-border-field (#D8D3CA) nor
+  // --color-border-card (#EFE9DE) sits close enough to force-map onto.
+  '--color-border-chip-spec': '#E5DECF',
 
   // Typography
   '--font-brand': "var(--font-figtree), system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -134,6 +168,12 @@ export const defaultTokens: TokenSheet = {
   // design spec (reserved headroom, e.g. a future display-black treatment;
   // design-spec.md's type-scale table note).
   '--type-weight-heavy': '800',
+  // Generic control/label weight primitives — promoted 1:1 from the button's
+  // per-variant weights (primary uses bold; secondary/tertiary/link use
+  // semibold). Standalone, like `--type-weight-heavy` above, because a button's
+  // weight belongs to no named type-scale step.
+  '--type-weight-bold': '700',
+  '--type-weight-semibold': '600',
   '--type-display-size': '52px',
   '--type-display-weight': '700',
   '--type-display-line-height': '1.04',
@@ -167,6 +207,9 @@ export const defaultTokens: TokenSheet = {
   // MegaMenu.tsx, MobileMenu.tsx, LanguageSelector.tsx, CountrySelector.tsx,
   // Footer.tsx) uses a `/1` line-height.
   '--type-ui-line-height': '1',
+  // Caption/label text size — a systemic 13px value; see the extend-vs-snap
+  // rule in contract.ts.
+  '--type-caption-size': '13px',
   '--type-label-size': '12px',
   '--type-label-weight': '600',
   // Promoted from component source: Badge.tsx and ProductOfMonth.tsx's
@@ -186,6 +229,16 @@ export const defaultTokens: TokenSheet = {
   // `subLabel` line, ProductCard.tsx's tag-tracked brand line) uses a `/1`
   // line-height.
   '--type-meta-line-height': '1',
+  // Promoted 1:1 from the button exemplar's link underline offset.
+  '--type-underline-offset': '3px',
+  // Promoted 1:1 from HeroSlider's headline clamp max (see contract.ts's home
+  // literal-closure addendum for the scale-gap rationale).
+  '--type-hero-size': '48px',
+  // Promoted 1:1 from BusinessReviews' aggregate score figure (see
+  // contract.ts's home literal-closure addendum for the scale-gap rationale).
+  '--type-stat-size': '34px',
+  // Rating's star-glyph letter-spacing — promoted 1:1 from Rating.tsx.
+  '--type-star-tracking': '1px',
 
   // Spacing, radius, sizing & elevation
   '--space-1': '4px',
@@ -202,6 +255,11 @@ export const defaultTokens: TokenSheet = {
   '--space-8': '32px',
   '--space-section': '44px',
   '--layout-maxw': '1240px',
+  // Home section-stack vertical-padding clamp max (min + inline padding are
+  // --space-5); off the space scale, so a dedicated layout token.
+  '--layout-section-pad-y': '40px',
+  // Smallest corner rounding — the inline flag-image corners; a step below xs.
+  '--radius-2xs': '2px',
   '--radius-xs': '5px',
   '--radius-sm': '6px',
   '--radius-md': '9px',
@@ -212,12 +270,79 @@ export const defaultTokens: TokenSheet = {
   // cosmetic compromise the gate previously used for lack of this token.
   '--radius-gate-card': '20px',
   '--radius-full': '30px',
+  // Promoted 1:1 from the button's `sm` height — the small control height,
+  // sibling of md/lg. Below the 44×44px minimum touch target, so it is for
+  // dense, non-primary contexts only.
+  '--control-height-sm': '36px',
   '--control-height-md': '44px',
   '--control-height-lg': '56px',
   '--tap-target-min': '44px',
   // The recurring media-placeholder slot height
   // (product-of-the-month / gallery-style placeholders).
   '--media-placeholder-h': '320px',
+  // Compact media-thumbnail height — promoted 1:1 from the mega-menu promo
+  // tile; a smaller inline sibling of --media-placeholder-h.
+  '--media-thumb-h': '120px',
+  // ProductCard's photo-slot height — a third sibling in the media-height
+  // family, distinct from the other two (promoted 1:1 from ProductCard.tsx).
+  '--media-card-h': '180px',
+  // Icon-glyph size (medium) — promoted 1:1 from the cart control's cart
+  // glyph. A reusable primitive for icon sizing across components.
+  '--icon-size-md': '16px',
+  // Larger icon-glyph size — sibling of --icon-size-md, for the ~19–22px
+  // glyph cluster (ProductCard's add-to-cart glyph, both QuantityStepper
+  // button glyphs — each individually within the 2px snap tolerance of this
+  // one token).
+  '--icon-size-lg': '20px',
+  // Mega-menu column widths — promoted 1:1 from the desktop mega-menu panel:
+  // the left category rail, the subtype column, and the promo column.
+  '--mega-rail-w': '220px',
+  '--mega-col-w': '240px',
+  '--mega-promo-w': '260px',
+  // Mobile navigation drawer width — promoted 1:1 from the drawer panel.
+  '--menu-drawer-w': '262px',
+  // Header row min-heights — promoted at their EXACT source values (the logo
+  // row and the nav row); previously carried as ~4–6px snap approximations,
+  // now zero-drift.
+  '--header-logo-h': '50px',
+  '--header-nav-h': '48px',
+  // Promoted 1:1 from HeroSlider's copy-column / body-copy max-widths.
+  '--hero-content-w': '640px',
+  '--hero-body-w': '520px',
+  // Promoted 1:1 from HeroSlider's fixed content padding (vertical + the
+  // horizontal clamp max).
+  '--hero-pad-y': '48px',
+  '--hero-pad-x': '56px',
+  // Promoted 1:1 from the home content-grid minmax floors — each surface's
+  // own token rather than a mega-menu width borrowed by pixel coincidence.
+  '--grid-min-xs': '180px',
+  '--grid-min-sm': '220px',
+  '--grid-min-md': '240px',
+  '--grid-min-lg': '260px',
+  // QuantityStepper's `lg` numeral-column width — promoted 1:1. No existing
+  // token sits within 2px of 40px (nearest is --space-8 at 32px, 8px away).
+  '--stepper-num-w-lg': '40px',
+  // Footer content block's deeper top padding (side/bottom map to the space
+  // scale; only the top sits off-scale).
+  '--footer-pad-top': '40px',
+  // Footer brand tagline's max line measure.
+  '--footer-tagline-w': '320px',
+  // Minimum width a wrapping form field keeps before dropping to its own row
+  // (the footer newsletter email input).
+  '--field-min-w': '180px',
+  // i18n dropdown widths — the language panel min-width and the country
+  // dropdown's two column min-widths.
+  '--selector-panel-w': '180px',
+  '--selector-country-w': '190px',
+  '--selector-lang-w': '170px',
+  // Entry-gate card max-width and its body-copy max line measure.
+  '--gate-card-w': '560px',
+  '--gate-copy-w': '380px',
+  // Site-search row heights — default and the compact header variant (the
+  // latter also the border-box floor keeping stretched controls at the tap
+  // target minimum).
+  '--search-row-h': '50px',
+  '--search-row-h-compact': '48px',
   '--border-width-default': '1px',
   '--border-width-emphasis': '1.5px',
   '--border-width-cta': '2px',

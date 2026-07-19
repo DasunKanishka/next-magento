@@ -1,0 +1,81 @@
+/*
+ * NewsletterSignup styles. See src/components/STYLING.md for the convention.
+ * Static token references throughout — no per-render value — so no --local-*
+ * bridge.
+ */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  /* 10px gap snapped to --space-3 (12px, +2px). */
+  gap: var(--space-3);
+}
+
+.label {
+  font-family: var(--font-brand);
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-on-brand);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1;
+  min-width: var(--field-min-w);
+}
+
+.consent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* Full tap target for the consent toggle (the whole label row is clickable). */
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-body-weight);
+  /* No type-step line-height matches 1.4; raw structural ratio (no token). */
+  line-height: 1.4;
+  color: var(--color-text-on-brand);
+  cursor: pointer;
+}
+
+.checkbox {
+  /* 24px matches --space-6 exactly (reused for its numeric value — a fixed
+     control size, not spacing). */
+  width: var(--space-6);
+  height: var(--space-6);
+  flex: 0 0 auto;
+}
+
+.error {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: var(--type-label-size);
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.4; raw structural ratio (no token). */
+  line-height: 1.4;
+  color: var(--color-urgency);
+}
+
+.status {
+  font-family: var(--font-brand);
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.5; raw structural ratio (no token). */
+  line-height: 1.5;
+  color: var(--color-on-brand);
+}
+
+.statusStrong {
+  display: block;
+  /* 4px bottom margin matches --space-1. */
+  margin-bottom: var(--space-1);
+}

@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import { getSlotProducts } from '@/lib/home/home-data';
 import type { ProductOfMonthEditorial } from '@/lib/home/editorial';
 import { AddToCartCard } from './AddToCartCard';
+import styles from './ProductOfMonth.module.css';
 
 export interface ProductOfMonthProps {
   editorial: ProductOfMonthEditorial;
@@ -13,14 +14,7 @@ async function FeaturedProduct() {
   const [product] = await getSlotProducts('product-of-month', 1);
   if (!product) {
     return (
-      <p
-        style={{
-          font: '400 14px/1.5 var(--font-brand)',
-          color: 'var(--color-text-muted)',
-        }}
-      >
-        Er is deze maand nog geen product uitgelicht.
-      </p>
+      <p className={styles.fallbackNote}>Er is deze maand nog geen product uitgelicht.</p>
     );
   }
   return <AddToCartCard product={product} />;
@@ -33,55 +27,17 @@ async function FeaturedProduct() {
  */
 export function ProductOfMonth({ editorial }: ProductOfMonthProps) {
   return (
-    <section
-      aria-label="Product van de maand"
-      style={{
-        display: 'grid',
-        gap: 28,
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        alignItems: 'center',
-        background: 'var(--color-surface-inset-b)',
-        borderRadius: 'var(--radius-2xl)',
-        padding: 'clamp(24px, 4vw, 44px)',
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <span
-          style={{
-            font: '600 12px/1 var(--font-brand)',
-            color: 'var(--color-premium-accent-ink)',
-            letterSpacing: 'var(--type-eyebrow-tracking)',
-            textTransform: 'uppercase',
-          }}
-        >
-          Product van de maand
-        </span>
+    <section aria-label="Product van de maand" className={styles.section}>
+      <div className={styles.copy}>
+        <span className={styles.eyebrow}>Product van de maand</span>
         {editorial.paragraphs.map((paragraph, i) => (
-          <p
-            key={i}
-            style={{
-              margin: 0,
-              font: '400 16px/1.65 var(--font-brand)',
-              color: 'var(--color-text-primary)',
-            }}
-          >
+          <p key={i} className={styles.paragraph}>
             {paragraph}
           </p>
         ))}
       </div>
       <div>
-        <Suspense
-          fallback={
-            <div
-              aria-hidden="true"
-              style={{
-                height: 320,
-                borderRadius: 'var(--radius-lg)',
-                background: 'var(--color-surface)',
-              }}
-            />
-          }
-        >
+        <Suspense fallback={<div aria-hidden="true" className={styles.fallbackMedia} />}>
           <FeaturedProduct />
         </Suspense>
       </div>

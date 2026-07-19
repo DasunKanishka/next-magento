@@ -1,0 +1,28 @@
+/*
+ * Shared bordered-surface shell. See src/components/STYLING.md for the
+ * convention. Every card-like surface — the product card, the banner tiles,
+ * the toast pill, the SEO stat item, and the business-reviews testimonial —
+ * paints one of exactly two shapes:
+ *   - on-surface: card background + card border, for content sitting on the
+ *     page background.
+ *   - on-brand: brand-tinted surface fill, no border, for content sitting on
+ *     a brand-toned section.
+ * Both share one corner radius. This module owns ONLY that shell — bg,
+ * border, radius. It is headless of padding, display/flex-direction, and box
+ * shadow: every consumer differs on those, so each keeps them local on its
+ * own rule and composes the shared shape onto it via CSS Modules `composes`
+ * (the same cross-file composition panelSurface.module.css already
+ * established for the anchored dropdown-panel surface).
+ */
+
+.onSurface {
+  background: var(--color-surface);
+  border: var(--border-width-default) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+}
+
+.onBrand {
+  background: var(--color-surface-on-brand);
+  border: none;
+  border-radius: var(--radius-lg);
+}

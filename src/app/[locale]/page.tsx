@@ -12,7 +12,8 @@ import {
   ProductRail,
   SeoContent,
 } from '@/components/home';
-import { STORE_IDENTITY } from '@/config/store-identity';
+import { getDataSource } from '@/lib/data-source';
+import { resolveStoreContext } from '@/lib/data-source/store-context';
 import { isSupportedLocale, type SupportedLocale } from '@/i18n/locales';
 import { routing } from '@/i18n/routing';
 import { getHomeShellData } from '@/lib/home/home-data';
@@ -37,7 +38,7 @@ const srOnly: React.CSSProperties = {
 const sectionStack: React.CSSProperties = {
   maxWidth: 'var(--layout-maxw)',
   margin: '0 auto',
-  padding: 'clamp(20px, 4vw, 40px) 20px',
+  padding: 'clamp(var(--space-5), 4vw, var(--layout-section-pad-y)) var(--space-5)',
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--space-section)',
@@ -62,13 +63,28 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   // route (never a pinned id) is observable end to end.
   const shell = await getHomeShellData('home');
 
+  // Store identity is resolved ONCE here — the highest sensible server
+  // boundary above both Header and Footer — and threaded down as props so
+  // neither has to re-fetch it. `getStoreIdentity()` is fail-closed for the
+  // legal/identity fields (throws rather than returning a partial/defaulted
+  // shape); the thrown error is caught by `src/app/[locale]/error.tsx`, which
+  // replaces the whole page with a full error state rather than letting a
+  // partial header/footer render with missing legal copy.
+  // NOTE: keep this fetch at the page (route-segment) level. If it is hoisted
+  // into `[locale]/layout.tsx` when more routes are added, `error.tsx` will no
+  // longer catch the throw (a segment error boundary does not catch errors from
+  // the layout at its own level) — add a `global-error.tsx` first, or the
+  // fail-closed containment breaks silently.
+  const { storeCode } = await resolveStoreContext();
+  const identity = await getDataSource().getStoreIdentity({ storeCode });
+
   return (
     <div data-testid="home-page" data-home-route={shell.homeRoute}>
-      <Header locale={locale} />
+      <Header locale={locale} identity={identity} />
 
       <main>
         <h1 style={srOnly}>
-          {STORE_IDENTITY.name} — {STORE_IDENTITY.tagline}
+          {identity.name} — {identity.tagline}
         </h1>
 
         <div style={sectionStack}>
@@ -118,7 +134,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </div>
       </main>
 
-      <Footer />
+      <Footer identity={identity} />
     </div>
   );
 }

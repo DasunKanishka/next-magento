@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n    }\n  }\n": typeof types.StoreConfigDocument,
+    "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n      header_logo_src\n      logo_alt\n      copyright\n      store_name\n    }\n  }\n": typeof types.StoreConfigDocument,
     "\n  query NavigationCategories($rootCategoryId: String!) {\n    categoryList(filters: { parent_id: { eq: $rootCategoryId } }) {\n      id\n      name\n      url_path\n      image\n      children {\n        id\n        name\n        url_path\n      }\n    }\n  }\n": typeof types.NavigationCategoriesDocument,
     "\n  fragment HomeProductFields on ProductInterface {\n    sku\n    name\n    url_key\n    small_image {\n      url\n      label\n    }\n    price_range {\n      minimum_price {\n        regular_price {\n          value\n          currency\n        }\n        final_price {\n          value\n          currency\n        }\n      }\n    }\n    rating_summary\n    review_count\n    stock_status\n  }\n": typeof types.HomeProductFieldsFragmentDoc,
     "\n  query MerchandisingProducts($categoryId: String!, $pageSize: Int!) {\n    products(filter: { category_id: { eq: $categoryId } }, pageSize: $pageSize) {\n      items {\n        ...HomeProductFields\n      }\n    }\n  }\n": typeof types.MerchandisingProductsDocument,
@@ -22,7 +22,7 @@ type Documents = {
     "\n  mutation SubscribeNewsletter($email: String!) {\n    subscribeEmailToNewsletter(email: $email) {\n      status\n    }\n  }\n": typeof types.SubscribeNewsletterDocument,
 };
 const documents: Documents = {
-    "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n    }\n  }\n": types.StoreConfigDocument,
+    "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n      header_logo_src\n      logo_alt\n      copyright\n      store_name\n    }\n  }\n": types.StoreConfigDocument,
     "\n  query NavigationCategories($rootCategoryId: String!) {\n    categoryList(filters: { parent_id: { eq: $rootCategoryId } }) {\n      id\n      name\n      url_path\n      image\n      children {\n        id\n        name\n        url_path\n      }\n    }\n  }\n": types.NavigationCategoriesDocument,
     "\n  fragment HomeProductFields on ProductInterface {\n    sku\n    name\n    url_key\n    small_image {\n      url\n      label\n    }\n    price_range {\n      minimum_price {\n        regular_price {\n          value\n          currency\n        }\n        final_price {\n          value\n          currency\n        }\n      }\n    }\n    rating_summary\n    review_count\n    stock_status\n  }\n": types.HomeProductFieldsFragmentDoc,
     "\n  query MerchandisingProducts($categoryId: String!, $pageSize: Int!) {\n    products(filter: { category_id: { eq: $categoryId } }, pageSize: $pageSize) {\n      items {\n        ...HomeProductFields\n      }\n    }\n  }\n": types.MerchandisingProductsDocument,
@@ -47,7 +47,7 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n    }\n  }\n"): (typeof documents)["\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n    }\n  }\n"];
+export function graphql(source: "\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n      header_logo_src\n      logo_alt\n      copyright\n      store_name\n    }\n  }\n"): (typeof documents)["\n  query StoreConfig {\n    storeConfig {\n      store_code\n      locale\n      base_currency_code\n      secure_base_media_url\n      cms_home_page\n      header_logo_src\n      logo_alt\n      copyright\n      store_name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

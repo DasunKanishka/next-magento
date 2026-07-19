@@ -1,0 +1,17 @@
+/*
+ * Shared section h2 heading. See src/components/STYLING.md for the
+ * convention. ProductRail's and CategoryBar's `.heading` rules were
+ * byte-identical, so the whole block is extracted here; both consumers
+ * compose it onto their own `<h2>`. Footer's distinct `.heading` (caption
+ * size + tag-tracking + on-brand color) is a different role — it stays in
+ * Footer.module.css untouched, not force-merged onto this primitive.
+ */
+
+.heading {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-bold);
+  font-size: var(--type-h3-size);
+  line-height: var(--type-h3-line-height);
+  color: var(--color-brand-ink);
+}

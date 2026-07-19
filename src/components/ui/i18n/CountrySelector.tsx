@@ -10,20 +10,9 @@ import {
 } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { languages } from '@/i18n/languages';
-import {
-  Checkmark,
-  Chevron,
-  codeChipStyle,
-  columnHeadingStyle,
-  Flag,
-  handleMenuArrowKeys,
-  optionActiveTealStyle,
-  optionBaseStyle,
-  panelStyle,
-  triggerBaseStyle,
-  triggerLabelStyle,
-  useDismiss,
-} from './selectorShared';
+import codeChipStyles from '../core/codeChip.module.css';
+import { useDismissMenu } from '../core/useDismissMenu';
+import { Checkmark, Chevron, Flag, styles } from './selectorShared';
 
 export interface CountrySelectorProps {
   /** Active delivery country. Defaults to Nederland. */
@@ -44,7 +33,8 @@ export interface CountrySelectorProps {
  * Header country selector with a two-column dropdown: delivery countries on the
  * left (teal-tint active + checkmark), UI languages on the right (navy code-chip
  * active + checkmark). Closes on selection, click-outside, or Esc. Both render
- * modes (`full`/`compact`) meet the 44×44px minimum tap target.
+ * modes (`full`/`compact`) meet the 44×44px minimum tap target. Styling lives in
+ * the shared selector module (see src/components/STYLING.md).
  */
 export function CountrySelector({
   value = defaultCountryCode,
@@ -59,7 +49,7 @@ export function CountrySelector({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const firstOptionRef = React.useRef<HTMLButtonElement>(null);
   const close = React.useCallback(() => setOpen(false), []);
-  const rootRef = useDismiss(open, close, triggerRef);
+  const { rootRef, onPanelKeyDown } = useDismissMenu(open, close, triggerRef);
 
   React.useEffect(() => {
     if (open) firstOptionRef.current?.focus();
@@ -68,7 +58,7 @@ export function CountrySelector({
   const country = findCountry(value) ?? countries[0];
 
   return (
-    <div ref={rootRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={rootRef} className={styles.root}>
       <button
         ref={triggerRef}
         type="button"
@@ -76,30 +66,13 @@ export function CountrySelector({
         aria-expanded={open}
         aria-label={`Bezorgland: ${country.name}. Kies land en taal`}
         onClick={() => setOpen((o) => !o)}
-        style={{
-          ...triggerBaseStyle,
-          ...(compact ? { gap: 6, padding: '0 10px' } : {}),
-        }}
+        className={styles.trigger}
       >
         <Flag src={country.flag} size={compact ? 18 : 22} />
         {!compact && (
-          <span
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              alignItems: 'flex-start',
-            }}
-          >
-            <span style={triggerLabelStyle}>{label}</span>
-            <span
-              style={{
-                font: '600 14px/1 var(--font-brand)',
-                color: 'var(--color-brand)',
-              }}
-            >
-              {country.name}
-            </span>
+          <span className={styles.triggerStack}>
+            <span className={styles.triggerLabel}>{label}</span>
+            <span className={styles.triggerValue}>{country.name}</span>
           </span>
         )}
         <Chevron open={open} />
@@ -109,11 +82,11 @@ export function CountrySelector({
         <div
           role="menu"
           aria-label="Land en taal"
-          onKeyDown={handleMenuArrowKeys}
-          style={panelStyle(alignLeft)}
+          onKeyDown={onPanelKeyDown}
+          className={`${styles.panel} ${alignLeft ? styles.panelLeft : styles.panelRight}`}
         >
-          <div role="group" aria-label="Land" style={{ minWidth: 190 }}>
-            <div style={columnHeadingStyle}>Land</div>
+          <div role="group" aria-label="Land" className={styles.columnCountry}>
+            <div className={styles.columnHeading}>Land</div>
             {countries.map((c, index) => {
               const active = c.code === value;
               return (
@@ -128,26 +101,18 @@ export function CountrySelector({
                     close();
                     triggerRef.current?.focus();
                   }}
-                  style={{ ...optionBaseStyle, ...(active ? optionActiveTealStyle : {}) }}
+                  className={`${styles.option} ${active ? styles.optionActiveTeal : ''}`}
                 >
                   <Flag src={c.flag} size={20} />
-                  <span style={{ flex: 1 }}>{c.name}</span>
+                  <span className={styles.optionGrow}>{c.name}</span>
                   {active && <Checkmark />}
                 </button>
               );
             })}
           </div>
 
-          <div
-            role="group"
-            aria-label="Taal"
-            style={{
-              minWidth: 170,
-              borderLeft: 'var(--border-width-default) solid var(--color-border-card)',
-              paddingLeft: 8,
-            }}
-          >
-            <div style={columnHeadingStyle}>Taal</div>
+          <div role="group" aria-label="Taal" className={styles.columnLang}>
+            <div className={styles.columnHeading}>Taal</div>
             {languages.map((l) => {
               const active = l.locale === language;
               return (
@@ -161,12 +126,18 @@ export function CountrySelector({
                     close();
                     triggerRef.current?.focus();
                   }}
-                  style={optionBaseStyle}
+                  className={styles.option}
                 >
-                  <span style={codeChipStyle(active)}>{l.code}</span>
-                  <span style={{ flex: 1 }}>{l.name}</span>
+                  <span
+                    className={`${codeChipStyles.codeChip} ${
+                      active ? codeChipStyles.codeChipActive : ''
+                    }`}
+                  >
+                    {l.code}
+                  </span>
+                  <span className={styles.optionGrow}>{l.name}</span>
                   {active && (
-                    <span style={{ color: 'var(--color-brand)', display: 'inline-flex' }}>
+                    <span className={styles.checkIcon}>
                       <Checkmark />
                     </span>
                   )}

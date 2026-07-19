@@ -1,0 +1,24 @@
+/*
+ * Badge styles. See src/components/STYLING.md for the convention. Only the
+ * variant-driven fill/text colors vary by prop; every other declaration is a
+ * static design token.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  /* 5px gap snapped to --space-1 (4px, +1px). */
+  gap: var(--space-1);
+  font-family: var(--font-brand);
+  font-weight: var(--type-label-weight);
+  font-size: var(--type-label-size);
+  line-height: var(--type-label-line-height);
+  /* 6px vertical padding snapped to --space-2 (8px, +2px); 11px horizontal
+     snapped to --space-3 (12px, +1px). */
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-xs);
+
+  /* Prop-driven values, supplied inline through the bridge. */
+  background: var(--local-bg);
+  color: var(--local-fg);
+}

@@ -1,9 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { languages } from '@/i18n/languages';
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../test-utils/tokenAssertions';
 import { LanguageSelector } from './LanguageSelector';
+import styles from './selectorShared.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/i18n/selectorShared.module.css',
+);
 
 describe('LanguageSelector', () => {
   it('renders the full trigger with a label + active language name', () => {
@@ -68,16 +77,18 @@ describe('LanguageSelector', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('trigger meets the 44×44px minimum tap target in both modes', () => {
+  it('trigger carries the shared module class in both modes, meeting the tap target via the module', () => {
     const { rerender } = render(<LanguageSelector value="nl" />);
-    let trigger = screen.getByRole('button', { name: /Taal:/ });
-    expect(trigger.style.minHeight).toBe('var(--tap-target-min)');
-    expect(trigger.style.minWidth).toBe('var(--tap-target-min)');
-
+    expect(screen.getByRole('button', { name: /Taal:/ }).className).toContain(
+      styles.trigger,
+    );
     rerender(<LanguageSelector value="nl" compact />);
-    trigger = screen.getByRole('button', { name: /Taal:/ });
-    expect(trigger.style.minHeight).toBe('var(--tap-target-min)');
-    expect(trigger.style.minWidth).toBe('var(--tap-target-min)');
+    expect(screen.getByRole('button', { name: /Taal:/ }).className).toContain(
+      styles.trigger,
+    );
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(/\.trigger\s*\{[\s\S]*?min-height:\s*var\(--tap-target-min\)/);
+    expect(css).toMatch(/\.trigger\s*\{[\s\S]*?min-width:\s*var\(--tap-target-min\)/);
   });
 
   it('wraps the option list in a labeled group', () => {
@@ -106,9 +117,7 @@ describe('LanguageSelector', () => {
     expect(options[options.length - 1]).toHaveFocus();
   });
 
-  it('every var(--*) this component emits is a real contract token', () => {
-    const { container } = render(<LanguageSelector value="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+  it('the shared selector stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

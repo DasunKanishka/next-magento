@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type { BannerTile } from '@/lib/home/editorial';
+import styles from './BannerTiles.module.css';
 
 export interface BannerTilesProps {
   tiles: BannerTile[];
@@ -15,75 +16,24 @@ export function BannerTiles({ tiles }: BannerTilesProps) {
   if (tiles.length === 0) return null;
 
   return (
-    <ul
-      style={{
-        listStyle: 'none',
-        margin: 0,
-        padding: 0,
-        display: 'grid',
-        gridTemplateColumns: `repeat(auto-fit, minmax(220px, 1fr))`,
-        gap: 16,
-      }}
-    >
+    <ul className={styles.grid}>
       {tiles.map((tile, i) => {
         const inner = (
           <>
-            <h3
-              style={{
-                margin: 0,
-                font: '700 18px/1.2 var(--font-brand)',
-                color: 'var(--color-brand-ink)',
-              }}
-            >
-              {tile.title}
-            </h3>
-            {tile.body ? (
-              <p
-                style={{
-                  margin: '8px 0 0',
-                  font: '400 14px/1.5 var(--font-brand)',
-                  color: 'var(--color-text-muted)',
-                }}
-              >
-                {tile.body}
-              </p>
-            ) : null}
-            {tile.label ? (
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  marginTop: 12,
-                  font: '600 13px/1 var(--font-brand)',
-                  color: 'var(--color-trust)',
-                }}
-              >
-                {tile.label} →
-              </span>
-            ) : null}
+            <h3 className={styles.title}>{tile.title}</h3>
+            {tile.body ? <p className={styles.body}>{tile.body}</p> : null}
+            {tile.label ? <span className={styles.label}>{tile.label} →</span> : null}
           </>
         );
 
-        const cardStyle: React.CSSProperties = {
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 'var(--tap-target-min)',
-          height: '100%',
-          padding: 20,
-          background: 'var(--color-surface)',
-          border: 'var(--border-width-default) solid var(--color-border-card)',
-          borderRadius: 'var(--radius-lg)',
-          textDecoration: 'none',
-        };
-
         return (
-          <li key={tile.title || i} style={{ display: 'flex' }}>
+          <li key={tile.title || i} className={styles.item}>
             {tile.href ? (
-              <a href={tile.href} style={cardStyle}>
+              <a href={tile.href} className={styles.card}>
                 {inner}
               </a>
             ) : (
-              <div style={cardStyle}>{inner}</div>
+              <div className={styles.card}>{inner}</div>
             )}
           </li>
         );

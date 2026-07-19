@@ -1,0 +1,36 @@
+/*
+ * Shared tinted full-width section band. See src/components/STYLING.md for
+ * the convention. Every home-page section band (ProductOfMonth, SeoContent,
+ * BusinessReviews) paints the identical shape — one corner radius and the
+ * same fluid clamp padding — but differs in background (the variant below),
+ * and in every layout declaration (display/grid/flex direction, gap,
+ * align-items, and SeoContent's own border). This class owns ONLY the shared
+ * shape; each consumer composes one of the variants below onto its own
+ * layout rule via CSS Modules `composes` (the same cross-file composition
+ * panelSurface.module.css and Surface.module.css already established).
+ */
+
+.band {
+  border-radius: var(--radius-2xl);
+  /* Fluid clamp; both endpoints are tokens — the fluid middle term (vw) is
+     an allowed viewport mechanic. */
+  padding: clamp(var(--space-6), 4vw, var(--space-section));
+}
+
+/* SeoContent's inset surface. */
+.insetA {
+  composes: band;
+  background: var(--color-surface-inset-a);
+}
+
+/* ProductOfMonth's inset surface. */
+.insetB {
+  composes: band;
+  background: var(--color-surface-inset-b);
+}
+
+/* BusinessReviews' brand-toned surface. */
+.brand {
+  composes: band;
+  background: var(--color-brand);
+}

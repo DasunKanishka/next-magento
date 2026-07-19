@@ -1,0 +1,61 @@
+/*
+ * PagerButton styles. See src/components/STYLING.md for the convention.
+ * The round shell (size, radius, cursor, base centering) is IconButton's —
+ * this module reproduces the two previously-duplicated Carousel
+ * (`on-surface`) and HeroSlider (`on-brand`) `.arrow` rules exactly, adding
+ * only what IconButton doesn't provide: the on-surface card shadow, and
+ * placement. Placement (position/offset, desktop-gating, and the `z-index`
+ * stacking integer) is a variant+direction mechanic a brand never re-themes
+ * — not a design value — so it stays a plain layout rule here per
+ * STYLING.md's structural-constant carve-out, exactly as it did in the
+ * pre-extraction Carousel/HeroSlider modules.
+ */
+
+.pagerButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-ui-line-height);
+}
+
+/* on-surface: desktop-only enhancement, matching Carousel's original gating.
+   The display rules use the compound `.pagerButton.onSurface` selector (0,2,0)
+   so they beat IconButton's own `.iconButton{display:inline-flex}` (0,1,0)
+   regardless of cross-module bundle order — the mobile-hide must not depend on
+   which stylesheet the bundler happens to emit last. */
+.onSurface {
+  box-shadow: var(--shadow-card);
+}
+
+.pagerButton.onSurface {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .pagerButton.onSurface {
+    display: inline-flex;
+  }
+
+  .onSurface {
+    z-index: 3;
+  }
+}
+
+.onSurface.prev {
+  left: calc(var(--space-2) * -1);
+}
+
+.onSurface.next {
+  right: calc(var(--space-2) * -1);
+}
+
+/* on-brand: always visible, matching HeroSlider's original arrow. */
+.onBrand.prev {
+  left: var(--space-3);
+}
+
+.onBrand.next {
+  right: var(--space-3);
+}
