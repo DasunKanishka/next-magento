@@ -64,19 +64,28 @@ describe('theme resolver — resolveTokens("default")', () => {
     const sheet = resolveTokens('default');
     const keys = Object.keys(sheet);
 
-    // The parent contract declares 119 distinct CSS custom-property keys once
+    // The parent contract declares 167 distinct CSS custom-property keys once
     // every grouped source-table row (e.g. a type-scale step's
     // -size/-weight/-line-height, or the space-1..8 scale) is expanded into
     // its independently-settable properties — see contract.ts's reconciliation
-    // note for why this is 119 (the source palette's 93, the
-    // accessibility-driven --color-premium-accent-ink, and the 25 gaps closed
-    // by the v0.1.1 "M1 — Contract token-scale extension" issue), and not the
-    // 70 quoted in the source design specification's summary prose (that
-    // figure undercounts its own tables by one row apiece in the color and
-    // typography sections). Asserting against CONTRACT_TOKEN_NAMES.length
-    // (rather than a bare literal) keeps this test honest if the contract
-    // ever changes.
-    expect(CONTRACT_TOKEN_NAMES.length).toBe(119);
+    // note for why this is 167 (the source palette's 93, the
+    // accessibility-driven --color-premium-accent-ink, the 25 gaps closed
+    // by the token-scale-coverage addendum, the standalone caption-size
+    // addendum, the 7 button-literal promotions of the interactive-surface
+    // & disabled-pair addendum, the 2 standalone weight primitives of the
+    // generic-weight addendum, the 10 header/nav literal-closure
+    // promotions, the 10 home literal-closure promotions of the home
+    // styling pass, the 5 ui-core/product literal-closure promotions of
+    // the ui-core/product styling pass, and the 12 footer/i18n/forms/
+    // feedback/gate literal-closure promotions of the final styling pass, and
+    // the standalone --layout-section-pad-y promotion of the anti-regression
+    // guard pass, which closed the home page's remaining section-padding
+    // literal), and not the 70 quoted in the source design specification's summary
+    // prose (that figure undercounts its own tables by one row apiece in the
+    // color and typography sections). Asserting against
+    // CONTRACT_TOKEN_NAMES.length (rather than a bare literal) keeps this
+    // test honest if the contract ever changes.
+    expect(CONTRACT_TOKEN_NAMES.length).toBe(167);
     expect(keys.length).toBe(CONTRACT_TOKEN_NAMES.length);
     expect(new Set(keys)).toEqual(new Set(CONTRACT_TOKEN_NAMES));
 

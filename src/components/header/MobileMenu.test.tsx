@@ -1,10 +1,18 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../ui/test-utils/tokenAssertions';
 import { MobileMenu } from './MobileMenu';
 import type { NavCategory } from './types';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/header/MobileMenu.module.css',
+);
 
 vi.mock('@/i18n/navigation', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,9 +103,7 @@ describe('MobileMenu', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('emits only real contract tokens when open', () => {
-    const { container } = render(<MobileMenu categories={categories} locale="nl" />);
-    open();
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+  it('the co-located stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

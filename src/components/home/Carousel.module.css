@@ -1,0 +1,38 @@
+/*
+ * Carousel styles. See src/components/STYLING.md for the convention. CSS
+ * Modules already hash class names per build, so — unlike the previous
+ * per-instance inline <style> block — a single static class set is safe to
+ * share across every rendered instance; only the item min-width varies by
+ * prop, bridged through --local-item-min-w (a caller-supplied layout
+ * parameter, not a design token — mirrors FreeShippingProgress's
+ * --local-fill-width precedent for non-token business/business-layout
+ * values). The `@media` breakpoint is a structural mechanic, not a themeable
+ * value (see STYLING.md). The paging arrows' round shell + placement now
+ * live in `ui/core/PagerButton` (extracted from this file's former
+ * duplicate-with-HeroSlider `.arrow`/`.arrowPrev`/`.arrowNext` rules).
+ */
+
+.wrap {
+  position: relative;
+}
+
+.track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(var(--local-item-min-w), 1fr);
+  gap: var(--space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* 4px matches --space-1 exactly. */
+  padding-bottom: var(--space-1);
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.track > * {
+  scroll-snap-align: start;
+}

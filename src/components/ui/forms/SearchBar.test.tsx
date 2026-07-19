@@ -1,13 +1,22 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { defaultTokens } from '@/theme/brands/default';
 import {
-  expectAllVarTokensAreContractKeys,
+  expectModuleCssReferencesRealTokens,
   pxValue,
 } from '../test-utils/tokenAssertions';
 import { SearchBar } from './SearchBar';
+import styles from './SearchBar.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/forms/SearchBar.module.css',
+);
 
 const push = vi.fn();
 
@@ -46,9 +55,9 @@ describe('SearchBar', () => {
     expect(push).toHaveBeenCalledWith('/zoeken?q=gin');
   });
 
-  it('validates: an empty/whitespace-only query blocks navigation and shows an inline error', async () => {
+  it('validates: an empty/whitespace-only query blocks navigation, flags the row, and shows an inline error', async () => {
     const user = userEvent.setup();
-    render(<SearchBar />);
+    const { container } = render(<SearchBar />);
     await user.type(screen.getByRole('searchbox'), '   ');
     await user.click(screen.getByRole('button', { name: '⌕ Zoeken' }));
 
@@ -57,33 +66,48 @@ describe('SearchBar', () => {
       'Vul een zoekterm in om te zoeken.',
     );
     expect(screen.getByRole('searchbox')).toHaveAttribute('aria-invalid', 'true');
+    // The invalid frame is a data-attribute variant the module keys off.
+    expect(container.querySelector('form')).toHaveAttribute('data-invalid', 'true');
   });
 
-  it('shows a focus ring (--focus-ring) while the input is focused', () => {
-    const { container } = render(<SearchBar />);
-    const input = screen.getByRole('searchbox');
-    fireEvent.focus(input);
-    const frame = container.querySelector('form');
-    expect(frame?.style.boxShadow).toBe('var(--focus-ring)');
-    fireEvent.blur(input);
-    expect(frame?.style.boxShadow).toBe('none');
+  it('drives the focus ring via a :focus-within rule in the module', () => {
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(
+      /\.row:focus-within\s*\{[\s\S]*?box-shadow:\s*var\(--focus-ring\)/,
+    );
   });
 
-  it('default row min-height (50) and submit button min-width both meet the 44px minimum touch target', () => {
+  it('default row min-height (--search-row-h) and submit button min-width both meet the 44px minimum touch target', () => {
     const { container } = render(<SearchBar />);
-    const frame = container.querySelector('form');
-    // The row stretches its controls to this min-height; the +4px border-box
-    // allowance keeps the inner controls at >=44px even at the mobile height.
-    expect(frame?.style.minHeight).toBe('50px');
-    expect(50).toBeGreaterThanOrEqual(pxValue(defaultTokens['--tap-target-min']));
+    const form = container.querySelector('form');
+    // Default row is not compact.
+    expect(form).toHaveAttribute('data-compact', 'false');
 
-    const submitBtn = screen.getByRole('button', { name: '⌕ Zoeken' });
-    expect(submitBtn.style.minWidth).toBe('var(--tap-target-min)');
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(/\.row\s*\{[\s\S]*?min-height:\s*var\(--search-row-h\)/);
+    expect(css).toMatch(/\.submit\s*\{[\s\S]*?min-width:\s*var\(--tap-target-min\)/);
+
+    // Both configured heights clear the tap-target minimum.
+    expect(pxValue(defaultTokens['--search-row-h'])).toBeGreaterThanOrEqual(44);
+    expect(pxValue(defaultTokens['--search-row-h-compact'])).toBeGreaterThanOrEqual(44);
     expect(pxValue(defaultTokens['--tap-target-min'])).toBeGreaterThanOrEqual(44);
   });
 
-  it('every var(--*) this component emits is a real contract token', () => {
+  it('applies the compact row height variant via data-compact', () => {
+    const { container } = render(<SearchBar compact />);
+    expect(container.querySelector('form')).toHaveAttribute('data-compact', 'true');
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(
+      /\.row\[data-compact='true'\]\s*\{[\s\S]*?min-height:\s*var\(--search-row-h-compact\)/,
+    );
+  });
+
+  it('carries its module class on the row', () => {
     const { container } = render(<SearchBar />);
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+    expect(container.querySelector('form')?.className).toContain(styles.row);
+  });
+
+  it('the co-located stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

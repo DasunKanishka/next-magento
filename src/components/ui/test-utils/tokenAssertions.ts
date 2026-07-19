@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { expect } from 'vitest';
 
 import { CONTRACT_TOKEN_NAMES } from '@/theme/contract';
@@ -41,4 +44,129 @@ export function pxValue(value: string): number {
     throw new Error(`Expected a px value, got "${value}"`);
   }
   return Number(match[1]);
+}
+
+/**
+ * Asserts every `var(--*)` reference in a component's CSS-module source is
+ * either a bridge property (`--local-*`, supplied at runtime by the component)
+ * or a real, currently-declared contract key. Guards against a stylesheet
+ * pointing at a token that does not exist (typo or removed key), which would
+ * silently render unstyled. Pass the raw text of a `*.module.css` file.
+ */
+export function expectModuleCssReferencesRealTokens(cssText: string): void {
+  // Strip block comments so example token names in doc comments are not
+  // mistaken for real declarations.
+  const withoutComments = cssText.replace(/\/\*[\s\S]*?\*\//g, '');
+  const found = extractVarTokenNames(withoutComments);
+  expect(
+    found.length,
+    'expected at least one var(--*) reference in the module CSS',
+  ).toBeGreaterThan(0);
+
+  const unknown = found.filter(
+    (name) => !name.startsWith('--local-') && !KNOWN_TOKENS.has(name),
+  );
+  expect(
+    unknown,
+    `module CSS references unknown token(s): ${unknown.join(', ')}`,
+  ).toEqual([]);
+}
+
+/** Recursively lists every `*.module.css` file under a directory. */
+function findModuleCssFiles(dir: string): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name === '.next') continue;
+      out.push(...findModuleCssFiles(full));
+    } else if (entry.name.endsWith('.module.css')) {
+      out.push(full);
+    }
+  }
+  return out;
+}
+
+/**
+ * Repo-wide companion to `expectAllVarTokensAreContractKeys` (which checks a
+ * single rendered-HTML chunk): sweeps EVERY `*.module.css` under `root`
+ * (shared and per-component modules alike) and asserts that every `var(--*)`
+ * each one references is either a `--local-*` bridge property or a real,
+ * currently-declared contract key. A typo'd/removed token anywhere in the
+ * stylesheet layer fails loudly, naming the file and the offending token,
+ * rather than silently rendering unstyled.
+ */
+export function expectAllModuleCssReferencesRealTokens(root = 'src'): void {
+  const files = findModuleCssFiles(root);
+  expect(
+    files.length,
+    `expected to find *.module.css files under ${root}`,
+  ).toBeGreaterThan(0);
+
+  const offenders: string[] = [];
+  for (const file of files) {
+    const withoutComments = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    const unknown = extractVarTokenNames(withoutComments).filter(
+      (name) => !name.startsWith('--local-') && !KNOWN_TOKENS.has(name),
+    );
+    if (unknown.length > 0) {
+      offenders.push(`${file}: ${[...new Set(unknown)].join(', ')}`);
+    }
+  }
+
+  expect(
+    offenders,
+    `module CSS references unknown contract token(s):\n${offenders.join('\n')}`,
+  ).toEqual([]);
+}
+
+/** Extracts every `var(--local-*)` bridge property consumed in CSS text. */
+export function extractConsumedLocalProps(cssText: string): string[] {
+  const withoutComments = cssText.replace(/\/\*[\s\S]*?\*\//g, '');
+  return extractVarTokenNames(withoutComments).filter((name) =>
+    name.startsWith('--local-'),
+  );
+}
+
+/** Extracts every `--local-*` custom property set on an element's inline style. */
+export function extractSetLocalProps(el: Element): string[] {
+  const style = el.getAttribute('style') ?? '';
+  return Array.from(style.matchAll(/(--local-[a-zA-Z0-9-]+)\s*:/g), (m) => m[1]);
+}
+
+/**
+ * Cross-checks the bridge contract between a component and its stylesheet in
+ * BOTH directions, so a typo on either side fails loudly rather than rendering
+ * silently unstyled:
+ *   - every `--local-*` the module reads (`var(--local-*)`) is set by at least
+ *     one of the rendered elements — else the rule resolves to nothing; and
+ *   - every `--local-*` the elements set is read by the module — else the value
+ *     is dead (e.g. a misspelled property that nothing consumes).
+ * Pass elements covering every variant so their union of set properties is the
+ * component's full bridge surface.
+ */
+export function expectBridgePropsConsistent(elements: Element[], cssText: string): void {
+  const consumed = new Set(extractConsumedLocalProps(cssText));
+  const set = new Set(elements.flatMap((el) => extractSetLocalProps(el)));
+
+  expect(
+    consumed.size,
+    'expected the module to consume at least one --local-* bridge property',
+  ).toBeGreaterThan(0);
+  expect(
+    set.size,
+    'expected the component to set at least one --local-* bridge property',
+  ).toBeGreaterThan(0);
+
+  const unfed = [...consumed].filter((name) => !set.has(name)).sort();
+  const dead = [...set].filter((name) => !consumed.has(name)).sort();
+
+  expect(
+    unfed,
+    `module reads bridge properties the component never sets: ${unfed.join(', ')}`,
+  ).toEqual([]);
+  expect(
+    dead,
+    `component sets bridge properties the module never reads: ${dead.join(', ')}`,
+  ).toEqual([]);
 }

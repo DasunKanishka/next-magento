@@ -5,8 +5,10 @@ import React from 'react';
 import { Link } from '@/i18n/navigation';
 import { languages } from '@/i18n/languages';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
-import { codeChipStyle } from '@/components/ui/i18n/selectorShared';
+import codeChipStyles from '@/components/ui/core/codeChip.module.css';
+import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { DEALS_HREF, DEALS_LABEL } from './navConfig';
+import styles from './MobileMenu.module.css';
 import type { NavCategory } from './types';
 
 export interface MobileMenuProps {
@@ -15,23 +17,6 @@ export interface MobileMenuProps {
   locale?: SupportedLocale;
   onLanguageChange?: (locale: SupportedLocale) => void;
 }
-
-const drawerItemStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  width: '100%',
-  minHeight: 'var(--tap-target-min)',
-  padding: '0 14px',
-  border: 'none',
-  background: 'transparent',
-  borderRadius: 'var(--radius-sm)',
-  font: '600 15px/1 var(--font-brand)',
-  color: 'var(--color-text-primary)',
-  textDecoration: 'none',
-  cursor: 'pointer',
-  textAlign: 'left',
-};
 
 /**
  * Mobile hamburger drawer. The trigger toggles a slide-in panel with the nav
@@ -54,22 +39,12 @@ export function MobileMenu({
     setDrillId(null);
   }, []);
 
-  React.useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        close();
-        triggerRef.current?.focus();
-      }
-    }
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, close]);
+  const { rootRef } = useDismissMenu(open, close, triggerRef);
 
   const drilled = drillId ? categories.find((c) => c.id === drillId) : null;
 
   return (
-    <div style={{ position: 'relative', display: 'inline-flex' }}>
+    <div ref={rootRef} className={styles.wrap}>
       <button
         ref={triggerRef}
         type="button"
@@ -77,31 +52,10 @@ export function MobileMenu({
         aria-expanded={open}
         aria-label={open ? 'Menu sluiten' : 'Menu openen'}
         onClick={() => (open ? close() : setOpen(true))}
-        style={{
-          display: 'inline-flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          gap: 4,
-          minWidth: 'var(--tap-target-min)',
-          minHeight: 'var(--tap-target-min)',
-          padding: 10,
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-        }}
+        className={styles.trigger}
       >
         {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            aria-hidden="true"
-            style={{
-              display: 'block',
-              width: 22,
-              height: 2,
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--color-brand)',
-            }}
-          />
+          <span key={i} aria-hidden="true" className={styles.bar} />
         ))}
       </button>
 
@@ -110,48 +64,22 @@ export function MobileMenu({
           <div
             data-testid="mobile-menu-backdrop"
             onClick={close}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 70,
-              background: 'rgba(4,12,28,.45)',
-            }}
+            className={styles.backdrop}
           />
-          <nav
-            aria-label="Hoofdmenu"
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              left: 0,
-              zIndex: 80,
-              width: 262,
-              maxWidth: '90vw',
-              background: 'var(--color-surface)',
-              border: 'var(--border-width-default) solid var(--color-border-card)',
-              borderRadius: 'var(--radius-lg)',
-              boxShadow: 'var(--shadow-overlay)',
-              padding: 10,
-            }}
-          >
+          <nav aria-label="Hoofdmenu" className={styles.nav}>
             {drilled ? (
               <div>
                 <button
                   type="button"
                   onClick={() => setDrillId(null)}
-                  style={{
-                    ...drawerItemStyle,
-                    justifyContent: 'flex-start',
-                    gap: 8,
-                    color: 'var(--color-trust)',
-                    font: '600 13px/1 var(--font-brand)',
-                  }}
+                  className={`${styles.drawerItem} ${styles.drawerItemBack}`}
                 >
                   <span aria-hidden="true">‹</span> terug
                 </button>
                 <Link
                   href={`/${drilled.urlPath}`}
                   onClick={close}
-                  style={drawerItemStyle}
+                  className={styles.drawerItem}
                 >
                   Alles in {drilled.name}
                 </Link>
@@ -160,11 +88,7 @@ export function MobileMenu({
                     key={child.id}
                     href={`/${child.urlPath}`}
                     onClick={close}
-                    style={{
-                      ...drawerItemStyle,
-                      font: '500 14px/1 var(--font-brand)',
-                      color: 'var(--color-text-muted)',
-                    }}
+                    className={`${styles.drawerItem} ${styles.drawerItemChild}`}
                   >
                     {child.name}
                   </Link>
@@ -172,21 +96,11 @@ export function MobileMenu({
               </div>
             ) : (
               <div>
-                <div
-                  style={{
-                    font: '600 11px/1 var(--font-brand)',
-                    letterSpacing: 'var(--type-eyebrow-tracking)',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-text-subtle)',
-                    padding: '6px 14px 8px',
-                  }}
-                >
-                  Menu
-                </div>
+                <div className={`${styles.eyebrow} ${styles.menuEyebrow}`}>Menu</div>
                 <Link
                   href={DEALS_HREF}
                   onClick={close}
-                  style={{ ...drawerItemStyle, color: 'var(--color-urgency)' }}
+                  className={`${styles.drawerItem} ${styles.drawerItemDeals}`}
                 >
                   {DEALS_LABEL}
                 </Link>
@@ -197,7 +111,7 @@ export function MobileMenu({
                       type="button"
                       aria-label={`${c.name} — submenu openen`}
                       onClick={() => setDrillId(c.id)}
-                      style={drawerItemStyle}
+                      className={styles.drawerItem}
                     >
                       {c.name}
                       <span aria-hidden="true">›</span>
@@ -207,37 +121,16 @@ export function MobileMenu({
                       key={c.id}
                       href={`/${c.urlPath}`}
                       onClick={close}
-                      style={drawerItemStyle}
+                      className={styles.drawerItem}
                     >
                       {c.name}
                     </Link>
                   ),
                 )}
 
-                <div
-                  role="separator"
-                  style={{
-                    height: 'var(--border-width-default)',
-                    background: 'var(--color-border-card)',
-                    margin: '10px 6px',
-                  }}
-                />
-                <div
-                  style={{
-                    font: '600 11px/1 var(--font-brand)',
-                    letterSpacing: 'var(--type-eyebrow-tracking)',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-text-subtle)',
-                    padding: '2px 14px 8px',
-                  }}
-                >
-                  Taal
-                </div>
-                <ul
-                  role="menu"
-                  aria-label="Taal"
-                  style={{ listStyle: 'none', margin: 0, padding: 0 }}
-                >
+                <div role="separator" className={styles.separator} />
+                <div className={`${styles.eyebrow} ${styles.langEyebrow}`}>Taal</div>
+                <ul role="menu" aria-label="Taal" className={styles.langList}>
                   {languages.map((l) => {
                     const active = l.locale === locale;
                     return (
@@ -250,14 +143,15 @@ export function MobileMenu({
                             onLanguageChange?.(l.locale);
                             close();
                           }}
-                          style={{
-                            ...drawerItemStyle,
-                            justifyContent: 'flex-start',
-                            gap: 10,
-                            font: '500 14px/1 var(--font-brand)',
-                          }}
+                          className={`${styles.drawerItem} ${styles.langItem}`}
                         >
-                          <span style={codeChipStyle(active)}>{l.code}</span>
+                          <span
+                            className={`${codeChipStyles.codeChip} ${
+                              active ? codeChipStyles.codeChipActive : ''
+                            }`}
+                          >
+                            {l.code}
+                          </span>
                           {l.name}
                         </button>
                       </li>

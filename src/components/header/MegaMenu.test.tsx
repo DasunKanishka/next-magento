@@ -1,10 +1,19 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectBridgePropsConsistent,
+  expectModuleCssReferencesRealTokens,
+} from '../ui/test-utils/tokenAssertions';
 import { MegaMenu } from './MegaMenu';
 import type { NavCategory } from './types';
+
+const MODULE_CSS_PATH = join(process.cwd(), 'src/components/header/MegaMenu.module.css');
 
 vi.mock('@/i18n/navigation', () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,5 +122,23 @@ describe('MegaMenu', () => {
       />,
     );
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
+  });
+
+  it('bridge is consistent both ways across the active/inactive rail states', () => {
+    const { container } = render(
+      <MegaMenu
+        categories={categories}
+        activeId="11"
+        onActivate={noop}
+        promoHtml=""
+        onClose={noop}
+      />,
+    );
+    const links = Array.from(container.querySelectorAll('a'));
+    expectBridgePropsConsistent(links, readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

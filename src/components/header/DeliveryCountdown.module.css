@@ -1,0 +1,19 @@
+/*
+ * DeliveryCountdown styles. See src/components/STYLING.md for the convention.
+ * Everything here is static per render (the label text changes, not the
+ * visual treatment), so the component sets no --local-* bridge property.
+ */
+
+.countdown {
+  display: inline-flex;
+  align-items: center;
+  /* 6px gap snapped to --space-2 (8px, +2px). */
+  gap: var(--space-2);
+  font-family: var(--font-brand);
+  /* 13px exactly matches --type-caption-size; the step carries no dedicated
+     line-height token, so the ratio stays a raw structural 1. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: 1;
+  color: var(--color-urgency);
+}

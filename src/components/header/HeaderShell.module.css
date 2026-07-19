@@ -1,0 +1,220 @@
+/*
+ * HeaderShell styles. See src/components/STYLING.md for the convention this
+ * follows — the same co-located module + bridge pattern as ui/core/Button.
+ * Two things vary per render: the sticky shadow (scroll position) and each
+ * nav trigger's fill (which category is open) — both bridged through
+ * --local-*. Everything else is a static contract token.
+ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-surface);
+  border-bottom: var(--border-width-default) solid var(--color-border-card);
+  box-shadow: var(--local-shadow);
+  transition: box-shadow 0.15s ease;
+}
+
+.mobile {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .desktop {
+    display: none;
+  }
+  .mobile {
+    display: block;
+  }
+}
+
+.maxwRow {
+  max-width: var(--layout-maxw);
+  margin: 0 auto;
+  /* 20px padding matches --space-5 exactly. */
+  padding: 0 var(--space-5);
+}
+
+.topRow {
+  display: flex;
+  align-items: flex-start;
+  /* 28px gap matches --space-7 exactly. */
+  gap: var(--space-7);
+  /* Shared with MegaMenu's promo-bar padding — see MegaMenu.module.css
+     .promoBar for the same de-duplicated expression (14px → --space-4,
+     +2px; 20px → --space-5, exact). */
+  padding: var(--space-4) var(--space-5);
+}
+
+.navSection {
+  border-top: var(--border-width-default) solid var(--color-border-card);
+}
+
+.navRowOuter {
+  position: relative;
+}
+
+.logoWrap {
+  display: flex;
+  align-items: center;
+  min-height: var(--header-logo-h);
+}
+
+.searchCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.trustRow {
+  display: flex;
+  gap: var(--space-5);
+  font-family: var(--font-brand);
+  /* 12px exactly matches --type-eyebrow-size; weight 500 has no eyebrow
+     counterpart (eyebrow-weight is 600), so it stays the standalone
+     --type-ui-weight primitive (also 500) rather than borrowing eyebrow's. */
+  font-size: var(--type-eyebrow-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+}
+
+.trustDelivery {
+  color: var(--color-cta);
+}
+
+.trustRating {
+  color: var(--color-premium-accent-ink);
+}
+
+.utilCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.utilRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.navBar {
+  display: flex;
+  align-items: center;
+  /* 6px gap snapped to --space-2 (8px, +2px). */
+  gap: var(--space-2);
+  min-height: var(--header-nav-h);
+}
+
+.navTrigger {
+  min-height: var(--tap-target-min);
+  /* 12px padding matches --space-3 exactly. */
+  padding: 0 var(--space-3);
+  background: var(--local-nav-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.dealsPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  /* 16px padding matches --space-4 exactly. */
+  padding: 0 var(--space-4);
+  background: var(--color-urgency);
+  color: var(--color-text-on-fill);
+  border-radius: var(--radius-full);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-ui-line-height);
+  text-decoration: none;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  /* 22px exactly matches --type-h3-size, reused for its numeric value only
+     — the wordmark maps to no named type step (mirrors the
+     --type-weight-heavy precedent in contract.ts), so its line-height stays
+     a raw structural ratio, not the h3 step's 1.1. */
+  font-size: var(--type-h3-size);
+  font-weight: var(--type-weight-heavy);
+  line-height: 1;
+  color: var(--color-brand);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.accountButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  /* 14px padding snapped to --space-4 (16px, +2px). */
+  padding: 0 var(--space-4);
+  background: var(--color-surface);
+  border: var(--border-width-emphasis) solid var(--color-border-field);
+  border-radius: var(--radius-md);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.countdownSlot {
+  margin-left: auto;
+}
+
+.mobileTrustBar {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  display: flex;
+  justify-content: center;
+  /* 16px gap matches --space-4 exactly. */
+  gap: var(--space-4);
+  /* 5px/12px padding: 5px snapped to --space-1 (4px, +1px); 12px matches
+     --space-3 exactly. */
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-meta-line-height);
+}
+
+.mobileTrustRating {
+  color: var(--color-premium-accent);
+}
+
+.mobileTopRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.mobileLogoWrap {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.mobileSearchWrap {
+  /* 10px bottom padding snapped to --space-3 (12px, +2px). */
+  padding: 0 var(--space-3) var(--space-3);
+}

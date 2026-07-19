@@ -1,0 +1,39 @@
+/*
+ * FreeShippingProgress styles. See src/components/STYLING.md for the
+ * convention. Two values vary per render: the message color (whether the
+ * threshold is reached) and the fill width (the live progress percentage —
+ * business data, not a design token, so it bridges as a plain computed
+ * value, mirroring Button's `--local-width` precedent for non-token literals
+ * like `100%`/`auto`).
+ */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  /* 5px gap snapped to --space-1 (4px, +1px). */
+  gap: var(--space-1);
+}
+
+.message {
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-meta-line-height);
+  color: var(--local-message-fg);
+}
+
+.track {
+  /* 6px bar height snapped to --space-2 (8px, +2px). */
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-inset-b);
+  overflow: hidden;
+}
+
+.fill {
+  width: var(--local-fill-width);
+  height: 100%;
+  background: var(--color-cta);
+  border-radius: var(--radius-full);
+  transition: width 0.25s ease;
+}

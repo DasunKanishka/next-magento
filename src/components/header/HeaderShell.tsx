@@ -3,17 +3,20 @@
 import React from 'react';
 
 import { CountrySelector, SearchBar } from '@/components/ui';
+import { Logo } from '@/components/ui/core/Logo';
+import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { defaultCountryCode, findCountry, type CountryCode } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
-import { DELIVERY_DEADLINE_COPY, REVIEW_RATING_COPY } from '@/config/delivery';
-import { STORE_IDENTITY } from '@/config/store-identity';
+import { REVIEW_RATING_COPY } from '@/config/delivery';
+import type { StoreIdentityDeliveryPromise, StoreIdentityLogo } from '@/lib/data-source';
 import { CartPill } from './CartPill';
 import { DeliveryCountdown } from './DeliveryCountdown';
 import { FreeShippingProgress } from './FreeShippingProgress';
 import { MegaMenu } from './MegaMenu';
 import { MobileMenu } from './MobileMenu';
 import { DEALS_HREF, DEALS_LABEL, MAX_INLINE_NAV_ITEMS } from './navConfig';
+import styles from './HeaderShell.module.css';
 import type { NavCategory } from './types';
 
 export interface HeaderShellProps {
@@ -25,25 +28,11 @@ export interface HeaderShellProps {
   cartCount?: number;
   /** Running cart total in EUR. */
   cartTotal?: number;
+  /** Backend-sourced logo (`identity.logo`) — image-with-text-fallback wordmark + its aria-label. */
+  logo: StoreIdentityLogo;
+  /** Backend-sourced delivery promise (`identity.deliveryPromise`) — the trust-row copy + the countdown's cut-off hour. */
+  deliveryPromise: StoreIdentityDeliveryPromise;
 }
-
-// Responsive switch + sticky shadow. Kept as a scoped stylesheet (the same
-// pattern the search bar uses for its pseudo-element rule) because inline styles
-// cannot express media queries; the token-driven visuals stay inline so they
-// remain assertable as real contract tokens.
-const SCOPED_CSS = `
-.hdr-mobile { display: none; }
-@media (max-width: 900px) {
-  .hdr-desktop { display: none; }
-  .hdr-mobile { display: block; }
-}
-`;
-
-const maxwRow: React.CSSProperties = {
-  maxWidth: 'var(--layout-maxw)',
-  margin: '0 auto',
-  padding: '0 20px',
-};
 
 /**
  * Interactive header shell (conversion-focused variant). Sticky on scroll,
@@ -59,13 +48,14 @@ export function HeaderShell({
   megaPromoHtml = '',
   cartCount = 0,
   cartTotal = 0,
+  logo,
+  deliveryPromise,
 }: HeaderShellProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
   const [country, setCountry] = React.useState<CountryCode>(defaultCountryCode);
   const [megaActiveId, setMegaActiveId] = React.useState<string | null>(null);
-  const navRef = React.useRef<HTMLDivElement>(null);
 
   const goTo = React.useCallback(
     (next: SupportedLocale) => {
@@ -82,158 +72,52 @@ export function HeaderShell({
   }, []);
 
   const closeMega = React.useCallback(() => setMegaActiveId(null), []);
-
-  React.useEffect(() => {
-    if (megaActiveId == null) return;
-    function onDown(e: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) closeMega();
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') closeMega();
-    }
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [megaActiveId, closeMega]);
+  const { rootRef: navRef } = useDismissMenu(megaActiveId != null, closeMega);
 
   const inlineCats = categories.slice(0, MAX_INLINE_NAV_ITEMS);
   const overflowCats = categories.slice(MAX_INLINE_NAV_ITEMS);
 
-  const navTriggerStyle = (active: boolean): React.CSSProperties => ({
-    minHeight: 'var(--tap-target-min)',
-    padding: '0 12px',
-    background: active ? 'var(--color-surface-inset-b)' : 'transparent',
-    border: 'none',
-    borderRadius: 'var(--radius-sm)',
-    font: '600 14px/1 var(--font-brand)',
-    color: 'var(--color-text-primary)',
-    cursor: 'pointer',
-  });
+  const navTriggerBridge = (active: boolean): React.CSSProperties =>
+    ({
+      '--local-nav-bg': active ? 'var(--color-surface-inset-b)' : 'transparent',
+    }) as React.CSSProperties;
 
   const dealsPill = (
-    <Link
-      href={DEALS_HREF}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        minHeight: 'var(--tap-target-min)',
-        padding: '0 16px',
-        background: 'var(--color-urgency)',
-        color: '#fff',
-        borderRadius: 'var(--radius-full)',
-        font: '700 14px/1 var(--font-brand)',
-        textDecoration: 'none',
-      }}
-    >
+    <Link href={DEALS_HREF} className={styles.dealsPill}>
       {DEALS_LABEL}
     </Link>
   );
 
-  const logo = (
-    <Link
-      href="/"
-      aria-label={`${STORE_IDENTITY.name} — naar de homepagina`}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        minHeight: 'var(--tap-target-min)',
-        font: '800 22px/1 var(--font-brand)',
-        color: 'var(--color-brand)',
-        textDecoration: 'none',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {STORE_IDENTITY.name}
-    </Link>
-  );
+  const logoEl = <Logo logo={logo} className={styles.logo} />;
 
   const accountButton = (
-    <button
-      type="button"
-      aria-label="Inloggen"
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-        minHeight: 'var(--tap-target-min)',
-        minWidth: 'var(--tap-target-min)',
-        padding: '0 14px',
-        background: 'var(--color-surface)',
-        border: 'var(--border-width-emphasis) solid var(--color-border-field)',
-        borderRadius: 'var(--radius-md)',
-        font: '600 14px/1 var(--font-brand)',
-        color: 'var(--color-text-primary)',
-        cursor: 'pointer',
-      }}
-    >
+    <button type="button" aria-label="Inloggen" className={styles.accountButton}>
       <span aria-hidden="true">👤</span>
       Inloggen
     </button>
   );
 
+  const headerBridge = {
+    '--local-shadow': scrolled ? 'var(--shadow-card)' : 'none',
+  } as React.CSSProperties;
+
   return (
-    <header
-      style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        background: 'var(--color-surface)',
-        borderBottom: 'var(--border-width-default) solid var(--color-border-card)',
-        boxShadow: scrolled ? 'var(--shadow-card)' : 'none',
-        transition: 'box-shadow .15s ease',
-      }}
-    >
-      <style>{SCOPED_CSS}</style>
-
+    <header className={styles.header} style={headerBridge}>
       {/* ---------- Desktop ---------- */}
-      <div className="hdr-desktop">
-        <div
-          style={{
-            ...maxwRow,
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 28,
-            padding: '14px 20px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', minHeight: 50 }}>
-            {logo}
-          </div>
+      <div className={styles.desktop}>
+        <div className={`${styles.maxwRow} ${styles.topRow}`}>
+          <div className={styles.logoWrap}>{logoEl}</div>
 
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-            }}
-          >
+          <div className={styles.searchCol}>
             <SearchBar />
-            <div
-              style={{ display: 'flex', gap: 20, font: '500 12px/1 var(--font-brand)' }}
-            >
-              <span style={{ color: 'var(--color-cta)' }}>
-                ✓ {DELIVERY_DEADLINE_COPY}
-              </span>
-              <span style={{ color: 'var(--color-premium-accent-ink)' }}>
-                ★ {REVIEW_RATING_COPY}
-              </span>
+            <div className={styles.trustRow}>
+              <span className={styles.trustDelivery}>✓ {deliveryPromise.copy}</span>
+              <span className={styles.trustRating}>★ {REVIEW_RATING_COPY}</span>
             </div>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 8,
-              alignItems: 'stretch',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className={styles.utilCol}>
+            <div className={styles.utilRow}>
               <CountrySelector
                 value={country}
                 language={locale}
@@ -252,20 +136,13 @@ export function HeaderShell({
         </div>
 
         {/* Nav row 2 + mega-menu */}
-        <div
-          style={{
-            borderTop: 'var(--border-width-default) solid var(--color-border-card)',
-          }}
-        >
+        <div className={styles.navSection}>
           <div
             ref={navRef}
             onMouseLeave={closeMega}
-            style={{ ...maxwRow, position: 'relative' }}
+            className={`${styles.maxwRow} ${styles.navRowOuter}`}
           >
-            <nav
-              aria-label="Hoofdnavigatie"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 48 }}
-            >
+            <nav aria-label="Hoofdnavigatie" className={styles.navBar}>
               {dealsPill}
               {inlineCats.map((c) => (
                 <button
@@ -276,7 +153,8 @@ export function HeaderShell({
                   onMouseEnter={() => setMegaActiveId(c.id)}
                   onFocus={() => setMegaActiveId(c.id)}
                   onClick={() => setMegaActiveId((cur) => (cur === c.id ? null : c.id))}
-                  style={navTriggerStyle(megaActiveId === c.id)}
+                  className={styles.navTrigger}
+                  style={navTriggerBridge(megaActiveId === c.id)}
                 >
                   {c.name}
                 </button>
@@ -293,13 +171,19 @@ export function HeaderShell({
                       overflowCats.some((c) => c.id === cur) ? null : overflowCats[0].id,
                     )
                   }
-                  style={navTriggerStyle(overflowCats.some((c) => c.id === megaActiveId))}
+                  className={styles.navTrigger}
+                  style={navTriggerBridge(
+                    overflowCats.some((c) => c.id === megaActiveId),
+                  )}
                 >
                   meer ▾
                 </button>
               ) : null}
-              <span style={{ marginLeft: 'auto' }}>
-                <DeliveryCountdown />
+              <span className={styles.countdownSlot}>
+                <DeliveryCountdown
+                  copy={deliveryPromise.copy}
+                  cutoffHour={deliveryPromise.cutoffHour}
+                />
               </span>
             </nav>
 
@@ -317,29 +201,15 @@ export function HeaderShell({
       </div>
 
       {/* ---------- Mobile ---------- */}
-      <div className="hdr-mobile">
-        <div
-          style={{
-            background: 'var(--color-brand)',
-            color: '#fff',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 16,
-            padding: '5px 12px',
-            font: '600 11px/1 var(--font-brand)',
-          }}
-        >
-          <span>✓ {DELIVERY_DEADLINE_COPY}</span>
-          <span style={{ color: 'var(--color-premium-accent)' }}>
-            ★ {REVIEW_RATING_COPY}
-          </span>
+      <div className={styles.mobile}>
+        <div className={styles.mobileTrustBar}>
+          <span>✓ {deliveryPromise.copy}</span>
+          <span className={styles.mobileTrustRating}>★ {REVIEW_RATING_COPY}</span>
         </div>
 
-        <div
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px' }}
-        >
+        <div className={styles.mobileTopRow}>
           <MobileMenu categories={categories} locale={locale} onLanguageChange={goTo} />
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>{logo}</div>
+          <div className={styles.mobileLogoWrap}>{logoEl}</div>
           <CountrySelector
             compact
             alignLeft
@@ -355,12 +225,8 @@ export function HeaderShell({
           <CartPill count={cartCount} total={cartTotal} />
         </div>
 
-        <div style={{ padding: '0 12px 10px' }}>
-          <SearchBar
-            height={44}
-            placeholder="Zoek merk, soort of product…"
-            buttonLabel="⌕"
-          />
+        <div className={styles.mobileSearchWrap}>
+          <SearchBar compact placeholder="Zoek merk, soort of product…" buttonLabel="⌕" />
         </div>
       </div>
     </header>

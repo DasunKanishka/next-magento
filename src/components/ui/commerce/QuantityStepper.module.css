@@ -1,0 +1,42 @@
+/*
+ * QuantityStepper styles. See src/components/STYLING.md for the convention.
+ * Every static rule here references a design token; the per-size dimensions
+ * (the closest analog to Button's SIZES) are fixed design constants resolved
+ * to token references in the component's DIMS map, then routed through the
+ * `--local-*` bridge — never raw pixel literals.
+ */
+
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  border: var(--border-width-emphasis) solid var(--color-border-field);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.button {
+  width: var(--local-btn-w);
+  height: var(--local-btn-h);
+  min-width: var(--local-btn-w);
+  min-height: var(--local-btn-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--local-btn-font-size);
+  color: var(--color-brand);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  padding: 0;
+}
+
+.num {
+  width: var(--local-num-w);
+  text-align: center;
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-semibold);
+  font-size: var(--local-num-font-size);
+  line-height: var(--type-ui-line-height);
+}

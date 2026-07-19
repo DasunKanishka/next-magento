@@ -1,6 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import type { CmsBlock, StoreConfig } from '@/lib/data-source/types';
+import {
+  STORE_DELIVERY_PROMISE_BLOCK,
+  STORE_FOOTER_COLUMNS_BLOCK,
+  STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+  STORE_IDENTITY_LEGAL_BLOCK,
+  STORE_IDENTITY_TAGLINE_BLOCK,
+} from '@/config/store-identity-content';
 
 import {
+  composeStoreIdentity,
   mapCategories,
   mapCmsBlocks,
   mapNewsletterStatus,
@@ -18,13 +28,17 @@ import {
  */
 
 describe('mapStoreConfig', () => {
-  it('maps every storeConfig field, including cms_home_page', () => {
+  it('maps every storeConfig field, including cms_home_page and the identity fields', () => {
     const result = mapStoreConfig({
       store_code: 'default',
       locale: 'nl_NL',
       base_currency_code: 'EUR',
       secure_base_media_url: 'https://249.magento.default/media/',
       cms_home_page: 'home',
+      header_logo_src: 'logo/default/logo.svg',
+      logo_alt: 'Example Store',
+      copyright: '© Example Store',
+      store_name: 'Default Store View',
     });
     expect(result).toStrictEqual({
       storeCode: 'default',
@@ -32,16 +46,24 @@ describe('mapStoreConfig', () => {
       currencyCode: 'EUR',
       mediaBaseUrl: 'https://249.magento.default/media/',
       cmsHomePage: 'home',
+      headerLogoSrc: 'logo/default/logo.svg',
+      logoAlt: 'Example Store',
+      copyright: '© Example Store',
+      storeName: 'Default Store View',
     });
   });
 
-  it('coalesces null leaves to empty strings (never undefined)', () => {
+  it('coalesces null leaves to empty strings (never undefined), and identity fields to null', () => {
     const result = mapStoreConfig({
       store_code: null,
       locale: null,
       base_currency_code: null,
       secure_base_media_url: null,
       cms_home_page: null,
+      header_logo_src: null,
+      logo_alt: null,
+      copyright: null,
+      store_name: null,
     });
     expect(result).toStrictEqual({
       storeCode: '',
@@ -49,11 +71,51 @@ describe('mapStoreConfig', () => {
       currencyCode: '',
       mediaBaseUrl: '',
       cmsHomePage: '',
+      headerLogoSrc: null,
+      logoAlt: null,
+      copyright: null,
+      storeName: null,
     });
-    // No field is undefined.
+    // No field is undefined (identity fields are legitimately null, not undefined).
     for (const value of Object.values(result)) {
       expect(value).not.toBeUndefined();
     }
+  });
+
+  it('maps identity fields to null when the raw fields are absent (not just null)', () => {
+    const result = mapStoreConfig({
+      store_code: 'default',
+      locale: 'nl_NL',
+      base_currency_code: 'EUR',
+      secure_base_media_url: 'https://249.magento.default/media/',
+      cms_home_page: 'home',
+    });
+    expect(result.headerLogoSrc).toBeNull();
+    expect(result.logoAlt).toBeNull();
+    expect(result.copyright).toBeNull();
+    expect(result.storeName).toBeNull();
+  });
+
+  it('maps a backend-returned empty string identity field to null (not "")', () => {
+    const result = mapStoreConfig({
+      store_code: 'default',
+      locale: 'nl_NL',
+      base_currency_code: 'EUR',
+      secure_base_media_url: 'https://249.magento.default/media/',
+      cms_home_page: 'home',
+      header_logo_src: '',
+      logo_alt: '',
+      copyright: '© Example Store',
+      store_name: 'Default Store View',
+    });
+    // '' means "unset" for these optional display strings → normalized to null.
+    expect(result.headerLogoSrc).toBeNull();
+    expect(result.logoAlt).toBeNull();
+    // Non-empty identity values are preserved.
+    expect(result.copyright).toBe('© Example Store');
+    expect(result.storeName).toBe('Default Store View');
+    // The existing required fields keep their empty-string coalescing contract.
+    expect(result.storeCode).toBe('default');
   });
 });
 
@@ -244,5 +306,233 @@ describe('mapNewsletterStatus', () => {
     expect(mapNewsletterStatus('SOMETHING_ELSE')).toBe('error');
     expect(mapNewsletterStatus(null)).toBe('error');
     expect(mapNewsletterStatus(undefined)).toBe('error');
+  });
+});
+
+describe('composeStoreIdentity', () => {
+  const validStoreConfig: StoreConfig = {
+    storeCode: 'default',
+    locale: 'nl_NL',
+    currencyCode: 'EUR',
+    mediaBaseUrl: 'https://249.magento.default/media/',
+    cmsHomePage: 'home',
+    headerLogoSrc: 'logo/default/logo.svg',
+    logoAlt: 'Example Store logo',
+    copyright: '© 2026 Example Store B.V.',
+    storeName: 'Example Store',
+  };
+
+  function block(identifier: string, content: string): CmsBlock {
+    return { identifier, title: '', content };
+  }
+
+  const validBlocks: CmsBlock[] = [
+    block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="registration-number">Reg. 00000000</p>'),
+    block(STORE_IDENTITY_TAGLINE_BLOCK, '<p>Jouw online specialiteitenwinkel.</p>'),
+    block(
+      STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+      '<ul><li>iDEAL</li><li>Mastercard</li><li>Visa</li></ul>',
+    ),
+    block(
+      STORE_FOOTER_COLUMNS_BLOCK,
+      '<div class="footer-column"><h3>Klantenservice</h3><ul>' +
+        '<li><a href="/verzending">Verzending</a></li>' +
+        '<li><a href="/retour">Retourneren</a></li>' +
+        '</ul></div>' +
+        '<div class="footer-column"><h3>Over ons</h3><ul>' +
+        '<li><a href="/over-ons">Over ons</a></li>' +
+        '</ul></div>',
+    ),
+    block(
+      STORE_DELIVERY_PROMISE_BLOCK,
+      '<p class="delivery-copy">Voor 22:00 besteld, morgen in huis</p>' +
+        '<p class="delivery-cutoff-hour">22</p>',
+    ),
+  ];
+
+  it('composes every field from mocked storeConfig + block data', () => {
+    const result = composeStoreIdentity({
+      storeConfig: validStoreConfig,
+      blocks: validBlocks,
+    });
+    expect(result).toStrictEqual({
+      name: 'Example Store',
+      logo: {
+        src: 'https://249.magento.default/media/logo/default/logo.svg',
+        alt: 'Example Store logo',
+        fallbackText: 'Example Store',
+      },
+      tagline: 'Jouw online specialiteitenwinkel.',
+      registrationNumber: 'Reg. 00000000',
+      copyright: '© 2026 Example Store B.V.',
+      paymentMethods: ['iDEAL', 'Mastercard', 'Visa'],
+      footerColumns: [
+        {
+          heading: 'Klantenservice',
+          links: [
+            { label: 'Verzending', href: '/verzending' },
+            { label: 'Retourneren', href: '/retour' },
+          ],
+        },
+        { heading: 'Over ons', links: [{ label: 'Over ons', href: '/over-ons' }] },
+      ],
+      deliveryPromise: { copy: 'Voor 22:00 besteld, morgen in huis', cutoffHour: 22 },
+    });
+  });
+
+  describe('logo URL resolution', () => {
+    it('resolves headerLogoSrc to an absolute URL against mediaBaseUrl when a logo is configured', () => {
+      const result = composeStoreIdentity({
+        storeConfig: validStoreConfig,
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBe(
+        'https://249.magento.default/media/logo/default/logo.svg',
+      );
+    });
+
+    it('is null when no logo is configured', () => {
+      const result = composeStoreIdentity({
+        storeConfig: { ...validStoreConfig, headerLogoSrc: null },
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBeNull();
+    });
+
+    it('does not double-prefix an already-absolute headerLogoSrc', () => {
+      const result = composeStoreIdentity({
+        storeConfig: {
+          ...validStoreConfig,
+          headerLogoSrc: 'https://cdn.example.com/logo.svg',
+        },
+        blocks: validBlocks,
+      });
+      expect(result.logo.src).toBe('https://cdn.example.com/logo.svg');
+    });
+
+    it('falls back logo.alt to an empty string when logoAlt is null', () => {
+      const result = composeStoreIdentity({
+        storeConfig: { ...validStoreConfig, logoAlt: null },
+        blocks: validBlocks,
+      });
+      expect(result.logo.alt).toBe('');
+    });
+  });
+
+  describe('fail-closed legal/identity fields', () => {
+    it('throws + logs the marker when name (storeName) is unsourceable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: { ...validStoreConfig, storeName: null },
+          blocks: validBlocks,
+        }),
+      ).toThrow('store-identity:fail-closed field=name');
+      expect(errorSpy).toHaveBeenCalledWith('store-identity:fail-closed field=name');
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs the marker when copyright is unsourceable', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: { ...validStoreConfig, copyright: null },
+          blocks: validBlocks,
+        }),
+      ).toThrow('store-identity:fail-closed field=copyright');
+      expect(errorSpy).toHaveBeenCalledWith('store-identity:fail-closed field=copyright');
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs field=registrationNumber when the whole legal block is missing', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const blocksWithoutLegalBlock = validBlocks.filter(
+        (b) => b.identifier !== STORE_IDENTITY_LEGAL_BLOCK,
+      );
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: validStoreConfig,
+          blocks: blocksWithoutLegalBlock,
+        }),
+      ).toThrow('store-identity:fail-closed field=registrationNumber');
+      expect(errorSpy).toHaveBeenCalledWith(
+        'store-identity:fail-closed field=registrationNumber',
+      );
+      errorSpy.mockRestore();
+    });
+
+    it('throws + logs the marker when the registration-number class is missing from the legal block', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const blocksWithoutRegistration = validBlocks.map((b) =>
+        b.identifier === STORE_IDENTITY_LEGAL_BLOCK
+          ? block(STORE_IDENTITY_LEGAL_BLOCK, '<p class="other">irrelevant</p>')
+          : b,
+      );
+      expect(() =>
+        composeStoreIdentity({
+          storeConfig: validStoreConfig,
+          blocks: blocksWithoutRegistration,
+        }),
+      ).toThrow('store-identity:fail-closed field=registrationNumber');
+      expect(errorSpy).toHaveBeenCalledWith(
+        'store-identity:fail-closed field=registrationNumber',
+      );
+      errorSpy.mockRestore();
+    });
+
+    it('treats an entirely unreachable source (empty storeConfig + no blocks) the same as a missing value', () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        composeStoreIdentity({ storeConfig: mapStoreConfig({}), blocks: [] }),
+      ).toThrow('store-identity:fail-closed field=name');
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('non-legal graceful degradation', () => {
+    it('tagline degrades to "" when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_IDENTITY_TAGLINE_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.tagline).toBe('');
+    });
+
+    it('paymentMethods degrades to [] when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_FOOTER_PAYMENT_METHODS_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.paymentMethods).toStrictEqual([]);
+    });
+
+    it('footerColumns degrades to [] when unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_FOOTER_COLUMNS_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.footerColumns).toStrictEqual([]);
+    });
+
+    it('deliveryPromise degrades to the empty default when entirely unauthored (no throw)', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_DELIVERY_PROMISE_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.deliveryPromise).toStrictEqual({ copy: '', cutoffHour: 0 });
+    });
+
+    it('deliveryPromise degrades atomically (copy without a valid cutoffHour → the empty default, no throw)', () => {
+      const blocks = validBlocks.map((b) =>
+        b.identifier === STORE_DELIVERY_PROMISE_BLOCK
+          ? block(
+              STORE_DELIVERY_PROMISE_BLOCK,
+              '<p class="delivery-copy">Voor 22:00 besteld, morgen in huis</p>',
+            )
+          : b,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.deliveryPromise).toStrictEqual({ copy: '', cutoffHour: 0 });
+    });
   });
 });

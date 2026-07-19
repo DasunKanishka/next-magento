@@ -1,8 +1,25 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
+import {
+  expectAllVarTokensAreContractKeys,
+  expectBridgePropsConsistent,
+  expectModuleCssReferencesRealTokens,
+} from '../test-utils/tokenAssertions';
 import { Toast } from './Toast';
+import styles from './Toast.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/feedback/Toast.module.css',
+);
+const SURFACE_MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/core/Surface.module.css',
+);
 
 describe('Toast', () => {
   it('renders all three documented tones', () => {
@@ -24,11 +41,33 @@ describe('Toast', () => {
     expect(toast).toHaveAttribute('aria-live', 'polite');
   });
 
-  it('uses --shadow-raised and --color-border-card, sharing tint tokens with Alert', () => {
+  it('bridges the per-tone icon-circle colors to Alert-shared tint/accent tokens', () => {
+    const { container, rerender } = render(<Toast tone="success">x</Toast>);
+    const el = () => container.firstElementChild as HTMLElement;
+    expect(el().style.getPropertyValue('--local-tint')).toBe('var(--color-cta-tint)');
+    expect(el().style.getPropertyValue('--local-accent')).toBe('var(--color-cta)');
+
+    rerender(<Toast tone="info">x</Toast>);
+    expect(el().style.getPropertyValue('--local-tint')).toBe('var(--color-trust-tint)');
+  });
+
+  it('uses --shadow-raised locally and composes the shared on-surface border/bg/radius shell', () => {
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(/\.toast\s*\{[\s\S]*?box-shadow:\s*var\(--shadow-raised\)/);
+    expect(css).toMatch(
+      /\.toast\s*\{[\s\S]*?composes:\s*onSurface from '..\/core\/Surface\.module\.css'/,
+    );
+    const surfaceCss = readFileSync(SURFACE_MODULE_CSS_PATH, 'utf8');
+    expect(surfaceCss).toMatch(
+      /\.onSurface\s*\{[\s\S]*?border:\s*var\(--border-width-default\) solid var\(--color-border-card\)/,
+    );
+  });
+
+  it('carries its module class on the root pill', () => {
     const { container } = render(<Toast tone="info">x</Toast>);
-    const el = container.firstElementChild as HTMLElement;
-    expect(el.style.boxShadow).toBe('var(--shadow-raised)');
-    expect(el.style.border).toContain('var(--color-border-card)');
+    expect((container.firstElementChild as HTMLElement).className).toContain(
+      styles.toast,
+    );
   });
 
   it('every var(--*) this component emits is a real contract token', () => {
@@ -40,5 +79,21 @@ describe('Toast', () => {
       </>,
     );
     expectAllVarTokensAreContractKeys(container.innerHTML);
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
+  });
+
+  it('bridge is consistent both ways across the tone surface', () => {
+    const success = render(<Toast tone="success">A</Toast>);
+    const info = render(<Toast tone="info">B</Toast>);
+    const error = render(<Toast tone="error">C</Toast>);
+    const elements = [
+      ...success.container.querySelectorAll('div'),
+      ...info.container.querySelectorAll('div'),
+      ...error.container.querySelectorAll('div'),
+    ];
+    expectBridgePropsConsistent(elements, readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

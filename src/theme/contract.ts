@@ -64,6 +64,133 @@
  * `--color-on-brand-strong` was considered and intentionally dropped — no
  * concrete definition exists for it anywhere in the source material, and an
  * undefined token is itself a smell.
+ *
+ * Caption-size addendum (total now 120, typography 36): a recurring 13px
+ * label/meta font-size used across the component tree had no matching
+ * token, leaving a child brand unable to override it. `--type-caption-size`
+ * closes that gap per the extend-vs-snap rule below (a scale-step gap
+ * between the 14px UI size and the 12px label size). Standalone — no
+ * accompanying weight or line-height token, matching the precedent set by
+ * `--type-weight-heavy` above.
+ *
+ * Interactive-surface & disabled-pair addendum (total now 127, color 60,
+ * spacing/radius/sizing 31): promotes the last raw component literals in the
+ * button exemplar into the contract so a child brand can override them — all
+ * 1:1 promotions with no rendered-value change. Adds a neutral
+ * interactive-surface family for the non-CTA (secondary/tertiary) button
+ * fills: `--color-surface-neutral` is the shared resting tint (the tertiary
+ * fill at rest AND the secondary fill on hover — one value, two consumers),
+ * with `-hover` and `-active` for the tertiary fill's deepening states and
+ * `-emphasis` for the secondary fill's pressed tint. Adds
+ * `--color-cta-disabled-fg`, the disabled CTA label color paired with the
+ * existing `--color-cta-disabled-bg` (the pair was previously split — bg a
+ * token, fg a literal). Adds `--color-border-disabled`, the disabled control
+ * border, sibling of `--color-disabled-bg`/`-fg`. Adds `--control-height-sm`
+ * (36px), the small control height, sibling of `--control-height-md`/`-lg`;
+ * 36px sits more than the snap tolerance below the 44px md height, so per the
+ * extend-vs-snap rule below it earns a token rather than snapping.
+ *
+ * Generic-weight addendum (total now 129, typography 38): the button exemplar
+ * carried its control weights (700/600) as raw numerics. Rather than borrow an
+ * unrelated named type step's weight token (which would mis-couple a control's
+ * weight to, say, the price or label role), two standalone weight primitives
+ * were added — `--type-weight-bold` (700) and `--type-weight-semibold` (600) —
+ * mirroring the `--type-weight-heavy` precedent for weights that map to no
+ * named type-scale step. 1:1 promotion, no rendered-value change.
+ *
+ * Header/nav literal-closure addendum (total now 139, color 61, typography 39,
+ * spacing/radius/sizing 39): a header/nav styling pass adopted a strict
+ * no-literal-anywhere policy, promoting the last raw values in the header,
+ * mega-menu, drawer, cart and button exemplar into the contract so a child
+ * brand can override every one. All 1:1 promotions (no rendered-value change)
+ * except the two header min-heights, promoted at their EXACT source values
+ * (previously carried as ~4–6px approximations, now zero-drift). Adds:
+ * `--color-scrim`, the modal/drawer backdrop ink (the compact-drawer variant;
+ * named so a stronger-alpha sibling can join later without a rename); a
+ * mega-menu column-width family `--mega-rail-w`/`--mega-col-w`/`--mega-promo-w`
+ * (left rail / subtype column / promo column); `--menu-drawer-w`, the mobile
+ * drawer width; `--media-thumb-h`, a compact media-thumbnail height (sibling of
+ * `--media-placeholder-h`, scaled for an inline tile rather than a full slot);
+ * `--header-logo-h` and `--header-nav-h`, the header logo-row and nav-row
+ * min-heights; `--icon-size-md`, a reusable icon-glyph size primitive (a text
+ * size token is semantically wrong for an icon); and `--type-underline-offset`,
+ * the link underline offset (previously a structural-constant carve-out in the
+ * button exemplar, now a token under the no-literal policy).
+ *
+ * Home literal-closure addendum (total now 149, color 61, typography 41,
+ * spacing/radius/sizing 47): a home-surface styling pass adopted the same
+ * strict no-literal-anywhere policy for the 9 home components. Two off-scale
+ * type-scale gaps surfaced (per the extend-vs-snap rule above, each sits more
+ * than 2px from its nearest neighbor step, so each earns a token rather than
+ * a snap): `--type-hero-size` (48px), the hero campaign headline's fluid
+ * `clamp()` max — fills the gap between `--type-h1-size` (38px) and
+ * `--type-display-size` (52px); and `--type-stat-size` (34px), a large
+ * aggregate stat/score figure (the business-reviews score number) — fills the
+ * gap between `--type-h2-size` (30px) and `--type-h1-size` (38px), and pairs
+ * with the existing `--type-weight-heavy` (already documented above as the
+ * stat-figure weight). Two hero panel copy widths — `--hero-content-w` (640px)
+ * and `--hero-body-w` (520px), the copy-column and body-copy max-widths — and
+ * the hero panel's fixed padding pair: `--hero-pad-y` (48px), 4px above
+ * `--space-section` (44px, the top of the spacing scale), a deliberately
+ * deeper hero-band vertical padding, and `--hero-pad-x` (56px), its horizontal
+ * counterpart (the fluid `clamp()` max of the hero content padding). A
+ * dedicated responsive-grid floor family, `--grid-min-{xs,sm,md,lg}`
+ * (180/220/240/260px), replaces what an earlier draft had reused by exact
+ * numeric coincidence from the mega-menu width family and a control height —
+ * a home grid floor and a mega-menu column width are unrelated concepts that
+ * merely happen to share a pixel value today, so each home surface now points
+ * at its own semantically-named token: `--grid-min-xs` the compact
+ * proof-point grid (SeoContent), `--grid-min-sm` the standard product/tile
+ * grids (ProductRail, BannerTiles), `--grid-min-md` the reviews grid
+ * (BusinessReviews), `--grid-min-lg` the feature-split grid (ProductOfMonth).
+ * None of the 10 changes a rendered value (each promotes the exact literal
+ * already shipping).
+ *
+ * ui-core/product literal-closure addendum (total now 154, color 62,
+ * typography 42, spacing/radius/sizing 50): a pass over the 8 remaining
+ * ui-core/commerce/product components (IconButton, Badge, Chip, Rating,
+ * ProductCard, PriceBlock, QuantityStepper, DeliveryNote) retired the last
+ * two "intentional literal" exceptions and closed 4 further gaps. Retired
+ * exceptions: `--color-media-placeholder-label` (already in the contract
+ * since the scale-coverage addendum, now actually consumed by ProductCard
+ * instead of its former literal-with-comment) and NEW `--color-border-chip-spec`
+ * — Chip's `spec` variant outline pill border, previously kept as a literal
+ * because neither of its two closest existing border-color neighbors was
+ * within a defensible distance (see `default.ts` for the concrete values);
+ * it gets its own token rather than an inexact force-map. New gaps, each a structural
+ * role per the extend-vs-snap rule (no existing token sits within 2px):
+ * `--icon-size-lg` (20px), a sibling of `--icon-size-md` (16px) for the
+ * ~19–22px glyph cluster (ProductCard's add-to-cart "+" glyph, both
+ * QuantityStepper button glyphs); `--media-card-h` (180px), the product-card
+ * photo-slot height, a sibling of `--media-placeholder-h`/`--media-thumb-h`
+ * scaled for the grid-card image slot (a distinct concept from either — kept
+ * separate per the no-coincidental-reuse rule); `--stepper-num-w-lg` (40px),
+ * QuantityStepper's `lg` numeral-column width (the `md` counterpart, 34px,
+ * snaps to the existing `--space-8` at 32px, so only `lg` needed a new
+ * token); and `--type-star-tracking` (1px), Rating's star-glyph
+ * letter-spacing (px-based, unlike the em-based `--type-eyebrow-tracking`/
+ * `--type-tag-tracking` pair, which style unrelated uppercase-label text).
+ *
+ * Footer/i18n/forms/feedback/gate literal-closure addendum (total now 166,
+ * color 63, spacing/radius/sizing 61): the final component-styling pass closed
+ * the last raw literals across the footer, the i18n country/language selectors,
+ * the form controls (search + text field), the feedback banners (alert + toast),
+ * and the entry gate. One color: `--color-scrim-strong`, the entry-gate backdrop
+ * ink — a heavier-opacity sibling of `--color-scrim` (named as a family with
+ * it). One radius: `--radius-2xs` (2px), the smallest corner rounding, a step
+ * below `--radius-xs`, for the inline flag-image corners. Ten structural
+ * width/height/padding roles, each a component-level measure with no existing
+ * token within snap tolerance (extend-vs-snap rule below): `--footer-pad-top`
+ * (40px, the footer block's deeper top padding — side/bottom map to the space
+ * scale); `--footer-tagline-w` (320px); `--field-min-w` (180px, a wrapping
+ * form field's minimum width); `--selector-panel-w` (180px),
+ * `--selector-country-w` (190px), `--selector-lang-w` (170px) — the i18n
+ * dropdown panel/column min-widths; `--gate-card-w` (560px) and `--gate-copy-w`
+ * (380px) — the entry-gate card + copy measures; and `--search-row-h` (50px) /
+ * `--search-row-h-compact` (48px) — the site-search row heights. Each promotes
+ * the exact literal already shipping (no rendered-value change), except the
+ * entry-gate card radius, now the existing `--radius-gate-card` at both
+ * breakpoints (retiring a prior cosmetic radius compromise).
  */
 
 export const COLOR_CONTRACT_KEYS = [
@@ -73,6 +200,7 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-cta-hover',
   '--color-cta-active',
   '--color-cta-disabled-bg',
+  '--color-cta-disabled-fg',
   '--color-urgency',
   '--color-premium-accent',
   '--color-premium-accent-ink',
@@ -84,9 +212,14 @@ export const COLOR_CONTRACT_KEYS = [
   '--color-surface',
   '--color-surface-inset-a',
   '--color-surface-inset-b',
+  '--color-surface-neutral',
+  '--color-surface-neutral-hover',
+  '--color-surface-neutral-active',
+  '--color-surface-neutral-emphasis',
   '--color-border',
   '--color-border-card',
   '--color-border-field',
+  '--color-border-disabled',
   '--color-disabled-bg',
   '--color-text-primary',
   '--color-text-muted',
@@ -121,15 +254,30 @@ export const COLOR_CONTRACT_KEYS = [
   '--pattern-photo-placeholder-a',
   '--pattern-photo-placeholder-b',
   '--color-media-placeholder-label',
+  // Modal/drawer backdrop ink (compact-drawer variant). Named without an
+  // alpha/emphasis suffix so a stronger sibling (e.g. a full-screen overlay)
+  // can be added later without renaming this one.
+  '--color-scrim',
+  // Stronger-alpha sibling of --color-scrim — the entry-gate backdrop sits at a
+  // heavier opacity than the compact-drawer scrim; named as a family with it.
+  '--color-scrim-strong',
+  // Chip's outline `spec` pill border — retired literal exception; neither
+  // --color-border-field nor --color-border-card sits close enough to force-map.
+  '--color-border-chip-spec',
 ] as const;
 
 export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--font-brand',
   '--font-mono',
-  // Standalone weight primitive — intentionally NOT step-scoped (a
-  // `--type-{step}-weight` name would be wrong here). Used for wordmarks and
-  // stat-figures that map to no named type-scale step.
+  // Standalone weight primitives — intentionally NOT step-scoped (a
+  // `--type-{step}-weight` name would be wrong here). `-heavy` is used for
+  // wordmarks and stat-figures that map to no named type-scale step; `-bold`
+  // and `-semibold` are generic control/label weights for elements (e.g.
+  // buttons) whose weight belongs to no single type step, so they must not
+  // borrow another step's weight token.
   '--type-weight-heavy',
+  '--type-weight-bold',
+  '--type-weight-semibold',
   '--type-display-size',
   '--type-display-weight',
   '--type-display-line-height',
@@ -151,6 +299,8 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--type-ui-size',
   '--type-ui-weight',
   '--type-ui-line-height',
+  // Caption/label text size — a systemic 13px value; see the extend-vs-snap rule below.
+  '--type-caption-size',
   '--type-label-size',
   '--type-label-weight',
   '--type-label-line-height',
@@ -162,6 +312,20 @@ export const TYPOGRAPHY_CONTRACT_KEYS = [
   '--type-meta-size',
   '--type-meta-weight',
   '--type-meta-line-height',
+  // Link/underline offset — the small legibility gap between text and its
+  // underline. Maps to no type step; a standalone typographic primitive.
+  '--type-underline-offset',
+  // Hero campaign headline's fluid clamp max — fills the scale-step gap
+  // between --type-h1-size (38px) and --type-display-size (52px).
+  '--type-hero-size',
+  // Large aggregate stat/score figure (e.g. an aggregate review score) —
+  // fills the scale-step gap between --type-h2-size (30px) and
+  // --type-h1-size (38px). Pairs with --type-weight-heavy above.
+  '--type-stat-size',
+  // Rating's star-glyph letter-spacing. px-based (not em-based like the
+  // eyebrow/tag tracking pair above, which style unrelated uppercase-label
+  // text) — a distinct role, so it is not shared with them.
+  '--type-star-tracking',
 ] as const;
 
 /**
@@ -187,6 +351,15 @@ export const SPACING_CONTRACT_KEYS = [
   '--space-8',
   '--space-section',
   '--layout-maxw',
+  // Fluid max of the home section-stack's vertical padding. Its min + inline
+  // padding snap exactly to --space-5 (20px); the 40px clamp max sits 4px from
+  // the nearest scale token (--space-section, 44px), past the 2px snap
+  // tolerance, so per the extend-vs-snap rule it earns its own structural
+  // (layout-role) token rather than absorbing a 4px drift.
+  '--layout-section-pad-y',
+  // Smallest corner rounding — a step below --radius-xs, for the inline
+  // flag-image corners in the i18n selectors and the entry gate.
+  '--radius-2xs',
   '--radius-xs',
   '--radius-sm',
   '--radius-md',
@@ -195,10 +368,75 @@ export const SPACING_CONTRACT_KEYS = [
   '--radius-2xl',
   '--radius-gate-card',
   '--radius-full',
+  '--control-height-sm',
   '--control-height-md',
   '--control-height-lg',
   '--tap-target-min',
   '--media-placeholder-h',
+  // Compact media-thumbnail height — sibling of --media-placeholder-h, scaled
+  // for an inline promo tile rather than a full-width gallery slot.
+  '--media-thumb-h',
+  // ProductCard's photo-slot height — a third sibling in the media-height
+  // family, scaled for a grid-card image slot (distinct from the other two;
+  // kept separate rather than reused by coincidence).
+  '--media-card-h',
+  // Reusable icon-glyph size primitive (medium). Icons recur across
+  // components; a text-size token is semantically wrong for an icon.
+  '--icon-size-md',
+  // Larger icon-glyph size — sibling of --icon-size-md, for the ~19–22px
+  // glyph cluster (ProductCard's add-to-cart glyph, QuantityStepper's ±
+  // glyphs).
+  '--icon-size-lg',
+  // Mega-menu column widths: left rail / subtype column / promo column.
+  '--mega-rail-w',
+  '--mega-col-w',
+  '--mega-promo-w',
+  // Mobile navigation drawer width.
+  '--menu-drawer-w',
+  // Header row min-heights: logo row / nav row.
+  '--header-logo-h',
+  '--header-nav-h',
+  // Hero panel copy-column / body-copy max-widths.
+  '--hero-content-w',
+  '--hero-body-w',
+  // Hero panel's fixed content padding — vertical (sits above --space-section,
+  // the top of the spacing scale; a deliberately deeper hero-band padding) and
+  // its horizontal counterpart (the fluid clamp max of the content padding).
+  '--hero-pad-y',
+  '--hero-pad-x',
+  // Responsive grid-item minimum-width floors — a dedicated family for the
+  // home content grids (proof-point / product / reviews / feature-split), so a
+  // grid floor never borrows an unrelated mega-menu column width or control
+  // height by pixel coincidence.
+  '--grid-min-xs',
+  '--grid-min-sm',
+  '--grid-min-md',
+  '--grid-min-lg',
+  // QuantityStepper's `lg` numeral-column width. The `md` counterpart (34px)
+  // snaps to the existing --space-8 (32px, -2px); `lg` (40px) sits 8px from
+  // --space-8, well past the snap tolerance, so it earns its own token.
+  '--stepper-num-w-lg',
+  // Footer content block's deeper top padding (its side/bottom paddings map to
+  // the existing space scale; only the top sits off-scale).
+  '--footer-pad-top',
+  // Footer brand tagline's max line measure.
+  '--footer-tagline-w',
+  // Minimum width a wrapping form field keeps before dropping to its own row
+  // (the footer newsletter email input).
+  '--field-min-w',
+  // i18n dropdown widths: the language panel min-width, and the country
+  // dropdown's two column min-widths (country column / language column).
+  '--selector-panel-w',
+  '--selector-country-w',
+  '--selector-lang-w',
+  // Entry-gate card max-width and its body-copy max line measure.
+  '--gate-card-w',
+  '--gate-copy-w',
+  // Site-search row heights: default and the compact header variant. The
+  // compact value is also the border-box floor that keeps the stretched
+  // controls at the minimum tap target.
+  '--search-row-h',
+  '--search-row-h-compact',
   '--border-width-default',
   '--border-width-emphasis',
   '--border-width-cta',

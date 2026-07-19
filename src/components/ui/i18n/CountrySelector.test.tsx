@@ -1,10 +1,19 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { countries } from '@/i18n/countries';
 import { languages } from '@/i18n/languages';
-import { expectAllVarTokensAreContractKeys } from '../test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../test-utils/tokenAssertions';
 import { CountrySelector } from './CountrySelector';
+import styles from './selectorShared.module.css';
+
+const MODULE_CSS_PATH = join(
+  process.cwd(),
+  'src/components/ui/i18n/selectorShared.module.css',
+);
 
 describe('CountrySelector', () => {
   it('renders the full trigger with the "Bezorgen naar" label + country name', () => {
@@ -92,24 +101,31 @@ describe('CountrySelector', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
-  it('trigger meets the 44×44px minimum tap target in both modes', () => {
+  it('trigger carries the shared module class in both modes, meeting the tap target via the module', () => {
     const { rerender } = render(<CountrySelector value="NL" />);
-    let trigger = screen.getByRole('button', { name: /Bezorgland/ });
-    expect(trigger.style.minHeight).toBe('var(--tap-target-min)');
-    expect(trigger.style.minWidth).toBe('var(--tap-target-min)');
-
+    expect(screen.getByRole('button', { name: /Bezorgland/ }).className).toContain(
+      styles.trigger,
+    );
     rerender(<CountrySelector value="NL" compact />);
-    trigger = screen.getByRole('button', { name: /Bezorgland/ });
-    expect(trigger.style.minHeight).toBe('var(--tap-target-min)');
-    expect(trigger.style.minWidth).toBe('var(--tap-target-min)');
+    expect(screen.getByRole('button', { name: /Bezorgland/ }).className).toContain(
+      styles.trigger,
+    );
+    const css = readFileSync(MODULE_CSS_PATH, 'utf8');
+    expect(css).toMatch(/\.trigger\s*\{[\s\S]*?min-height:\s*var\(--tap-target-min\)/);
+    expect(css).toMatch(/\.trigger\s*\{[\s\S]*?min-width:\s*var\(--tap-target-min\)/);
   });
 
-  it('alignLeft anchors the dropdown to the left edge', () => {
-    const { container } = render(<CountrySelector value="NL" alignLeft />);
-    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
-    const menu = within(container).getByRole('menu');
-    expect(menu.style.left).toBe('0px');
-    expect(menu.style.right).toBe('');
+  it('alignLeft anchors the dropdown to the left edge (else the right)', () => {
+    const left = render(<CountrySelector value="NL" alignLeft />);
+    fireEvent.click(within(left.container).getByRole('button', { name: /Bezorgland/ }));
+    const leftMenu = within(left.container).getByRole('menu');
+    expect(leftMenu.className).toContain(styles.panelLeft);
+    expect(leftMenu.className).not.toContain(styles.panelRight);
+
+    const right = render(<CountrySelector value="NL" />);
+    fireEvent.click(within(right.container).getByRole('button', { name: /Bezorgland/ }));
+    const rightMenu = within(right.container).getByRole('menu');
+    expect(rightMenu.className).toContain(styles.panelRight);
   });
 
   it('wraps each column in a labeled group', () => {
@@ -140,9 +156,7 @@ describe('CountrySelector', () => {
     expect(options[0]).toHaveFocus();
   });
 
-  it('every var(--*) this component emits is a real contract token', () => {
-    const { container } = render(<CountrySelector value="NL" language="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+  it('the shared selector stylesheet references only real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

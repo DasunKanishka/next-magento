@@ -48,6 +48,13 @@ export interface CanonicalCategory {
  *
  * Extended with `cmsHomePage` — the frontend resolves the home page from
  * Magento's store-view-scoped `cms_home_page` rather than pinning it in code.
+ *
+ * Further extended with the Magento-native store-identity fields
+ * (`headerLogoSrc`, `logoAlt`, `copyright`, `storeName`) so the store's
+ * identity scalars are backend-sourced rather than hardcoded. These are `null`
+ * when Magento returns the field empty/absent — no fabricated default.
+ * `headerLogoSrc` is the RAW path Magento returns; resolving it to an absolute
+ * URL is out of scope here (owned by `getStoreIdentity`).
  */
 export interface StoreConfig {
   storeCode: string;
@@ -55,6 +62,65 @@ export interface StoreConfig {
   currencyCode: string;
   mediaBaseUrl: string;
   cmsHomePage: string;
+  headerLogoSrc: string | null;
+  logoAlt: string | null;
+  copyright: string | null;
+  storeName: string | null;
+}
+
+/** The resolved header/footer logo — always render-ready, never a raw path. */
+export interface StoreIdentityLogo {
+  /** Absolute media URL, already resolved against `StoreConfig.mediaBaseUrl`. `null` when no logo is configured. */
+  src: string | null;
+  /** Alt text for the logo image; `''` when unset. */
+  alt: string;
+  /** Store name, for a text-wordmark fallback when `src` is `null`. */
+  fallbackText: string;
+}
+
+/** A single footer navigation link. */
+export interface StoreIdentityFooterLink {
+  label: string;
+  href: string;
+}
+
+/** A footer navigation column: a heading plus its links. */
+export interface StoreIdentityFooterColumn {
+  heading: string;
+  links: StoreIdentityFooterLink[];
+}
+
+/** The delivery-promise copy shown alongside the order cut-off time. */
+export interface StoreIdentityDeliveryPromise {
+  copy: string;
+  /** 24h hour (0–23) orders must be placed before to qualify for the promise. */
+  cutoffHour: number;
+}
+
+/**
+ * Canonical store identity — the single backend-agnostic shape every header,
+ * footer, and legal-copy consumer reads. Composed by `getStoreIdentity` from
+ * the extended `StoreConfig` native scalars plus admin-authorable content
+ * (see `composeStoreIdentity` in the Magento adapter's mapper module for the
+ * exact per-field source).
+ *
+ * `name`, `registrationNumber`, and `copyright` are the three legal/identity
+ * fields: `getStoreIdentity` throws rather than return this shape with any of
+ * them missing or defaulted — there is no hardcoded fallback for a legal fact
+ * anywhere in this codebase. Every other field degrades to a documented empty
+ * value when unauthored. (The footer legal line is sourced from `copyright`,
+ * the native store-config field, so a separate `legalEntity` value was
+ * redundant and has been removed.)
+ */
+export interface StoreIdentity {
+  name: string;
+  logo: StoreIdentityLogo;
+  tagline: string;
+  registrationNumber: string;
+  copyright: string;
+  paymentMethods: string[];
+  footerColumns: StoreIdentityFooterColumn[];
+  deliveryPromise: StoreIdentityDeliveryPromise;
 }
 
 /**
@@ -95,6 +161,18 @@ export type MerchandisingSlot =
  */
 export interface DataSource {
   getStoreConfig(args: { storeCode: string }): Promise<StoreConfig>;
+
+  /**
+   * Resolve the store's canonical identity — the composed shape every header,
+   * footer, and legal-copy surface reads. Backend-agnostic: the caller never
+   * knows whether a field came from a native store-config scalar or an
+   * admin-authored content source.
+   *
+   * THROWS when a legal/identity field (`name`, `registrationNumber`,
+   * `copyright`) cannot be sourced — no partial or defaulted identity is ever
+   * returned for those three fields.
+   */
+  getStoreIdentity(args: { storeCode: string }): Promise<StoreIdentity>;
 
   getNavigationCategories(args: {
     storeCode: string;

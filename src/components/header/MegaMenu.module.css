@@ -1,0 +1,144 @@
+/*
+ * MegaMenu styles. See src/components/STYLING.md for the convention.
+ * The only per-render value is the left-rail link's active state (fill +
+ * text color), bridged through --local-fg/--local-bg; everything else is a
+ * static token.
+ */
+
+.panel {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this panel's own anchor + layout. */
+  composes: panelSurface from '../ui/core/panelSurface.module.css';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  overflow: hidden;
+}
+
+.cols {
+  display: flex;
+}
+
+.rail {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3);
+  min-width: var(--mega-rail-w);
+  border-right: var(--border-width-default) solid var(--color-border-card);
+  background: var(--color-surface-inset-a);
+}
+
+.railLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--tap-target-min);
+  /* 14px padding snapped to --space-4 (16px, +2px). */
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--type-ui-line-height);
+  color: var(--local-fg);
+  background: var(--local-bg);
+}
+
+.middle {
+  flex: 1;
+  padding: var(--space-5);
+  min-width: var(--mega-col-w);
+}
+
+.middleEyebrow {
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     + margin stay local. */
+  composes: eyebrow from '../ui/core/Eyebrow.module.css';
+  color: var(--color-text-subtle);
+  margin-bottom: var(--space-3);
+}
+
+.subtypeGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 2px row-gap snapped to --space-1 (4px, +2px); 20px column-gap matches
+     --space-5 exactly. */
+  gap: var(--space-1) var(--space-5);
+}
+
+.subtypeLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.3; kept as a raw structural ratio
+     per STYLING.md (no token applies). */
+  line-height: 1.3;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.emptyState {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.4; kept as a raw structural ratio
+     per STYLING.md (no token applies). */
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+.promoCol {
+  width: var(--mega-promo-w);
+  padding: var(--space-5);
+  border-left: var(--border-width-default) solid var(--color-border-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.promoTile {
+  height: var(--media-thumb-h);
+  border-radius: var(--radius-md);
+  background: var(--pattern-photo-placeholder-b);
+}
+
+.promoLink {
+  display: inline-flex;
+  align-items: center;
+  /* 6px gap snapped to --space-2 (8px, +2px). */
+  gap: var(--space-2);
+  min-height: var(--tap-target-min);
+  font-family: var(--font-brand);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-trust);
+  text-decoration: none;
+}
+
+.promoBar {
+  background: var(--color-brand-ink);
+  color: var(--color-on-brand);
+  /* Shared with HeaderShell's top-row padding — see
+     HeaderShell.module.css .topRow for the same de-duplicated expression. */
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-brand);
+  font-size: var(--type-caption-size);
+  /* Weight 500 has no standalone primitive (only -heavy/-bold/-semibold
+     exist); --type-ui-weight is also 500, so it is reused here for its
+     numeric value even though the size comes from the caption step. */
+  font-weight: var(--type-ui-weight);
+  /* No type-step line-height matches 1.5; kept as a raw structural ratio
+     per STYLING.md (no token applies). */
+  line-height: 1.5;
+}

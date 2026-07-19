@@ -1,0 +1,14 @@
+/*
+ * Locale-segment error boundary layout. See src/components/STYLING.md for the
+ * convention — every value is a contract token, no raw literal.
+ */
+
+.wrap {
+  max-width: var(--layout-maxw);
+  margin: 0 auto;
+  padding: var(--layout-section-pad-y) var(--space-5);
+}
+
+.actions {
+  margin-top: var(--space-5);
+}

@@ -1,0 +1,143 @@
+/*
+ * MobileMenu styles. See src/components/STYLING.md for the convention.
+ * Every visual difference between drawer rows (back control, deals entry,
+ * drilled child link) is fixed at its call site, not driven by a runtime
+ * prop, so each gets its own static class instead of a --local-* bridge —
+ * this component sets no bridge property at all.
+ */
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  /* 4px gap exactly matches --space-1. */
+  gap: var(--space-1);
+  min-width: var(--tap-target-min);
+  min-height: var(--tap-target-min);
+  /* 10px padding snapped to --space-3 (12px, +2px). */
+  padding: var(--space-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.bar {
+  display: block;
+  /* 22px width snapped to --space-6 (24px, +2px). */
+  width: var(--space-6);
+  /* 2px height snapped to --space-1 (4px, +2px). */
+  height: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--color-scrim);
+}
+
+.nav {
+  /* Card background/border/radius/shadow come from the shared surface;
+     everything below is this drawer's own anchor + layout. */
+  composes: panelSurface from '../ui/core/panelSurface.module.css';
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 80;
+  width: var(--menu-drawer-w);
+  max-width: 90vw;
+  /* 10px padding snapped to --space-3 (12px, +2px). */
+  padding: var(--space-3);
+}
+
+.drawerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap-target-min);
+  /* 14px padding snapped to --space-4 (16px, +2px). */
+  padding: 0 var(--space-4);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  /* 15px exactly matches --type-body-size, reused for its numeric value
+     only — weight/line-height stay their own values below since a drawer
+     row maps to no named type step (weight 600, line-height 1 vs. body's
+     400/1.65). */
+  font-size: var(--type-body-size);
+  font-weight: var(--type-weight-semibold);
+  line-height: 1;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.drawerItemDeals {
+  color: var(--color-urgency);
+}
+
+.drawerItemBack {
+  justify-content: flex-start;
+  gap: var(--space-2);
+  color: var(--color-trust);
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-weight-semibold);
+  /* --type-caption-size carries no dedicated line-height token. */
+  line-height: 1;
+}
+
+.drawerItemChild {
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-muted);
+}
+
+.eyebrow {
+  /* Shared uppercase-tracked triplet — see ui/core/Eyebrow.module.css. Color
+     stays local. */
+  composes: eyebrow from '../ui/core/Eyebrow.module.css';
+  color: var(--color-text-subtle);
+}
+
+.menuEyebrow {
+  /* 6px/8px snapped to --space-2 (+2px) / 14px to --space-4 (+2px). */
+  padding: var(--space-2) var(--space-4) var(--space-2);
+}
+
+.langEyebrow {
+  /* 2px snapped to --space-1 (4px, +2px); 14px to --space-4 (+2px). */
+  padding: var(--space-1) var(--space-4) var(--space-2);
+}
+
+.separator {
+  height: var(--border-width-default);
+  background: var(--color-border-card);
+  /* 10px/6px margin snapped to --space-3 (12px, +2px) / --space-2 (8px, +2px). */
+  margin: var(--space-3) var(--space-2);
+}
+
+.langList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.langItem {
+  justify-content: flex-start;
+  /* 10px gap snapped to --space-3 (12px, +2px). */
+  gap: var(--space-3);
+  font-size: var(--type-ui-size);
+  font-weight: var(--type-ui-weight);
+  line-height: var(--type-ui-line-height);
+}

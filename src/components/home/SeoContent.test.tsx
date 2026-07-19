@@ -1,9 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { expectAllVarTokensAreContractKeys } from '../ui/test-utils/tokenAssertions';
+import { expectModuleCssReferencesRealTokens } from '../ui/test-utils/tokenAssertions';
 import { SeoContent } from './SeoContent';
+import styles from './SeoContent.module.css';
+
+const MODULE_CSS_PATH = join(process.cwd(), 'src/components/home/SeoContent.module.css');
 
 const HTML = '<h2>Wijn online bestellen</h2><p>Ruim assortiment.</p>';
 
@@ -28,8 +34,12 @@ describe('SeoContent', () => {
     expect(screen.queryByTestId('seo-copy')).not.toBeInTheDocument();
   });
 
-  it('emits only real contract tokens', () => {
-    const { container } = render(<SeoContent html={HTML} />);
-    expectAllVarTokensAreContractKeys(container.innerHTML);
+  it('carries its module class on the copy block', () => {
+    render(<SeoContent html={HTML} />);
+    expect(screen.getByTestId('seo-copy').className).toContain(styles.copy);
+  });
+
+  it('the co-located stylesheet references only bridge properties and real tokens', () => {
+    expectModuleCssReferencesRealTokens(readFileSync(MODULE_CSS_PATH, 'utf8'));
   });
 });

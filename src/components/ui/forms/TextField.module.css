@@ -1,0 +1,37 @@
+/*
+ * TextField styles. See src/components/STYLING.md for the convention.
+ * Fully static token references — the resting frame, the focus frame, and the
+ * placeholder color are all fixed, so there is no --local-* bridge. The focus
+ * frame and the ::placeholder color are rule sets an inline style cannot
+ * express, so they live here.
+ */
+
+.field {
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
+  width: 100%;
+  /* Resting frame — the emphasis hairline. */
+  border: var(--border-width-emphasis) solid var(--color-border-field);
+  border-radius: var(--radius-md);
+  /* 14px padding snapped to --space-4 (16px, +2px). */
+  padding: 0 var(--space-4);
+  font-family: var(--font-brand);
+  /* 13px matches --type-caption-size exactly. */
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-body-weight);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-brand);
+  background: var(--color-surface);
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.field::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Focus swaps to the CTA-weight frame in the brand color plus the focus ring. */
+.field:focus {
+  border: var(--border-width-cta) solid var(--color-brand);
+  box-shadow: var(--focus-ring);
+}

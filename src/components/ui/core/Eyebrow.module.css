@@ -1,0 +1,21 @@
+/*
+ * Shared uppercase-tracked eyebrow label. See src/components/STYLING.md for
+ * the convention. The same 6-property type triplet (family, weight, size,
+ * line-height, tracking, uppercase transform) recurs across ProductOfMonth,
+ * MegaMenu, MobileMenu, and the shared i18n selector module. Only the
+ * triplet is shared here — color (varies: premium-accent-ink / text-muted /
+ * text-subtle) and any margin/padding (varies per consumer) stay local, so
+ * each consumer composes this class onto its own color + spacing rule.
+ * AgeGate's legend/eyebrow is untouched — it lives in its own global
+ * stylesheet (see AgeGate.tsx) and is a deliberate carve-out, not migrated
+ * onto this primitive.
+ */
+
+.eyebrow {
+  font-family: var(--font-brand);
+  font-weight: var(--type-eyebrow-weight);
+  font-size: var(--type-eyebrow-size);
+  line-height: var(--type-eyebrow-line-height);
+  letter-spacing: var(--type-eyebrow-tracking);
+  text-transform: uppercase;
+}

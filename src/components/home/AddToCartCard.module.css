@@ -1,0 +1,36 @@
+/*
+ * AddToCartCard styles. See src/components/STYLING.md for the convention. The
+ * only per-render value is the stock-status line's color, bridged through
+ * --local-status-fg.
+ */
+
+.wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * Forwarded to the wrapped ProductCard so it fills the flex column (replacing a
+ * former inline `height: 100%` style prop — the bridge hard rule forbids an
+ * inline literal even for a layout keyword). `flex: 1 1 auto` grows the card to
+ * consume the cell height above the status line, so the card still fills its
+ * grid cell.
+ */
+.card {
+  flex: 1 1 auto;
+}
+
+.status {
+  /* 18px snapped to --space-4 (16px, -2px). */
+  min-height: var(--space-4);
+  /* 6px snapped to --space-2 (8px, +2px). */
+  margin-top: var(--space-2);
+  font-family: var(--font-brand);
+  font-weight: var(--type-ui-weight);
+  font-size: var(--type-label-size);
+  /* No type-step line-height matches 1.4 (label is 1); kept as a raw
+     structural ratio per STYLING.md (no token applies). */
+  line-height: 1.4;
+  color: var(--local-status-fg);
+}

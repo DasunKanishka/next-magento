@@ -1,0 +1,19 @@
+/*
+ * Shared anchored dropdown-panel surface. See src/components/STYLING.md for
+ * the convention. Every overlay that pops an anchored panel (the i18n
+ * selectors, the mega-menu, the mobile drawer) paints the identical surface —
+ * card background, border, corner radius, overlay shadow — but differs in
+ * everything about where and how that surface sits: anchor offset, width,
+ * stacking order, internal padding and columns. This class owns ONLY the
+ * shared surface and is headless of all of that layout; a consumer composes
+ * it onto its own panel class via CSS Modules `composes` and keeps every
+ * positioning/layout declaration local, so no single component has to grow
+ * props to cover three differently-shaped overlays.
+ */
+
+.panelSurface {
+  background: var(--color-surface);
+  border: var(--border-width-default) solid var(--color-border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-overlay);
+}

@@ -1,0 +1,31 @@
+/*
+ * Shared language/country code-chip badge. See src/components/STYLING.md for
+ * the convention. Promoted here (from the i18n selectors' internal module) so
+ * a header component (MobileMenu) can consume it without reaching across
+ * folders into an i18n component's internals — this is now the one shared
+ * home for both `CountrySelector`/`LanguageSelector` and `MobileMenu`. Fully
+ * static — no value varies per render, so there is no --local-* bridge.
+ */
+
+.codeChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 26px min-width snapped to --space-7 (28px, +2px). */
+  min-width: var(--space-7);
+  /* 3px/6px padding: --space-1 (4px, +1px) / --space-2 (8px, +2px). */
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-brand);
+  font-size: var(--type-meta-size);
+  font-weight: var(--type-weight-bold);
+  line-height: var(--type-meta-line-height);
+  background: var(--color-surface-inset-b);
+  color: var(--color-text-muted);
+}
+
+/* Active code chip — navy fill with on-brand text. */
+.codeChipActive {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}

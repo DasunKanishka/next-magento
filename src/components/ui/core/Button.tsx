@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import styles from './Button.module.css';
+
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'link';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -25,80 +27,107 @@ export interface ButtonProps extends Omit<
   subLabel?: React.ReactNode;
 }
 
+type FilledVariant = Exclude<ButtonVariant, 'link'>;
+
+interface VariantColors {
+  bg: string;
+  bgHover: string;
+  bgActive: string;
+  bgDisabled: string;
+  fg: string;
+  fgDisabled: string;
+  border: string;
+  borderDisabled: string;
+  shadow: string;
+}
+
 /**
- * Role-mapping object: assigns each `variant` role to its contract tokens.
- * This is the ONLY place literal (non-token) values may live per the
- * component library's brand-neutrality rule — every other line in this file
- * references either a `var(--contract-name)` or a value pulled from this map.
+ * Per-variant color values fed to the module through the `--local-*` bridge.
+ * Every value is a `var(--token)` reference, so every color a variant paints
+ * stays brand-overridable — no raw color literal lives here or in the module.
  *
- * `primary` is the CTA rule anchor: its `bg`/`hoverBg`/`activeBg` are the
- * only variant background values in this table, and they are exclusively
- * `--color-cta*`. `secondary`/`tertiary`/`link` reference `--color-brand`
- * only for border/text — never for a fill a user clicks on.
+ * `primary` is the CTA rule anchor: its fills are exclusively `--color-cta*`.
+ * `secondary`/`tertiary` reference `--color-brand` only for border/text, never
+ * for a fill a user clicks on; their neutral interactive fills come from the
+ * shared `--color-surface-neutral*` family.
  */
-const PALETTE: Record<
-  Exclude<ButtonVariant, 'link'>,
-  {
-    bg: string;
-    hoverBg: string;
-    activeBg: string;
-    disabledBg: string;
-    color: string;
-    disabledColor: string;
-    border: string;
-    disabledBorder?: string;
-    weight: number;
-  }
-> = {
+const VARIANT_COLORS: Record<FilledVariant, VariantColors> = {
   primary: {
     bg: 'var(--color-cta)',
-    hoverBg: 'var(--color-cta-hover)',
-    activeBg: 'var(--color-cta-active)',
-    disabledBg: '#BBE0CC',
-    color: '#fff',
-    disabledColor: '#82B098',
+    bgHover: 'var(--color-cta-hover)',
+    bgActive: 'var(--color-cta-active)',
+    bgDisabled: 'var(--color-cta-disabled-bg)',
+    fg: 'var(--color-text-on-fill)',
+    fgDisabled: 'var(--color-cta-disabled-fg)',
     border: 'none',
-    weight: 700,
+    borderDisabled: 'none',
+    shadow: 'var(--shadow-cta)',
   },
   secondary: {
-    bg: '#fff',
-    hoverBg: '#EEF1F6',
-    activeBg: '#DFE5EF',
-    disabledBg: '#fff',
-    color: 'var(--color-brand)',
-    disabledColor: '#AEB6C4',
-    border: '1.5px solid var(--color-brand)',
-    disabledBorder: '1.5px solid #D2D8E2',
-    weight: 600,
+    bg: 'var(--color-surface)',
+    bgHover: 'var(--color-surface-neutral)',
+    bgActive: 'var(--color-surface-neutral-emphasis)',
+    bgDisabled: 'var(--color-surface)',
+    fg: 'var(--color-brand)',
+    fgDisabled: 'var(--color-disabled-fg)',
+    border: 'var(--border-width-emphasis) solid var(--color-brand)',
+    borderDisabled: 'var(--border-width-emphasis) solid var(--color-border-disabled)',
+    shadow: 'none',
   },
   tertiary: {
-    bg: '#EEF1F6',
-    hoverBg: '#E1E7F0',
-    activeBg: '#D5DDEA',
-    disabledBg: '#F2F4F7',
-    color: 'var(--color-brand)',
-    disabledColor: '#AEB6C4',
+    bg: 'var(--color-surface-neutral)',
+    bgHover: 'var(--color-surface-neutral-hover)',
+    bgActive: 'var(--color-surface-neutral-active)',
+    bgDisabled: 'var(--color-disabled-bg)',
+    fg: 'var(--color-brand)',
+    fgDisabled: 'var(--color-disabled-fg)',
     border: 'none',
-    weight: 600,
+    borderDisabled: 'none',
+    shadow: 'none',
   },
 };
 
 /**
- * Sizing role-map. `md`/`lg` resolve to the contract's control-height
- * tokens (44px/56px — both meet the 44×44px minimum touch target). `sm`
- * (36px) is a documented smaller variant for dense, non-primary-action
- * contexts (secondary/tertiary/link) — it is not intended as a lone primary
- * tap target; use `md` or larger for the primary action on a screen.
+ * Per-size dimensions fed through the bridge. `md`/`lg` heights resolve to the
+ * control-height tokens (44px/56px — both meet the 44×44px minimum touch
+ * target). `sm` (36px) is a documented smaller variant for dense, non-primary
+ * contexts; use `md` or larger for the primary action on a screen.
+ *
+ * Off-scale source values are snapped to the nearest token within a ≤2px
+ * tolerance so they become brand-overridable: `md` horizontal padding 22px →
+ * `--space-6` (24px, +2px); `lg` font-size 16px → `--type-body-size` (15px,
+ * −1px). The `sm` height (36px) sits beyond the snap tolerance from the md
+ * height, so it has its own token, `--control-height-sm`.
  */
-const SIZES: Record<ButtonSize, { height: string; padding: string; font: number }> = {
-  sm: { height: '36px', padding: '0 16px', font: 13 },
-  md: { height: 'var(--control-height-md)', padding: '0 22px', font: 14 },
-  lg: { height: 'var(--control-height-lg)', padding: '0 28px', font: 16 },
+const SIZE_TOKENS: Record<
+  ButtonSize,
+  { height: string; padX: string; fontSize: string }
+> = {
+  sm: {
+    height: 'var(--control-height-sm)', // 36px
+    padX: 'var(--space-4)', // 16px
+    fontSize: 'var(--type-caption-size)', // 13px
+  },
+  md: {
+    height: 'var(--control-height-md)', // 44px
+    padX: 'var(--space-6)', // 22px → 24px snap
+    fontSize: 'var(--type-ui-size)', // 14px
+  },
+  lg: {
+    height: 'var(--control-height-lg)', // 56px
+    padX: 'var(--space-7)', // 28px
+    fontSize: 'var(--type-body-size)', // 16px → 15px snap
+  },
 };
 
 /**
  * Primary CTA and button system. One `primary` action per screen;
  * `--color-brand` (navy) is never used as a clickable action surface.
+ *
+ * Styling follows the co-located CSS module (see src/components/STYLING.md):
+ * static tokens and every state rule live in `Button.module.css`; only
+ * prop-driven values are passed here, exclusively as `--local-*` bridge
+ * properties — never as a direct CSS property with a literal value.
  */
 export function Button({
   variant = 'primary',
@@ -112,36 +141,39 @@ export function Button({
   style = {},
   ...rest
 }: ButtonProps) {
-  const [hover, setHover] = React.useState(false);
-  const [active, setActive] = React.useState(false);
+  const s = SIZE_TOKENS[size];
+
+  // Values common to every variant that vary by prop.
+  const layoutBridge: Record<string, string> = {
+    '--local-direction': subLabel ? 'column' : 'row',
+    // Gap snapped to the nearest spacing token (≤2px): stacked 3px →
+    // `--space-1` (4px, +1px); inline 9px → `--space-2` (8px, −1px).
+    '--local-gap': subLabel ? 'var(--space-1)' : 'var(--space-2)',
+    '--local-width': fullWidth ? '100%' : 'auto',
+    '--local-font-size': s.fontSize,
+    // Standalone weight primitives (not a named type step's weight, which would
+    // mis-couple a control's weight to an unrelated text role).
+    '--local-font-weight':
+      variant === 'primary' ? 'var(--type-weight-bold)' : 'var(--type-weight-semibold)',
+  };
 
   if (variant === 'link') {
-    const s = SIZES[size];
+    const bridge = {
+      ...layoutBridge,
+      '--local-fg': 'var(--color-brand)',
+      '--local-fg-hover': 'var(--color-trust)',
+      '--local-fg-disabled': 'var(--color-disabled-fg)',
+    } as React.CSSProperties;
+
     return (
       <button
         type="button"
+        className={`${styles.button} ${styles.link}`}
+        data-variant="link"
+        data-size={size}
         onClick={disabled ? undefined : onClick}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => {
-          setHover(false);
-          setActive(false);
-        }}
         disabled={disabled}
-        style={{
-          background: 'none',
-          border: 'none',
-          padding: 0,
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          font: `600 ${s.font}px/1 var(--font-brand)`,
-          color: disabled
-            ? '#AEB6C4'
-            : hover
-              ? 'var(--color-trust)'
-              : 'var(--color-brand)',
-          textDecoration: disabled ? 'none' : 'underline',
-          textUnderlineOffset: '3px',
-          ...style,
-        }}
+        style={{ ...bridge, ...style }}
         {...rest}
       >
         {children}
@@ -149,53 +181,38 @@ export function Button({
     );
   }
 
-  const p = PALETTE[variant] ?? PALETTE.primary;
-  const s = SIZES[size];
-  const bg = disabled ? p.disabledBg : active ? p.activeBg : hover ? p.hoverBg : p.bg;
+  const c = VARIANT_COLORS[variant] ?? VARIANT_COLORS.primary;
+  const bridge = {
+    ...layoutBridge,
+    '--local-height': s.height,
+    '--local-pad-x': s.padX,
+    '--local-bg': c.bg,
+    '--local-bg-hover': c.bgHover,
+    '--local-bg-active': c.bgActive,
+    '--local-bg-disabled': c.bgDisabled,
+    '--local-fg': c.fg,
+    '--local-fg-disabled': c.fgDisabled,
+    '--local-border': c.border,
+    '--local-border-disabled': c.borderDisabled,
+    '--local-shadow': c.shadow,
+  } as React.CSSProperties;
 
   return (
     <button
       type="button"
+      className={styles.button}
+      data-variant={variant}
+      data-size={size}
       onClick={disabled ? undefined : onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => {
-        setHover(false);
-        setActive(false);
-      }}
-      onMouseDown={() => setActive(true)}
-      onMouseUp={() => setActive(false)}
       disabled={disabled}
-      style={{
-        display: 'inline-flex',
-        flexDirection: subLabel ? 'column' : 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: subLabel ? 3 : 9,
-        width: fullWidth ? '100%' : 'auto',
-        height: s.height,
-        minHeight: s.height,
-        padding: s.padding,
-        background: bg,
-        color: disabled ? p.disabledColor : p.color,
-        border: disabled && p.disabledBorder ? p.disabledBorder : p.border,
-        borderRadius: 'var(--radius-md)',
-        font: `${p.weight} ${s.font}px/1 var(--font-brand)`,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        boxShadow: variant === 'primary' && !disabled ? 'var(--shadow-cta)' : 'none',
-        transition: 'background .15s ease',
-        ...style,
-      }}
+      style={{ ...bridge, ...style }}
       {...rest}
     >
-      {iconLeft && !subLabel ? (
-        <span style={{ display: 'inline-flex' }}>{iconLeft}</span>
-      ) : null}
+      {iconLeft && !subLabel ? <span className={styles.icon}>{iconLeft}</span> : null}
       {subLabel ? (
         <>
           <span>{children}</span>
-          <span style={{ font: '500 11px/1 var(--font-brand)', opacity: 0.85 }}>
-            {subLabel}
-          </span>
+          <span className={styles.subLabel}>{subLabel}</span>
         </>
       ) : (
         children

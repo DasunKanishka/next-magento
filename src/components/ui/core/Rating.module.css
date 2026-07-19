@@ -1,0 +1,38 @@
+/*
+ * Rating styles. See src/components/STYLING.md for the convention. `size` is
+ * a free-form caller-supplied px dial (score/count text share the star
+ * glyph's size), so it bridges as a plain computed value rather than a
+ * token — mirroring the Carousel `--local-item-min-w` / FreeShippingProgress
+ * `--local-fill-width` precedent — while every color and the star tracking
+ * are static design tokens.
+ */
+
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  /* 6px gap snapped to --space-2 (8px, +2px). */
+  gap: var(--space-2);
+}
+
+.star {
+  color: var(--color-premium-accent);
+  font-size: var(--local-font-size);
+  letter-spacing: var(--type-star-tracking);
+  line-height: var(--type-ui-line-height);
+}
+
+.score {
+  font-family: var(--font-brand);
+  font-weight: var(--type-weight-semibold);
+  font-size: var(--local-font-size);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-brand-ink);
+}
+
+.count {
+  font-family: var(--font-brand);
+  font-weight: var(--type-ui-weight);
+  font-size: var(--local-font-size);
+  line-height: var(--type-ui-line-height);
+  color: var(--color-text-subtle);
+}

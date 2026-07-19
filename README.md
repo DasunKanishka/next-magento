@@ -8,8 +8,8 @@ backend lives in a separate `backend/` repo.
 ## Prerequisites
 
 - **Node 24**, **pnpm 10**
-- A reachable Magento GraphQL endpoint (dev: `https://249.magento.default/graphql`)
-- For the mkcert-signed dev backend, the mkcert root CA on disk (see `.env.example`)
+- A reachable stock Magento 2 GraphQL endpoint
+- If that endpoint uses a self-signed / privately-signed certificate (e.g. a local dev instance), its root CA on disk (see `.env.example` / `NODE_EXTRA_CA_CERTS`)
 
 ## Setup
 
@@ -31,11 +31,14 @@ directly). See `.env.example` for the full list.
 | -------------------------- | ------------------------------------------------ |
 | `MAGENTO_GRAPHQL_ENDPOINT` | Magento `/graphql` URL                           |
 | `MAGENTO_STORE_CODE`       | default `Store` header (store view)              |
-| `NODE_EXTRA_CA_CERTS`      | trust the mkcert dev CA for local TLS            |
+| `NODE_EXTRA_CA_CERTS`      | trust a self-signed/private CA for local TLS     |
 | `MAGENTO_CAT_*`            | optional per-slot curation-category id overrides |
 
 These two vars (`MAGENTO_GRAPHQL_ENDPOINT` / `MAGENTO_STORE_CODE`) repoint the
-adapter at any Magento instance with **no code change**.
+adapter at any **stock** Magento instance with **no code change** and no custom
+backend module. For the full connection + native-content authoring guide (which
+store-config fields and CMS blocks to author in the Magento admin, and the
+fail-closed behavior), see [`docs/backend-configuration.md`](docs/backend-configuration.md).
 
 **Currency is not configured** — it is resolved from the Magento store **scope**
 (Store View → Website → Default), exactly like categories, navigation and CMS

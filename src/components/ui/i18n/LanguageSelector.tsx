@@ -4,18 +4,9 @@ import React from 'react';
 
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import { findLanguageByLocale, languages } from '@/i18n/languages';
-import {
-  Checkmark,
-  Chevron,
-  codeChipStyle,
-  columnHeadingStyle,
-  handleMenuArrowKeys,
-  optionBaseStyle,
-  panelStyle,
-  triggerBaseStyle,
-  triggerLabelStyle,
-  useDismiss,
-} from './selectorShared';
+import codeChipStyles from '../core/codeChip.module.css';
+import { useDismissMenu } from '../core/useDismissMenu';
+import { Checkmark, Chevron, styles } from './selectorShared';
 
 export interface LanguageSelectorProps {
   /** Active UI language locale. Defaults to Nederlands. */
@@ -32,7 +23,8 @@ export interface LanguageSelectorProps {
 /**
  * Standalone language selector — a single-column language list. Closes on
  * selection, click-outside, or Esc. Both render modes (`full`/`compact`) meet
- * the 44×44px minimum tap target.
+ * the 44×44px minimum tap target. Styling lives in the shared selector module
+ * (see src/components/STYLING.md).
  */
 export function LanguageSelector({
   value = defaultLocale,
@@ -45,7 +37,7 @@ export function LanguageSelector({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const firstOptionRef = React.useRef<HTMLButtonElement>(null);
   const close = React.useCallback(() => setOpen(false), []);
-  const rootRef = useDismiss(open, close, triggerRef);
+  const { rootRef, onPanelKeyDown } = useDismissMenu(open, close, triggerRef);
 
   React.useEffect(() => {
     if (open) firstOptionRef.current?.focus();
@@ -54,7 +46,7 @@ export function LanguageSelector({
   const current = findLanguageByLocale(value) ?? languages[0];
 
   return (
-    <div ref={rootRef} style={{ position: 'relative', display: 'inline-block' }}>
+    <div ref={rootRef} className={styles.root}>
       <button
         ref={triggerRef}
         type="button"
@@ -62,30 +54,15 @@ export function LanguageSelector({
         aria-expanded={open}
         aria-label={`Taal: ${current.name}. Kies taal`}
         onClick={() => setOpen((o) => !o)}
-        style={{
-          ...triggerBaseStyle,
-          ...(compact ? { gap: 6, padding: '0 10px' } : {}),
-        }}
+        className={styles.trigger}
       >
-        <span style={codeChipStyle(true)}>{current.code}</span>
+        <span className={`${codeChipStyles.codeChip} ${codeChipStyles.codeChipActive}`}>
+          {current.code}
+        </span>
         {!compact && (
-          <span
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              alignItems: 'flex-start',
-            }}
-          >
-            <span style={triggerLabelStyle}>{label}</span>
-            <span
-              style={{
-                font: '600 14px/1 var(--font-brand)',
-                color: 'var(--color-brand)',
-              }}
-            >
-              {current.name}
-            </span>
+          <span className={styles.triggerStack}>
+            <span className={styles.triggerLabel}>{label}</span>
+            <span className={styles.triggerValue}>{current.name}</span>
           </span>
         )}
         <Chevron open={open} />
@@ -95,11 +72,13 @@ export function LanguageSelector({
         <div
           role="menu"
           aria-label="Taal"
-          onKeyDown={handleMenuArrowKeys}
-          style={{ ...panelStyle(alignLeft), minWidth: 180 }}
+          onKeyDown={onPanelKeyDown}
+          className={`${styles.panel} ${styles.panelLang} ${
+            alignLeft ? styles.panelLeft : styles.panelRight
+          }`}
         >
-          <div role="group" aria-label="Taal" style={{ width: '100%' }}>
-            <div style={columnHeadingStyle}>Taal</div>
+          <div role="group" aria-label="Taal" className={styles.column}>
+            <div className={styles.columnHeading}>Taal</div>
             {languages.map((l, index) => {
               const active = l.locale === value;
               return (
@@ -114,12 +93,18 @@ export function LanguageSelector({
                     close();
                     triggerRef.current?.focus();
                   }}
-                  style={optionBaseStyle}
+                  className={styles.option}
                 >
-                  <span style={codeChipStyle(active)}>{l.code}</span>
-                  <span style={{ flex: 1 }}>{l.name}</span>
+                  <span
+                    className={`${codeChipStyles.codeChip} ${
+                      active ? codeChipStyles.codeChipActive : ''
+                    }`}
+                  >
+                    {l.code}
+                  </span>
+                  <span className={styles.optionGrow}>{l.name}</span>
                   {active && (
-                    <span style={{ color: 'var(--color-brand)', display: 'inline-flex' }}>
+                    <span className={styles.checkIcon}>
                       <Checkmark />
                     </span>
                   )}

@@ -111,7 +111,11 @@ function Harness() {
         note="Incl. btw, excl. verzendkosten"
       />
 
-      <DeliveryNote countdown="5u 42m" threshold="Gratis vanaf €150" />
+      <DeliveryNote
+        title="Voor 22:00 besteld, morgen in huis"
+        countdown="5u 42m"
+        threshold="Gratis vanaf €150"
+      />
 
       <QuantityStepper value={2} onChange={() => {}} size="lg" />
 

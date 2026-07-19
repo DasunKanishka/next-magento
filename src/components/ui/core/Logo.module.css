@@ -1,0 +1,14 @@
+/*
+ * The rendered `<img>` is bounded to the exact box the text wordmark already
+ * reserves in both consumers (`.logo` in HeaderShell, `.wordmark` in Footer
+ * both carry `min-height: var(--tap-target-min)`) — so swapping the fallback
+ * text for the image never grows the slot. Width is intentionally `auto`:
+ * the logo's intrinsic aspect ratio is unknown ahead of time (admin-authored
+ * asset), so it scales proportionally from the bounded height rather than
+ * being forced into a fixed box that would distort it.
+ */
+.image {
+  display: block;
+  max-height: var(--tap-target-min);
+  width: auto;
+}
