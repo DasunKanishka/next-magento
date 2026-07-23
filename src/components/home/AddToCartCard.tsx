@@ -3,11 +3,15 @@
 import React from 'react';
 
 import { ProductCard } from '@/components/ui';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import type { CanonicalProduct } from '@/lib/data-source';
 import styles from './AddToCartCard.module.css';
 
 export interface AddToCartCardProps {
   product: CanonicalProduct;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /** Percentage-off flag, e.g. "−17%", when a genuine discount is present. */
@@ -26,9 +30,10 @@ function discountBadge(product: CanonicalProduct): string | null {
  * clearly marked. Price and stock come from a per-request read, so this card is
  * the fresh part of the page.
  */
-export function AddToCartCard({ product }: AddToCartCardProps) {
+export function AddToCartCard({ product, locale = defaultLocale }: AddToCartCardProps) {
   const [acknowledged, setAcknowledged] = React.useState(false);
   const inStock = product.stockStatus === 'IN_STOCK';
+  const copy = getChromeCopy(locale);
 
   const handleAdd = React.useCallback(() => {
     setAcknowledged(true);
@@ -52,10 +57,12 @@ export function AddToCartCard({ product }: AddToCartCardProps) {
         reviews={product.reviewCount ?? null}
         saleBadge={discountBadge(product)}
         onAdd={handleAdd}
+        addToCartLabel={copy.addToCartLabel}
+        wishlistLabel={copy.wishlistLabel}
         className={styles.card}
       />
       <div aria-live="polite" className={styles.status} style={bridge}>
-        {!inStock ? 'Tijdelijk uitverkocht' : acknowledged ? 'Toegevoegd ✓' : ''}
+        {!inStock ? copy.outOfStockLabel : acknowledged ? copy.addedToCartLabel : ''}
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ import { seedConsent } from './helpers';
 
 const REPORT_DIR = resolve(process.cwd(), 'a11y-report');
 const TAP_MIN = 44;
-const GATE_TITLE = 'Waar mogen we naartoe bezorgen?';
+const GATE_TITLE = 'Where can we deliver to?';
 
 /** Both rules are off in the jsdom unit scan; here they are forced on. */
 const AXE_OPTIONS = {
@@ -161,14 +161,14 @@ test.describe('rendered home page', () => {
   test('axe: zero critical/serious with color-contrast + target-size enabled', async ({
     page,
   }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
     await scanAndAssert(page, 'home', 'axe-home.json');
   });
 
   test('every interactive control is at least 44x44px', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
 
@@ -203,14 +203,14 @@ test.describe('rendered home page (desktop width)', () => {
   test('axe: zero critical/serious with color-contrast + target-size enabled', async ({
     page,
   }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
     await scanAndAssert(page, 'home-desktop', 'axe-home-desktop.json');
   });
 
   test('every interactive control is at least 44x44px', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
 
@@ -249,7 +249,7 @@ test.describe('rendered home page (dark OS color scheme)', () => {
   test('axe: zero critical/serious with color-contrast + target-size enabled', async ({
     page,
   }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
     await expect(page.getByTestId('product-card').first()).toBeVisible();
     await scanAndAssert(page, 'home-dark', 'axe-home-dark.json');
@@ -261,13 +261,13 @@ test.describe('consent gate', () => {
   test('axe: zero critical/serious with color-contrast + target-size enabled', async ({
     page,
   }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
     await scanAndAssert(page, 'gate', 'axe-gate.json');
   });
 
   test('every gate control is at least 44x44px', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
 
     const { measuredCount, exempt, shortfalls } = await measureTapTargets(page, 'body');

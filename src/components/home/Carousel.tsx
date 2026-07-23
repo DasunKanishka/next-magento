@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { PagerButton } from '@/components/ui/core/PagerButton';
 import styles from './Carousel.module.css';
 
@@ -11,6 +13,9 @@ export interface CarouselProps {
   children: React.ReactNode;
   /** Approximate item min-width in px (drives the track column sizing). */
   itemMinWidth?: number;
+  /** Previous/next pager button labels, resolved to the store locale by the caller. */
+  prevLabel?: string;
+  nextLabel?: string;
 }
 
 /**
@@ -19,7 +24,13 @@ export interface CarouselProps {
  * additionally offers previous/next paging buttons. Every item keeps its own
  * tab order, so the whole track is reachable by keyboard even without the arrows.
  */
-export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps) {
+export function Carousel({
+  label,
+  children,
+  itemMinWidth = 240,
+  prevLabel = getChromeCopy(defaultLocale).carouselPrevLabel,
+  nextLabel = getChromeCopy(defaultLocale).carouselNextLabel,
+}: CarouselProps) {
   const trackRef = React.useRef<HTMLDivElement>(null);
 
   const page = React.useCallback((direction: 1 | -1) => {
@@ -43,7 +54,7 @@ export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps)
       <PagerButton
         variant="on-surface"
         direction="prev"
-        label="Vorige"
+        label={prevLabel}
         onClick={() => page(-1)}
       />
 
@@ -61,7 +72,7 @@ export function Carousel({ label, children, itemMinWidth = 240 }: CarouselProps)
       <PagerButton
         variant="on-surface"
         direction="next"
-        label="Volgende"
+        label={nextLabel}
         onClick={() => page(1)}
       />
     </div>

@@ -16,18 +16,18 @@ test.beforeEach(async ({ context }) => {
 test('columns are labeled groups and Arrow keys rove focus with wrap-around', async ({
   page,
 }) => {
-  await page.goto('/nl');
+  await page.goto('/en');
   await expect(page.getByTestId('home-page')).toBeVisible();
 
-  const trigger = page.getByRole('button', { name: /Bezorgland: Nederland/ });
+  const trigger = page.getByRole('button', { name: /Delivery country: Netherlands/ });
   await trigger.click();
 
-  const menu = page.getByRole('menu', { name: 'Land en taal' });
+  const menu = page.getByRole('menu', { name: 'Country and language' });
   await expect(menu).toBeVisible();
 
   // Each column's radio set is wrapped in a labeled group.
-  await expect(page.getByRole('group', { name: 'Land' })).toBeVisible();
-  await expect(page.getByRole('group', { name: 'Taal' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Country' })).toBeVisible();
+  await expect(page.getByRole('group', { name: 'Language' })).toBeVisible();
 
   const options = menu.getByRole('menuitemradio');
   const optionCount = await options.count();
@@ -54,14 +54,14 @@ test('columns are labeled groups and Arrow keys rove focus with wrap-around', as
 });
 
 test('Escape closes the panel and returns focus to the trigger', async ({ page }) => {
-  await page.goto('/nl');
+  await page.goto('/en');
   await expect(page.getByTestId('home-page')).toBeVisible();
 
-  const trigger = page.getByRole('button', { name: /Bezorgland: Nederland/ });
+  const trigger = page.getByRole('button', { name: /Delivery country: Netherlands/ });
   await trigger.click();
-  await expect(page.getByRole('menu', { name: 'Land en taal' })).toBeVisible();
+  await expect(page.getByRole('menu', { name: 'Country and language' })).toBeVisible();
 
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('menu', { name: 'Land en taal' })).toHaveCount(0);
+  await expect(page.getByRole('menu', { name: 'Country and language' })).toHaveCount(0);
   await expect(trigger).toBeFocused();
 });

@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
  * is showing" — its absence proves the underlying page was not rendered.
  */
 
-const GATE_TITLE = 'Waar mogen we naartoe bezorgen?';
+const GATE_TITLE = 'Where can we deliver to?';
 
 test('MUST-3: with client JS disabled and no consent cookie, the gate renders and NO storefront content is sent (AC#2)', async ({
   browser,
@@ -19,7 +19,7 @@ test('MUST-3: with client JS disabled and no consent cookie, the gate renders an
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
 
-  const response = await page.goto('/nl');
+  const response = await page.goto('/en');
   expect(response, 'navigation returned a response').not.toBeNull();
   expect(response!.status(), 'status is not an error').toBeLessThan(400);
 
@@ -27,7 +27,7 @@ test('MUST-3: with client JS disabled and no consent cookie, the gate renders an
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
   await expect(
     page.getByText(
-      'Geen verkoop van alcohol onder de 18 jaar · Geniet, maar drink met mate',
+      'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly',
     ),
   ).toBeVisible();
 
@@ -49,22 +49,22 @@ test('full flow: blocked → select country → confirm 18+ → CTA enables → 
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await page.goto('/nl');
+  await page.goto('/en');
 
   // Blocked: gate visible, storefront absent.
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
   await expect(page.getByTestId('home-page')).toHaveCount(0);
 
-  const cta = page.getByRole('button', { name: /De winkel betreden/ });
+  const cta = page.getByRole('button', { name: /Enter the store/ });
   // Once hydrated the CTA gates on validity.
   await expect(cta).toBeDisabled();
 
   // Select a delivery country (clicking the tile checks its native radio).
-  await page.locator('label.agegate__tile', { hasText: 'Nederland' }).click();
+  await page.locator('label.agegate__tile', { hasText: 'Netherlands' }).click();
   await expect(cta).toBeDisabled(); // country only — not yet valid
 
   // Confirm 18+.
-  await page.getByRole('checkbox', { name: /18 jaar of ouder/i }).check();
+  await page.getByRole('checkbox', { name: /18 years or older/i }).check();
   await expect(cta).toBeEnabled();
 
   // Enter the store.

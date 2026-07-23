@@ -7,6 +7,8 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { AgeGate } from '@/components/ui/gate/AgeGate';
 import { recordConsent } from '@/lib/age-gate/actions';
 import { hasConsented } from '@/lib/age-gate/server';
+import { resolveStoreContext } from '@/lib/data-source/store-context';
+import { resolveActiveLocale } from '@/i18n/resolve-locale';
 import { routing } from '@/i18n/routing';
 import { buildBrandStyleBlock } from '@/theme/css';
 import { getActiveBrand, resolveTokens } from '@/theme/resolver';
@@ -61,10 +63,20 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) {
+  const { locale: routeLocale } = await params;
+  if (!hasLocale(routing.locales, routeLocale)) {
     notFound();
   }
+
+  // The active locale is a STORE-SCOPE property: resolved from Magento
+  // `storeConfig.locale`, not trusted from the `[locale]` URL segment alone
+  // (that segment's own validity was just checked above, against
+  // `routing.locales`, itself derived from the store view — see
+  // `src/i18n/locales.ts`). With exactly one store view today the two always
+  // agree; this is the seam that keeps resolving correctly if a second store
+  // view (with a different locale) is ever added.
+  const { storeConfig } = await resolveStoreContext();
+  const locale = resolveActiveLocale(storeConfig.locale);
 
   // Provides the locale to next-intl's server components. Note the storefront is
   // NOT statically rendered: `hasConsented()` reads a cookie below, which makes

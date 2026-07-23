@@ -31,8 +31,10 @@ beforeEach(() => {
 describe('SearchBar', () => {
   it('renders with the documented default placeholder and button label', () => {
     render(<SearchBar />);
-    expect(screen.getByPlaceholderText(/Zoek 8.000\+ producten/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '⌕ Zoeken' })).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Search brand, type, or product/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '⌕ Search' })).toBeInTheDocument();
   });
 
   it('navigates to /zoeken?q=<value> and calls onSearch on submit with a non-empty query', async () => {
@@ -41,7 +43,7 @@ describe('SearchBar', () => {
     render(<SearchBar onSearch={onSearch} />);
 
     await user.type(screen.getByRole('searchbox'), 'single malt whisky');
-    await user.click(screen.getByRole('button', { name: '⌕ Zoeken' }));
+    await user.click(screen.getByRole('button', { name: '⌕ Search' }));
 
     expect(push).toHaveBeenCalledWith('/zoeken?q=single%20malt%20whisky');
     expect(onSearch).toHaveBeenCalledWith('single malt whisky');
@@ -59,12 +61,10 @@ describe('SearchBar', () => {
     const user = userEvent.setup();
     const { container } = render(<SearchBar />);
     await user.type(screen.getByRole('searchbox'), '   ');
-    await user.click(screen.getByRole('button', { name: '⌕ Zoeken' }));
+    await user.click(screen.getByRole('button', { name: '⌕ Search' }));
 
     expect(push).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      'Vul een zoekterm in om te zoeken.',
-    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a search term to search.');
     expect(screen.getByRole('searchbox')).toHaveAttribute('aria-invalid', 'true');
     // The invalid frame is a data-attribute variant the module keys off.
     expect(container.querySelector('form')).toHaveAttribute('data-invalid', 'true');

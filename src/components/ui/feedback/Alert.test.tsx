@@ -58,7 +58,7 @@ describe('Alert', () => {
         Dismissible
       </Alert>,
     );
-    const closeBtn = screen.getByRole('button', { name: 'Sluiten' });
+    const closeBtn = screen.getByRole('button', { name: 'Close' });
     fireEvent.click(closeBtn);
     expect(onClose).toHaveBeenCalledTimes(1);
   });

@@ -45,7 +45,7 @@ test.describe('empty backend (invariant gate)', () => {
     await seedConsent(context, EMPTY_BACKEND_BASE_URL);
     const page = await context.newPage();
 
-    const response = await page.goto('/nl');
+    const response = await page.goto('/en');
     // Graceful, not the fail-closed error boundary: the stub's storeConfig +
     // `store_identity_legal` block are just enough to satisfy the
     // store-identity fail-closed gate, so a 500 here would mean the fixture
@@ -74,7 +74,18 @@ test.describe('empty backend (invariant gate)', () => {
     await expect(page.getByTestId('product-card')).toHaveCount(0);
 
     // No aggregate score / testimonial band.
-    await expect(page.getByRole('region', { name: 'Klantbeoordelingen' })).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Customer reviews' })).toHaveCount(0);
+
+    // Store/UI locale-match (see store-locale-match.spec.ts): the empty-slot
+    // fallback copy this fixture is uniquely positioned to exercise (every
+    // slot returns zero products only here) renders in the store locale
+    // (English), not the pre-fix Dutch original.
+    await expect(page.getByText('No product featured this month yet.')).toBeVisible();
+    // Every merchandising rail (4 slots) is empty against the stub, so this
+    // fallback note renders once per rail — assert the first occurrence.
+    await expect(
+      page.getByText('No products in this selection right now.').first(),
+    ).toBeVisible();
 
     // Belt-and-braces: none of the LIVE dev-store's real authored editorial
     // strings leaked through — a guard against the fixture's own env-var
@@ -93,6 +104,18 @@ test.describe('empty backend (invariant gate)', () => {
         bodyText,
         `must not contain live-backend content "${liveContent}"`,
       ).not.toContain(liveContent);
+    }
+
+    // Pre-fix Dutch empty-state copy must not render either (the store/UI
+    // locale-match invariant — see store-locale-match.spec.ts).
+    for (const banned of [
+      'Er is deze maand nog geen product uitgelicht.',
+      'Er zijn op dit moment geen producten in deze selectie.',
+    ]) {
+      expect(
+        bodyText,
+        `must not render the pre-fix Dutch empty-state copy "${banned}"`,
+      ).not.toContain(banned);
     }
 
     await context.close();

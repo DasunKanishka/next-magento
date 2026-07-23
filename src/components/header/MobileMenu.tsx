@@ -5,6 +5,8 @@ import React from 'react';
 import { Link } from '@/i18n/navigation';
 import { languages } from '@/i18n/languages';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
+import { languageDisplayName } from '@/i18n/display-names';
 import codeChipStyles from '@/components/ui/core/codeChip.module.css';
 import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { DEALS_HREF, DEALS_LABEL } from './navConfig';
@@ -21,7 +23,7 @@ export interface MobileMenuProps {
 /**
  * Mobile hamburger drawer. The trigger toggles a slide-in panel with the nav
  * list (Deals highlighted first) and a language list at the bottom. Categories
- * with subtypes drill down to a second level with a "‹ terug" control, mirroring
+ * with subtypes drill down to a second level with a "‹ back" control, mirroring
  * the desktop mega-menu one level at a time. Closes on Esc, backdrop click, or
  * any navigation.
  */
@@ -42,6 +44,7 @@ export function MobileMenu({
   const { rootRef } = useDismissMenu(open, close, triggerRef);
 
   const drilled = drillId ? categories.find((c) => c.id === drillId) : null;
+  const copy = getChromeCopy(locale);
 
   return (
     <div ref={rootRef} className={styles.wrap}>
@@ -50,7 +53,7 @@ export function MobileMenu({
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={open ? 'Menu sluiten' : 'Menu openen'}
+        aria-label={open ? copy.mobileMenuToggleClose : copy.mobileMenuToggleOpen}
         onClick={() => (open ? close() : setOpen(true))}
         className={styles.trigger}
       >
@@ -66,7 +69,7 @@ export function MobileMenu({
             onClick={close}
             className={styles.backdrop}
           />
-          <nav aria-label="Hoofdmenu" className={styles.nav}>
+          <nav aria-label={copy.mobileMenuLabel} className={styles.nav}>
             {drilled ? (
               <div>
                 <button
@@ -74,14 +77,14 @@ export function MobileMenu({
                   onClick={() => setDrillId(null)}
                   className={`${styles.drawerItem} ${styles.drawerItemBack}`}
                 >
-                  <span aria-hidden="true">‹</span> terug
+                  <span aria-hidden="true">‹</span> {copy.mobileMenuBack}
                 </button>
                 <Link
                   href={`/${drilled.urlPath}`}
                   onClick={close}
                   className={styles.drawerItem}
                 >
-                  Alles in {drilled.name}
+                  {copy.mobileMenuViewAllPrefix(drilled.name)}
                 </Link>
                 {drilled.children.map((child) => (
                   <Link
@@ -96,7 +99,9 @@ export function MobileMenu({
               </div>
             ) : (
               <div>
-                <div className={`${styles.eyebrow} ${styles.menuEyebrow}`}>Menu</div>
+                <div className={`${styles.eyebrow} ${styles.menuEyebrow}`}>
+                  {copy.mobileMenuSectionLabel}
+                </div>
                 <Link
                   href={DEALS_HREF}
                   onClick={close}
@@ -109,7 +114,7 @@ export function MobileMenu({
                     <button
                       key={c.id}
                       type="button"
-                      aria-label={`${c.name} — submenu openen`}
+                      aria-label={copy.mobileMenuOpenSubmenu(c.name)}
                       onClick={() => setDrillId(c.id)}
                       className={styles.drawerItem}
                     >
@@ -129,8 +134,14 @@ export function MobileMenu({
                 )}
 
                 <div role="separator" className={styles.separator} />
-                <div className={`${styles.eyebrow} ${styles.langEyebrow}`}>Taal</div>
-                <ul role="menu" aria-label="Taal" className={styles.langList}>
+                <div className={`${styles.eyebrow} ${styles.langEyebrow}`}>
+                  {copy.mobileMenuLanguageLabel}
+                </div>
+                <ul
+                  role="menu"
+                  aria-label={copy.mobileMenuLanguageLabel}
+                  className={styles.langList}
+                >
                   {languages.map((l) => {
                     const active = l.locale === locale;
                     return (
@@ -152,7 +163,7 @@ export function MobileMenu({
                           >
                             {l.code}
                           </span>
-                          {l.name}
+                          {languageDisplayName(locale, l.locale)}
                         </button>
                       </li>
                     );

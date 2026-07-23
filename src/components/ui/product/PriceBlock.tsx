@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './PriceBlock.module.css';
 
 export interface PriceBlockProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -18,7 +20,7 @@ export interface PriceBlockProps extends React.HTMLAttributes<HTMLDivElement> {
    * IconButton `size` props follow.
    */
   size?: number;
-  /** Show the "Je bespaart €x,xx" savings flag. */
+  /** Show the "You save €x.xx" savings flag. */
   showSavings?: boolean;
   /** Override the auto-computed savings label. */
   savingsLabel?: string | null;
@@ -67,7 +69,7 @@ export function PriceBlock({
   const oldPriceLabel = oldPrice != null ? formatEuro(oldPrice) : null;
   const computedSavings =
     onSale && typeof price === 'number' && typeof oldPrice === 'number'
-      ? `Je bespaart ${formatEuro(oldPrice - price)}`
+      ? getChromeCopy(defaultLocale).savingsLabel(formatEuro(oldPrice - price))
       : null;
   const savings = savingsLabel || computedSavings;
 

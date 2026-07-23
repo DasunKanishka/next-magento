@@ -5,6 +5,8 @@ import React from 'react';
 import { Button, LanguageSelector } from '@/components/ui';
 import { countries, type CountryCode } from '@/i18n/countries';
 import type { SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
+import { countryDisplayName } from '@/i18n/display-names';
 import { usePathname, useRouter } from '@/i18n/navigation';
 
 export interface AgeGateProps {
@@ -16,10 +18,6 @@ export interface AgeGateProps {
    */
   recordConsentAction: (formData: FormData) => void | Promise<void>;
 }
-
-/** EXACT legal fine-print string — do not alter wording or the middot separator. */
-const LEGAL_NOTICE =
-  'Geen verkoop van alcohol onder de 18 jaar · Geniet, maar drink met mate';
 
 /**
  * Scoped stylesheet for the gate. Class-based (not co-located CSS-module)
@@ -258,6 +256,7 @@ function GateMark() {
 export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const copy = getChromeCopy(locale);
   const [country, setCountry] = React.useState<CountryCode | ''>('');
   const [ageChecked, setAgeChecked] = React.useState(false);
   // `false` during SSR + hydration, `true` once client JS is live. Drives the
@@ -298,15 +297,13 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
         <GateMark />
 
         <h1 id="agegate-title" className="agegate__title">
-          Waar mogen we naartoe bezorgen?
+          {copy.ageGateTitle}
         </h1>
 
-        <p className="agegate__copy">
-          Kies je bezorgland en bevestig je leeftijd om de winkel te betreden.
-        </p>
+        <p className="agegate__copy">{copy.ageGateCopy}</p>
 
         <fieldset className="agegate__fieldset">
-          <legend className="agegate__legend">Bezorgland</legend>
+          <legend className="agegate__legend">{copy.ageGateCountryLegend}</legend>
 
           <div className="agegate__grid">
             {countries.map((c) => (
@@ -321,7 +318,7 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
                 />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={c.flag} alt="" aria-hidden="true" className="agegate__flag" />
-                <span>{c.name}</span>
+                <span>{countryDisplayName(locale, c.code)}</span>
                 <span className="agegate__badge" aria-hidden="true">
                   <BadgeCheck />
                 </span>
@@ -335,11 +332,12 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
             className="agegate__checkbox"
             type="checkbox"
             name="ageConfirmed"
+            // eslint-disable-next-line i18next/no-literal-string -- boolean form-value marker, not language.
             value="true"
             checked={ageChecked}
             onChange={(e) => setAgeChecked(e.target.checked)}
           />
-          <span>Ja, ik ben 18 jaar of ouder</span>
+          <span>{copy.ageGateAgeConfirm}</span>
         </label>
 
         <Button
@@ -349,10 +347,18 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
           fullWidth
           disabled={ctaDisabled}
         >
-          De winkel betreden →
+          {copy.ageGateCta}
         </Button>
 
-        <p className="agegate__legal">{LEGAL_NOTICE}</p>
+        {/*
+          Legal/compliance-sensitive fine print (alcohol age-restriction
+          notice). Translated from the Dutch original in
+          `src/i18n/chrome-copy.ts` (`ageGateLegalNotice`) as part of the
+          store-locale migration — flagged `needs-confirm` in this change's
+          handoff for a legal-accuracy review before this ships; do not alter
+          the wording again without the same review.
+        */}
+        <p className="agegate__legal">{copy.ageGateLegalNotice}</p>
       </form>
     </div>
   );

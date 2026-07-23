@@ -2,6 +2,8 @@ import React, { Suspense } from 'react';
 
 import type { MerchandisingSlot } from '@/lib/data-source';
 import { getSlotProducts } from '@/lib/home/home-data';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { AddToCartCard } from './AddToCartCard';
 import { Carousel } from './Carousel';
 import styles from './ProductRail.module.css';
@@ -13,6 +15,8 @@ export interface ProductRailProps {
   limit: number;
   heading: string;
   variant: RailVariant;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /** Placeholder cells shown while the fresh price/stock read is in flight. */
@@ -36,28 +40,35 @@ async function RailItems({
   limit,
   variant,
   heading,
+  locale,
 }: {
   slot: MerchandisingSlot;
   limit: number;
   variant: RailVariant;
   heading: string;
+  locale: SupportedLocale;
 }) {
   const products = await getSlotProducts(slot, limit);
+  const copy = getChromeCopy(locale);
 
   if (products.length === 0) {
-    return (
-      <p className={styles.emptyNote}>
-        Er zijn op dit moment geen producten in deze selectie.
-      </p>
-    );
+    return <p className={styles.emptyNote}>{copy.productRailEmptyState}</p>;
   }
 
   const cards = products.map((product) => (
-    <AddToCartCard key={product.sku} product={product} />
+    <AddToCartCard key={product.sku} product={product} locale={locale} />
   ));
 
   if (variant === 'carousel') {
-    return <Carousel label={heading}>{cards}</Carousel>;
+    return (
+      <Carousel
+        label={heading}
+        prevLabel={copy.carouselPrevLabel}
+        nextLabel={copy.carouselNextLabel}
+      >
+        {cards}
+      </Carousel>
+    );
   }
   return <div className={styles.grid}>{cards}</div>;
 }
@@ -70,13 +81,25 @@ async function RailItems({
  * The product content is a per-request dynamic hole: it streams in behind a
  * skeleton while the rest of the page (the cached shell) renders immediately.
  */
-export function ProductRail({ slot, limit, heading, variant }: ProductRailProps) {
+export function ProductRail({
+  slot,
+  limit,
+  heading,
+  variant,
+  locale = defaultLocale,
+}: ProductRailProps) {
   const hasHeading = heading.trim() !== '';
   return (
     <section aria-label={hasHeading ? heading : undefined}>
       {hasHeading ? <h2 className={styles.heading}>{heading}</h2> : null}
       <Suspense fallback={<RailSkeleton count={Math.min(limit, 4)} />}>
-        <RailItems slot={slot} limit={limit} variant={variant} heading={heading} />
+        <RailItems
+          slot={slot}
+          limit={limit}
+          variant={variant}
+          heading={heading}
+          locale={locale}
+        />
       </Suspense>
     </section>
   );

@@ -120,7 +120,7 @@ describe('panelSurface (shared dropdown-panel surface)', () => {
   // onto its own panel/nav rule, so the rendered element must carry both.
   it('CountrySelector composes the shared surface onto its dropdown panel', () => {
     render(<CountrySelector value="NL" />);
-    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Delivery country/ }));
     expect(screen.getByRole('menu').className).toContain(panelStyles.panelSurface);
   });
 
@@ -138,9 +138,9 @@ describe('panelSurface (shared dropdown-panel surface)', () => {
   });
 
   it('MobileMenu composes the shared surface onto its drawer nav', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Menu openen' }));
-    expect(screen.getByRole('navigation', { name: 'Hoofdmenu' }).className).toContain(
+    render(<MobileMenu categories={categories} locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    expect(screen.getByRole('navigation', { name: 'Main menu' }).className).toContain(
       panelStyles.panelSurface,
     );
   });

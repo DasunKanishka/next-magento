@@ -9,5 +9,5 @@
 export const DEALS_HREF = '/aanbiedingen';
 export const DEALS_LABEL = '🔥 Deals';
 
-/** Maximum top-level categories shown inline before the rest collapse under "meer". */
+/** Maximum top-level categories shown inline before the rest collapse under "more". */
 export const MAX_INLINE_NAV_ITEMS = 6;

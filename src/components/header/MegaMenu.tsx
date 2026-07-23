@@ -3,6 +3,8 @@
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './MegaMenu.module.css';
 import type { NavCategory } from './types';
 
@@ -20,6 +22,8 @@ export interface MegaMenuProps {
   promoHtml: string;
   /** Close the panel (e.g. after following a link). */
   onClose: () => void;
+  /** Active UI locale — drives the store-locale chrome copy below. */
+  locale?: SupportedLocale;
 }
 
 /**
@@ -37,14 +41,17 @@ export function MegaMenu({
   onActivate,
   promoHtml,
   onClose,
+  locale = defaultLocale,
 }: MegaMenuProps) {
   const active = categories.find((c) => c.id === activeId) ?? categories[0];
   if (!active) return null;
 
+  const copy = getChromeCopy(locale);
+
   return (
     <div
       role="region"
-      aria-label={`Categoriemenu: ${active.name}`}
+      aria-label={copy.megaMenuRegionLabel(active.name)}
       className={styles.panel}
     >
       <div className={styles.cols}>
@@ -92,7 +99,7 @@ export function MegaMenu({
               ))}
             </ul>
           ) : (
-            <p className={styles.emptyState}>Ontdek de volledige collectie.</p>
+            <p className={styles.emptyState}>{copy.megaMenuEmptyState}</p>
           )}
         </div>
 
@@ -104,7 +111,7 @@ export function MegaMenu({
             onClick={onClose}
             className={styles.promoLink}
           >
-            Bekijk alles in {active.name}
+            {copy.megaMenuViewAllPrefix} {active.name}
             <span aria-hidden="true">→</span>
           </Link>
         </div>

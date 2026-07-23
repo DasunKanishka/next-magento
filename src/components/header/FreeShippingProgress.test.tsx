@@ -19,14 +19,14 @@ const MODULE_CSS_PATH = join(
 describe('FreeShippingProgress', () => {
   it('invites the visitor toward the threshold at an empty cart', () => {
     render(<FreeShippingProgress cartTotal={0} />);
-    expect(screen.getByText(/Nog €150,00 tot gratis bezorging/)).toBeInTheDocument();
+    expect(screen.getByText(/€150,00 more for free shipping/)).toBeInTheDocument();
     const bar = screen.getByRole('progressbar');
     expect(bar).toHaveAttribute('aria-valuenow', '0');
   });
 
   it('confirms free shipping once the threshold is reached', () => {
     render(<FreeShippingProgress cartTotal={200} />);
-    expect(screen.getByText(/Je hebt gratis bezorging/)).toBeInTheDocument();
+    expect(screen.getByText(/You have free shipping/)).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
   });
 

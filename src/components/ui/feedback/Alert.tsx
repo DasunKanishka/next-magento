@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './Alert.module.css';
 import { FEEDBACK_TONE_FAMILIES, FEEDBACK_TONE_ICONS, type FeedbackTone } from './tone';
 
@@ -12,6 +14,8 @@ export interface AlertProps extends Omit<React.HTMLAttributes<HTMLDivElement>, '
   children?: React.ReactNode;
   /** Show a dismiss control; banners persist until closed. */
   onClose?: () => void;
+  /** Dismiss-control aria-label, resolved to the store locale. */
+  closeLabel?: string;
 }
 
 interface ToneColors {
@@ -64,6 +68,7 @@ export function Alert({
   title,
   children,
   onClose,
+  closeLabel = getChromeCopy(defaultLocale).alertCloseLabel,
   style = {},
   ...rest
 }: AlertProps) {
@@ -111,7 +116,7 @@ export function Alert({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Sluiten"
+          aria-label={closeLabel}
           className={styles.close}
         >
           <svg

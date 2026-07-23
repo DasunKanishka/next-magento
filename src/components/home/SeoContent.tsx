@@ -1,6 +1,8 @@
 import React from 'react';
 
 import type { StatCallout } from '@/lib/home/editorial';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './SeoContent.module.css';
 
 export interface SeoContentProps {
@@ -13,6 +15,8 @@ export interface SeoContentProps {
    * hardcoded/fallback set. Renders none when unauthored.
    */
   stats: StatCallout[];
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /**
@@ -21,12 +25,13 @@ export interface SeoContentProps {
  * backend-sourced; renders nothing at all when neither is authored, and
  * whatever subset is present otherwise.
  */
-export function SeoContent({ html, stats }: SeoContentProps) {
+export function SeoContent({ html, stats, locale = defaultLocale }: SeoContentProps) {
   const hasCopy = html.trim() !== '';
   if (!hasCopy && stats.length === 0) return null;
+  const copy = getChromeCopy(locale);
 
   return (
-    <section aria-label="Over onze winkel" className={styles.section}>
+    <section aria-label={copy.seoContentLabel} className={styles.section}>
       {stats.length > 0 ? (
         <ul className={styles.statGrid}>
           {stats.map((stat, i) => (

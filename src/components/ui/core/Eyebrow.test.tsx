@@ -162,20 +162,20 @@ describe('Eyebrow (shared uppercase-tracked label triplet)', () => {
     expect(middleEyebrow?.textContent).toBe('Mannen');
   });
 
-  it('MobileMenu composes the shared triplet onto its "Menu" and "Taal" eyebrows', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Menu openen' }));
+  it('MobileMenu composes the shared triplet onto its "Menu" and "Language" eyebrows', () => {
+    render(<MobileMenu categories={categories} locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
     expect(screen.getByText('Menu').className).toContain(eyebrowStyles.eyebrow);
-    expect(screen.getByText('Taal').className).toContain(eyebrowStyles.eyebrow);
+    expect(screen.getByText('Language').className).toContain(eyebrowStyles.eyebrow);
   });
 
   it('selectorShared composes the shared triplet onto triggerLabel and columnHeading', () => {
     render(<CountrySelector value="NL" />);
-    expect(screen.getByText('Bezorgen naar').className).toContain(eyebrowStyles.eyebrow);
+    expect(screen.getByText('Deliver to').className).toContain(eyebrowStyles.eyebrow);
 
-    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
-    expect(screen.getByText('Land').className).toContain(eyebrowStyles.eyebrow);
-    expect(screen.getByText('Taal').className).toContain(eyebrowStyles.eyebrow);
+    fireEvent.click(screen.getByRole('button', { name: /Delivery country/ }));
+    expect(screen.getByText('Country').className).toContain(eyebrowStyles.eyebrow);
+    expect(screen.getByText('Language').className).toContain(eyebrowStyles.eyebrow);
   });
 
   it('selectorShared triggerLabel and columnHeading carry their own local color classes', () => {

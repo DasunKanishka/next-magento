@@ -14,7 +14,7 @@ import {
 } from '@/components/home';
 import { getDataSource } from '@/lib/data-source';
 import { resolveStoreContext } from '@/lib/data-source/store-context';
-import { isSupportedLocale, type SupportedLocale } from '@/i18n/locales';
+import { resolveActiveLocale } from '@/i18n/resolve-locale';
 import { routing } from '@/i18n/routing';
 import { getHomeShellData } from '@/lib/home/home-data';
 
@@ -54,8 +54,17 @@ const sectionStack: React.CSSProperties = {
  * band streams its fresh price/stock content into its own boundary.
  */
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: raw } = await params;
-  const locale: SupportedLocale = isSupportedLocale(raw) ? raw : routing.defaultLocale;
+  // The `[locale]` URL segment's own validity is checked by the parent layout;
+  // this page only needs to await it to satisfy Next's dynamic-params contract.
+  await params;
+
+  // The active locale is a STORE-SCOPE property: resolved from Magento
+  // `storeConfig.locale`, not from the URL segment. This
+  // also gives us `storeCode` for the identity read further below, so the
+  // store-context resolution (memoized, see `resolveStoreContext`) happens
+  // once, up front.
+  const { storeCode, storeConfig } = await resolveStoreContext();
+  const locale = resolveActiveLocale(storeConfig.locale);
   setRequestLocale(locale);
 
   // Resolve the store's configured home route and, keyed to it, the page-level
@@ -75,7 +84,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   // longer catch the throw (a segment error boundary does not catch errors from
   // the layout at its own level) — add a `global-error.tsx` first, or the
   // fail-closed containment breaks silently.
-  const { storeCode } = await resolveStoreContext();
   const identity = await getDataSource().getStoreIdentity({ storeCode });
 
   return (
@@ -88,24 +96,26 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </h1>
 
         <div style={sectionStack}>
-          <HeroSlider slides={shell.hero} />
+          <HeroSlider slides={shell.hero} locale={locale} />
 
           <ProductRail
             slot="highlighted"
             limit={4}
             heading={shell.railHeadings.highlighted}
             variant="grid"
+            locale={locale}
           />
 
-          <CategoryBar categories={shell.categories} />
+          <CategoryBar categories={shell.categories} locale={locale} />
 
-          <BusinessReviews content={shell.reviews} />
+          <BusinessReviews content={shell.reviews} locale={locale} />
 
           <ProductRail
             slot="weekdeals"
             limit={6}
             heading={shell.railHeadings.weekdeals}
             variant="carousel"
+            locale={locale}
           />
 
           <BannerTiles tiles={shell.banners1} />
@@ -115,6 +125,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             limit={6}
             heading={shell.railHeadings['new-in']}
             variant="carousel"
+            locale={locale}
           />
 
           <BannerTiles tiles={shell.banners2} />
@@ -124,17 +135,18 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             limit={6}
             heading={shell.railHeadings.featured}
             variant="carousel"
+            locale={locale}
           />
 
           <BannerTiles tiles={shell.banners3} />
 
-          <ProductOfMonth editorial={shell.productOfMonth} />
+          <ProductOfMonth editorial={shell.productOfMonth} locale={locale} />
 
-          <SeoContent html={shell.seoHtml} stats={shell.statCallouts} />
+          <SeoContent html={shell.seoHtml} stats={shell.statCallouts} locale={locale} />
         </div>
       </main>
 
-      <Footer identity={identity} />
+      <Footer identity={identity} locale={locale} />
     </div>
   );
 }

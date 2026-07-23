@@ -1,10 +1,14 @@
 import React from 'react';
 
 import type { BusinessReviewsContent } from '@/lib/home/editorial';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './BusinessReviews.module.css';
 
 export interface BusinessReviewsProps {
   content: BusinessReviewsContent;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /**
@@ -12,12 +16,16 @@ export interface BusinessReviewsProps {
  * testimonials on a deep brand-toned surface. Renders nothing when neither a
  * score nor any testimonial is authored; renders whatever subset is present.
  */
-export function BusinessReviews({ content }: BusinessReviewsProps) {
+export function BusinessReviews({
+  content,
+  locale = defaultLocale,
+}: BusinessReviewsProps) {
   const { score, basis, testimonials } = content;
   if (!score && testimonials.length === 0) return null;
+  const copy = getChromeCopy(locale);
 
   return (
-    <section aria-label="Klantbeoordelingen" className={styles.section}>
+    <section aria-label={copy.businessReviewsLabel} className={styles.section}>
       {score ? (
         <div className={styles.score}>
           <span aria-hidden="true" className={styles.stars}>

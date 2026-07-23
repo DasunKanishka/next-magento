@@ -3,11 +3,15 @@
 import React from 'react';
 
 import type { HeroSlide } from '@/lib/home/editorial';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { PagerButton } from '@/components/ui/core/PagerButton';
 import styles from './HeroSlider.module.css';
 
 export interface HeroSliderProps {
   slides: HeroSlide[];
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /**
@@ -16,8 +20,9 @@ export interface HeroSliderProps {
  * screens. Renders nothing when no panels are authored, and works with any
  * count up to the zone cap. All controls are real, keyboard-operable buttons.
  */
-export function HeroSlider({ slides }: HeroSliderProps) {
+export function HeroSlider({ slides, locale = defaultLocale }: HeroSliderProps) {
   const [active, setActive] = React.useState(0);
+  const copy = getChromeCopy(locale);
 
   if (slides.length === 0) return null;
 
@@ -26,7 +31,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
   const go = (next: number) => setActive((next + slides.length) % slides.length);
 
   return (
-    <section aria-label="Uitgelichte campagnes" aria-roledescription="carousel">
+    <section aria-label={copy.heroSliderLabel} aria-roledescription="carousel">
       <div className={styles.stage}>
         <div className={styles.content}>
           <h2 className={styles.headline}>{slide.title}</h2>
@@ -43,13 +48,13 @@ export function HeroSlider({ slides }: HeroSliderProps) {
             <PagerButton
               variant="on-brand"
               direction="prev"
-              label="Vorige campagne"
+              label={copy.heroSliderPrevLabel}
               onClick={() => go(index - 1)}
             />
             <PagerButton
               variant="on-brand"
               direction="next"
-              label="Volgende campagne"
+              label={copy.heroSliderNextLabel}
               onClick={() => go(index + 1)}
             />
           </>
@@ -57,7 +62,11 @@ export function HeroSlider({ slides }: HeroSliderProps) {
       </div>
 
       {slides.length > 1 ? (
-        <div role="tablist" aria-label="Kies een campagne" className={styles.tablist}>
+        <div
+          role="tablist"
+          aria-label={copy.heroSliderTablistLabel}
+          className={styles.tablist}
+        >
           {slides.map((s, i) => {
             const isActive = i === index;
             const bridge = {
@@ -74,7 +83,7 @@ export function HeroSlider({ slides }: HeroSliderProps) {
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                aria-label={`Campagne ${i + 1}`}
+                aria-label={copy.heroSliderDotLabel(i + 1)}
                 onClick={() => setActive(i)}
                 className={styles.dot}
                 style={bridge}

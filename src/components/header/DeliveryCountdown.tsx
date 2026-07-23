@@ -3,6 +3,7 @@
 import React from 'react';
 
 import { deliveryCountdownLabel } from '@/config/delivery';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
 import styles from './DeliveryCountdown.module.css';
 
 export interface DeliveryCountdownProps {
@@ -10,6 +11,8 @@ export interface DeliveryCountdownProps {
   copy: string;
   /** Backend-sourced order cut-off hour (`identity.deliveryPromise.cutoffHour`). */
   cutoffHour: number;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
   /** Optional style hook for the containing element. */
   style?: React.CSSProperties;
 }
@@ -24,16 +27,17 @@ export interface DeliveryCountdownProps {
 export function DeliveryCountdown({
   copy,
   cutoffHour,
+  locale = defaultLocale,
   style = {},
 }: DeliveryCountdownProps) {
   const [label, setLabel] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const tick = () => setLabel(deliveryCountdownLabel(new Date(), cutoffHour));
+    const tick = () => setLabel(deliveryCountdownLabel(new Date(), cutoffHour, locale));
     tick();
     const id = window.setInterval(tick, 30_000);
     return () => window.clearInterval(id);
-  }, [cutoffHour]);
+  }, [cutoffHour, locale]);
 
   return (
     <span aria-live="polite" className={styles.countdown} style={style}>

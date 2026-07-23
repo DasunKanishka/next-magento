@@ -76,7 +76,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(page.getByRole('heading', { name: newTitle })).toBeVisible();
     } finally {
       await setCmsBlockContent(block.id, original);
@@ -97,7 +97,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(page.getByRole('heading', { level: 3, name: newTitle })).toBeVisible();
     } finally {
       await setCmsBlockContent(block.id, original);
@@ -121,7 +121,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(page.getByText(newScore)).toBeVisible();
     } finally {
       await setCmsBlockContent(block.id, original);
@@ -145,7 +145,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(page.getByText(newCopy)).toBeVisible();
     } finally {
       await setCmsBlockContent(block.id, original);
@@ -162,7 +162,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(page.getByTestId('seo-copy').getByText(newCopy)).toBeVisible();
     } finally {
       await setCmsBlockContent(block.id, original);
@@ -194,11 +194,11 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       // Scope to the SEO content region: `8.000+` also legitimately appears in
       // the footer tagline (a store-identity field), so a page-wide negative
       // check would match that unrelated occurrence.
-      const seoRegion = page.getByRole('region', { name: 'Over onze winkel' });
+      const seoRegion = page.getByRole('region', { name: 'About our store' });
       await expect(seoRegion.getByText(newValue)).toBeVisible();
       // The previously-hardcoded figure must be gone from the stat grid now
       // that the block carries only the QA fixture item — proves the render is
@@ -223,7 +223,7 @@ test.describe('home-editorial round-trip (live dev backend)', () => {
       await revalidateHomeShell(request);
 
       await seedConsent(page.context());
-      await page.goto('/nl');
+      await page.goto('/en');
       await expect(
         page.getByRole('heading', { level: 2, name: newHeading }),
       ).toBeVisible();
