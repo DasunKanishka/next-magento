@@ -66,6 +66,15 @@ describe('POST /api/revalidate', () => {
     ]);
   });
 
+  it('revalidates the home-shell tag (home editorial content) when explicitly requested', async () => {
+    const res = await POST(
+      makeRequest('POST', { secret: SECRET, body: { tag: 'home-shell' } }),
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ revalidated: true, tag: 'home-shell' });
+    expect(h.revalidateTagCalls).toEqual([{ tag: 'home-shell', profile: { expire: 0 } }]);
+  });
+
   it('accepts an optional storeCode alongside the tag', async () => {
     const res = await POST(
       makeRequest('POST', {

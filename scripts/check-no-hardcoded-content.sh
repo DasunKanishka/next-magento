@@ -54,9 +54,15 @@ set -euo pipefail
 BASE="${1:-.}"
 
 # Enumerated content surfaces (non-test files only — see SCOPE above).
+# `src/components/home` + `src/app` were added by issue 001 (V0.1.4): the
+# hardcoded `SeoContent` stat-callout regression (C1) shipped green precisely
+# because this guard did not scan the home surface at all (H2) — the home
+# page (`src/app/**/page.tsx`) and its components are now in scope too.
 SURFACE_DIRS=(
   "$BASE/src/components/header"
   "$BASE/src/components/footer"
+  "$BASE/src/components/home"
+  "$BASE/src/app"
   "$BASE/src/config"
 )
 
@@ -93,6 +99,13 @@ DENYLIST=(
   # containing "Klantenservice"/"Assortiment" in prose does not trip this).
   "heading: 'Assortiment'"
   "heading: 'Klantenservice'"
+  # Home `SeoContent` stat-callout proof points (issue 001, V0.1.4): the exact
+  # pre-migration STAT_CALLOUTS literals, hardcoded regardless of backend
+  # state (defect C1) before being moved to the `home_stat_callouts` CMS block
+  # via `getEditorialContent` (see `src/lib/home/home-data.ts`).
+  "'8.000+'"
+  "'4,8 ★'"
+  "'Morgen in huis'"
   # JUDGMENT CALL: the pre-migration COLUMNS array also carried per-link
   # `href`/`label` pairs (e.g. `/whisky`, `/verzending`, `/over-ons`). Those
   # are deliberately NOT denylisted here: several of those exact route paths

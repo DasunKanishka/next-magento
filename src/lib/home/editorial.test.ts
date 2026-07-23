@@ -5,6 +5,7 @@ import {
   parseBusinessReviews,
   parseHeroSlides,
   parseProductOfMonthEditorial,
+  parseStatCallouts,
 } from './editorial';
 
 const HERO = `
@@ -106,5 +107,30 @@ describe('parseProductOfMonthEditorial', () => {
     const { paragraphs } = parseProductOfMonthEditorial(raw);
     expect(paragraphs).toHaveLength(2);
     expect(paragraphs[0]).toContain('€34,95');
+  });
+});
+
+describe('parseStatCallouts', () => {
+  const RAW = `
+    <div class="stat-callout"><strong>8.000+</strong><p>producten op voorraad</p></div>
+    <div class="stat-callout"><strong>4,8 &#9733;</strong><p>gemiddelde klantbeoordeling</p></div>
+    <div class="stat-callout"><strong>Morgen in huis</strong><p>bij bestelling voor 22:00</p></div>`;
+
+  it('extracts the figure and label for each callout, capped', () => {
+    const stats = parseStatCallouts(RAW, 2);
+    expect(stats).toHaveLength(2);
+    expect(stats[0]).toEqual({ value: '8.000+', label: 'producten op voorraad' });
+    expect(stats[1].value).toBe('4,8 ★');
+  });
+
+  it('drops a callout with no figure', () => {
+    const raw = '<div class="stat-callout"><p>geen waarde</p></div>';
+    expect(parseStatCallouts(raw, 3)).toEqual([]);
+  });
+
+  it('returns an empty list for empty/unauthored input without throwing (empty-backend invariant)', () => {
+    expect(parseStatCallouts('', 3)).toEqual([]);
+    expect(parseStatCallouts(null, 3)).toEqual([]);
+    expect(parseStatCallouts(undefined, 3)).toEqual([]);
   });
 });

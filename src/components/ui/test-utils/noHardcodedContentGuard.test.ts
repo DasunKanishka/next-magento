@@ -22,6 +22,8 @@ beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'no-hardcoded-content-'));
   mkdirSync(join(dir, 'src/components/header'), { recursive: true });
   mkdirSync(join(dir, 'src/components/footer'), { recursive: true });
+  mkdirSync(join(dir, 'src/components/home'), { recursive: true });
+  mkdirSync(join(dir, 'src/app'), { recursive: true });
   mkdirSync(join(dir, 'src/config'), { recursive: true });
   mkdirSync(join(dir, 'src/other'), { recursive: true });
 });
@@ -98,6 +100,16 @@ describe('check-no-hardcoded-content guard', () => {
       name: 'footer column heading literal reintroduced in the footer',
       file: 'src/components/footer/Footer.tsx',
       body: "const COLUMNS = [{ heading: 'Assortiment', links: [] }];\n",
+    },
+    {
+      name: 'the SeoContent stat-callout proof-point figures reintroduced in a home component',
+      file: 'src/components/home/SeoContent.tsx',
+      body: "const STAT_CALLOUTS = [{ value: '8.000+', label: 'x' }, { value: '4,8 ★', label: 'y' }, { value: 'Morgen in huis', label: 'z' }];\n",
+    },
+    {
+      name: 'the SeoContent stat-callout proof-point figures reintroduced directly in the home route (src/app)',
+      file: 'src/app/home-page-fixture.tsx',
+      body: "export const STAT = '8.000+';\n",
     },
   ];
 

@@ -4,9 +4,10 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { getDataSource, type CanonicalProduct } from '@/lib/data-source';
 import { resolveStoreContext } from '@/lib/data-source/store-context';
-import { allSlotCategoryIds } from '@/config/merchandising-slots';
+import { allSlotCategoryIds, resolveSlotCategoryId } from '@/config/merchandising-slots';
 import {
   HOME_CONTENT_ZONES,
+  HOME_SEO_BLOCK_IDENTIFIER,
   HOME_STRUCTURED_ZONE_IDENTIFIERS,
 } from '@/config/content-zones';
 import { sanitizeCmsHtml } from '@/lib/sanitize/cms-html';
@@ -16,14 +17,26 @@ import {
   parseBusinessReviews,
   parseHeroSlides,
   parseProductOfMonthEditorial,
+  parseStatCallouts,
   type BannerTile,
   type BusinessReviewsContent,
   type HeroSlide,
   type ProductOfMonthEditorial,
+  type StatCallout,
 } from './editorial';
 
-/** Free-form editorial block authored under the store's home page. */
-const SEO_BLOCK_IDENTIFIER = 'home_seo_content';
+/**
+ * The four merchandising slots that render a plain-text rail heading (the
+ * fifth slot, `product-of-month`, has its own narrative editorial zone and no
+ * rail heading — see `ProductOfMonth`).
+ */
+const RAIL_HEADING_SLOTS = ['highlighted', 'weekdeals', 'new-in', 'featured'] as const;
+
+/** A merchandising slot that renders a plain-text rail heading. */
+export type RailHeadingSlot = (typeof RAIL_HEADING_SLOTS)[number];
+
+/** Free-form editorial block authored under the store's home page (config-sourced). */
+const SEO_BLOCK_IDENTIFIER = HOME_SEO_BLOCK_IDENTIFIER;
 
 /** Simple navigable category shape for the "shop by category" bar. */
 export interface HomeCategory {
@@ -52,6 +65,17 @@ export interface HomeShellData {
   productOfMonth: ProductOfMonthEditorial;
   /** Sanitized free-form editorial HTML for the search-optimised copy block. */
   seoHtml: string;
+  /** Headline proof-point figures shown above the SEO copy panel. */
+  statCallouts: StatCallout[];
+  /**
+   * Rail heading text per merchandising slot, sourced from the slot's own
+   * curation-category NATIVE `name` (Magento requires every category to carry
+   * one — there is no separate CMS block to author). Resolved alongside the
+   * category tree fetch (`getNavigationCategories`), not a second call.
+   * Empty string when the category is absent (e.g. an empty backend) — the
+   * caller renders no heading rather than a hardcoded fallback.
+   */
+  railHeadings: Record<RailHeadingSlot, string>;
 }
 
 function blockContent(
@@ -95,6 +119,17 @@ export async function getHomeShellData(requestedRoute = 'home'): Promise<HomeShe
     .filter((c) => !slotIds.has(c.id))
     .map((c) => ({ id: c.id, name: c.name, urlPath: c.urlPath }));
 
+  // Rail headings read straight off the ALREADY-FETCHED category tree (the
+  // merchandising slot categories are present in `rawCategories` before the
+  // filter above removes them from the navigable set) — no second call.
+  const categoryNameById = new Map(rawCategories.map((c) => [c.id, c.name]));
+  const railHeadings = Object.fromEntries(
+    RAIL_HEADING_SLOTS.map((slot) => [
+      slot,
+      categoryNameById.get(resolveSlotCategoryId(slot)) ?? '',
+    ]),
+  ) as Record<RailHeadingSlot, string>;
+
   const zone = (key: keyof typeof HOME_CONTENT_ZONES) => HOME_CONTENT_ZONES[key];
 
   return {
@@ -125,6 +160,11 @@ export async function getHomeShellData(requestedRoute = 'home'): Promise<HomeShe
       blockContent(editorial, zone('productOfMonthEditorial').identifier),
     ),
     seoHtml: sanitizeCmsHtml(blockContent(seoBlocks, SEO_BLOCK_IDENTIFIER)),
+    statCallouts: parseStatCallouts(
+      blockContent(editorial, zone('statCallouts').identifier),
+      zone('statCallouts').maxItems,
+    ),
+    railHeadings,
   };
 }
 

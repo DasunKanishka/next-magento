@@ -93,7 +93,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <ProductRail
             slot="highlighted"
             limit={4}
-            heading="Aanbevolen voor jou"
+            heading={shell.railHeadings.highlighted}
             variant="grid"
           />
 
@@ -104,7 +104,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <ProductRail
             slot="weekdeals"
             limit={6}
-            heading="Weekdeals"
+            heading={shell.railHeadings.weekdeals}
             variant="carousel"
           />
 
@@ -113,7 +113,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <ProductRail
             slot="new-in"
             limit={6}
-            heading="Nieuw binnen"
+            heading={shell.railHeadings['new-in']}
             variant="carousel"
           />
 
@@ -122,7 +122,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <ProductRail
             slot="featured"
             limit={6}
-            heading="Uitgelichte producten"
+            heading={shell.railHeadings.featured}
             variant="carousel"
           />
 
@@ -130,7 +130,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
           <ProductOfMonth editorial={shell.productOfMonth} />
 
-          <SeoContent html={shell.seoHtml} />
+          <SeoContent html={shell.seoHtml} stats={shell.statCallouts} />
         </div>
       </main>
 

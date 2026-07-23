@@ -164,7 +164,9 @@ describe('Surface (shared bordered-shell primitive)', () => {
   });
 
   it('SeoContent composes the on-surface shell onto each stat item', () => {
-    const { container } = render(<SeoContent html="<p>x</p>" />);
+    const { container } = render(
+      <SeoContent html="<p>x</p>" stats={[{ value: '8.000+', label: 'x' }]} />,
+    );
     expect(container.querySelector('li')?.className).toContain(surfaceStyles.onSurface);
   });
 

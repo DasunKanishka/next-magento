@@ -63,14 +63,18 @@ async function RailItems({
 }
 
 /**
- * A titled band of merchandising products. The product content is a per-request
- * dynamic hole: it streams in behind a skeleton while the rest of the page (the
- * cached shell) renders immediately.
+ * A titled band of merchandising products. The heading is admin-authored (the
+ * slot's own curation-category native name — see `getHomeShellData`), so it
+ * is not guaranteed non-empty (e.g. an empty backend): render neither the
+ * `<h2>` nor an aria-label when unauthored, rather than a hardcoded fallback.
+ * The product content is a per-request dynamic hole: it streams in behind a
+ * skeleton while the rest of the page (the cached shell) renders immediately.
  */
 export function ProductRail({ slot, limit, heading, variant }: ProductRailProps) {
+  const hasHeading = heading.trim() !== '';
   return (
-    <section aria-label={heading}>
-      <h2 className={styles.heading}>{heading}</h2>
+    <section aria-label={hasHeading ? heading : undefined}>
+      {hasHeading ? <h2 className={styles.heading}>{heading}</h2> : null}
       <Suspense fallback={<RailSkeleton count={Math.min(limit, 4)} />}>
         <RailItems slot={slot} limit={limit} variant={variant} heading={heading} />
       </Suspense>
