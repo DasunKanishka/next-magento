@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# Rejects a commit whose message carries a Claude/Anthropic Co-authored-by
+# trailer, BEFORE the commit is written to history. This is the real-time
+# half of the AI-provenance guard — see scripts/check-no-ai-artifacts.sh for
+# the CI-side commit-range scan of already-made commits.
+#
+# Installed via `git config core.hooksPath .githooks` (see package.json's
+# `prepare` script, run automatically on `pnpm install`).
+set -euo pipefail
+
+MSG_FILE="$1"
+
+if grep -inE '^Co-authored-by:.*(claude|anthropic)' "$MSG_FILE" >/dev/null 2>&1; then
+  echo "✖ commit-msg: rejected — this commit message carries a Claude/" >&2
+  echo "  Anthropic Co-authored-by trailer. AI-tool provenance may never" >&2
+  echo "  enter this repo's history." >&2
+  echo "  Offending line(s):" >&2
+  grep -inE '^Co-authored-by:.*(claude|anthropic)' "$MSG_FILE" >&2 || true
+  exit 1
+fi
+
+exit 0

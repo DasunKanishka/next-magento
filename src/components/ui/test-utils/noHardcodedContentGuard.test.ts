@@ -181,3 +181,63 @@ describe('check-no-hardcoded-content guard', () => {
     expect(code, output).toBe(0);
   });
 });
+
+/**
+ * Pass 3 (the widened root-artifact scan) reads `git ls-files -- ':(top)*'`
+ * — it is a silent no-op in the plain non-git temp dirs used above (git has
+ * no repo to query), so it needs its own REAL git-repo fixture to exercise
+ * for real. Fresh throwaway repo per test, torn down after — mirrors the
+ * pattern in noAiArtifactsGuard.test.ts.
+ */
+describe('check-no-hardcoded-content guard — root-artifact brand-token scan (git ls-files pass)', () => {
+  let gitDir: string;
+
+  beforeEach(() => {
+    gitDir = mkdtempSync(join(tmpdir(), 'no-hardcoded-content-root-'));
+    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: gitDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: gitDir });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: gitDir });
+  });
+
+  afterEach(() => {
+    rmSync(gitDir, { recursive: true, force: true });
+  });
+
+  function runRootGuard(): { code: number; output: string } {
+    try {
+      const output = execFileSync('bash', [GUARD, gitDir], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      return { code: 0, output };
+    } catch (err) {
+      const e = err as { status?: number; stdout?: string; stderr?: string };
+      return { code: e.status ?? 1, output: `${e.stdout ?? ''}${e.stderr ?? ''}` };
+    }
+  }
+
+  it('FAILS when a TRACKED root file carries a brand token, outside every enumerated surface', () => {
+    writeFileSync(join(gitDir, 'leaked-brand-note.md'), 'Deploying TopDrinks config.\n');
+    execFileSync('git', ['add', '-A'], { cwd: gitDir });
+    const { code, output } = runRootGuard();
+    expect(code, output).toBe(1);
+    expect(output).toContain('leaked-brand-note.md');
+  });
+
+  it('PASSES on a clean tracked tree', () => {
+    writeFileSync(join(gitDir, 'README.md'), 'Nothing brand-related here.\n');
+    execFileSync('git', ['add', '-A'], { cwd: gitDir });
+    const { code, output } = runRootGuard();
+    expect(code, output).toBe(0);
+  });
+
+  it('does not false-positive on an UNTRACKED file carrying a brand token (git ls-files scope)', () => {
+    writeFileSync(
+      join(gitDir, 'scratch.md'),
+      'TopDrinks appears here but is never staged/tracked.\n',
+    );
+    // deliberately NOT `git add`ed
+    const { code, output } = runRootGuard();
+    expect(code, output).toBe(0);
+  });
+});

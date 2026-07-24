@@ -20,6 +20,10 @@
 #   2. The BRAND-TOKEN check greps the whole shipped frontend (src/**, docs/**,
 #      .env.example, README.md) for the 4 core brand identifiers, so a brand
 #      string can't leak in through an untracked surface either.
+#   3. The ROOT-ARTIFACT brand-token check (widened, constitution v1.4.0)
+#      greps EVERY tracked file in the repo (`git ls-files -- ':(top)*'`) for
+#      the same 4 identifiers, so a brand string can't leak in through any new
+#      root-level artifact either — a strictly wider superset of pass 2.
 # Arbitrary NEW prose reintroducing store content in different wording (e.g. a
 # rewritten tagline, a differently-worded delivery promise) is UNDETECTABLE by
 # this script — this is the documented complement to the Reviewer's concrete-
@@ -181,6 +185,36 @@ for f in "${BRAND_FILES[@]}"; do
     if [ -n "$hit" ]; then
       while IFS= read -r line; do
         violations+=("$f — brand token '$tok' shipped in frontend/docs: $line")
+      done <<<"$hit"
+    fi
+  done
+done
+
+# ---- 3. Root-artifact brand-token scan (widened, constitution v1.4.0) -----
+# The two scans above are path-enumerated (SURFACE_DIRS / src+docs+2 files).
+# This third pass scans EVERY tracked file in the repo (`git ls-files --
+# ':(top)*'` — the `:(top)` pathspec magic anchors matching to the repo root
+# regardless of the caller's cwd, so this stays correct however the script is
+# invoked) for the same BRAND_TOKENS, so a brand string can never smuggle in
+# through a new root-level artifact (a stray README variant, a committed
+# config file, a rogue script) that neither of the two scans above happens to
+# cover. Self-reference exception: this guard's own file and any *.test.*/
+# *.spec.* fixture (e.g. mappers.test.ts's legitimate sample data) are
+# excluded, same convention as the rest of this guard.
+mapfile -t ALL_TRACKED_FILES < <(
+  git -C "$BASE" ls-files -- ':(top)*' 2>/dev/null \
+    | grep -vE '^scripts/check-no-hardcoded-content\.sh$' \
+    | grep -vE '\.test\.|\.spec\.' \
+    | sort
+)
+for f in "${ALL_TRACKED_FILES[@]}"; do
+  path="$BASE/$f"
+  [ -f "$path" ] || continue
+  for tok in "${BRAND_TOKENS[@]}"; do
+    hit=$(grep -Fn -- "$tok" "$path" 2>/dev/null || true)
+    if [ -n "$hit" ]; then
+      while IFS= read -r line; do
+        violations+=("$f — brand token '$tok' shipped in a tracked repo file: $line")
       done <<<"$hit"
     fi
   done
