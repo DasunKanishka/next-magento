@@ -75,6 +75,11 @@ jobs:
       - name: No hardcoded content
         run: pnpm check:no-hardcoded-content
 
+      # Framework-currency gate: no deprecated framework file-convention may
+      # silently persist (Next 16 deprecated `middleware` in favor of `proxy`).
+      - name: Framework currency
+        run: pnpm check:framework-currency
+
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
       - name: Typecheck

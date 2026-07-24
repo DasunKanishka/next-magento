@@ -20,7 +20,8 @@
     "check:contract-neutral": "bash scripts/check-contract-neutral.sh",
     "check:no-internal-vocab": "bash scripts/check-no-internal-vocab.sh",
     "check:no-hardcoded-style-literals": "bash scripts/check-no-hardcoded-style-literals.sh",
-    "check:no-hardcoded-content": "bash scripts/check-no-hardcoded-content.sh"
+    "check:no-hardcoded-content": "bash scripts/check-no-hardcoded-content.sh",
+    "check:framework-currency": "bash scripts/check-framework-currency.sh"
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
