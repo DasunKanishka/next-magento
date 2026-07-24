@@ -111,6 +111,11 @@ export interface StoreIdentityDeliveryPromise {
  * value when unauthored. (The footer legal line is sourced from `copyright`,
  * the native store-config field, so a separate `legalEntity` value was
  * redundant and has been removed.)
+ *
+ * `alcoholLegalNotice` is the alcohol age-restriction disclosure rendered on
+ * BOTH the age-gate and the footer. It deliberately degrades to `''` rather
+ * than joining the fail-closed set above — see
+ * `src/config/store-identity-content.ts` for the reasoning.
  */
 export interface StoreIdentity {
   name: string;
@@ -121,6 +126,7 @@ export interface StoreIdentity {
   paymentMethods: string[];
   footerColumns: StoreIdentityFooterColumn[];
   deliveryPromise: StoreIdentityDeliveryPromise;
+  alcoholLegalNotice: string;
 }
 
 /**

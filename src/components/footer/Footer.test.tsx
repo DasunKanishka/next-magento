@@ -52,6 +52,8 @@ const TEST_IDENTITY: StoreIdentity = {
     },
   ],
   deliveryPromise: { copy: 'Voor 22:00 besteld, morgen in huis', cutoffHour: 22 },
+  alcoholLegalNotice:
+    '18+ Sale of alcohol only to persons 18 years and older · Enjoy, but drink responsibly.',
 };
 
 describe('Footer', () => {
@@ -79,14 +81,19 @@ describe('Footer', () => {
     expect(screen.getByRole('link', { name: 'Contact' })).toBeInTheDocument();
   });
 
-  it('renders the legal bottom bar with the copyright holder, registration number, and the age notice', () => {
+  it('renders the legal bottom bar with the copyright holder, registration number, and the backend-sourced alcohol notice', () => {
     render(<Footer identity={TEST_IDENTITY} />);
     expect(screen.getByText(new RegExp(TEST_IDENTITY.copyright))).toBeInTheDocument();
     expect(
       screen.getByText(new RegExp(TEST_IDENTITY.registrationNumber)),
     ).toBeInTheDocument();
-    expect(screen.getByText(/18 years and older/)).toBeInTheDocument();
-    expect(screen.getByText(/drink responsibly/)).toBeInTheDocument();
+    expect(screen.getByText(TEST_IDENTITY.alcoholLegalNotice)).toBeInTheDocument();
+  });
+
+  it('renders no alcohol-notice element when identity.alcoholLegalNotice is "" (graceful degrade, never a hardcoded fallback)', () => {
+    render(<Footer identity={{ ...TEST_IDENTITY, alcoholLegalNotice: '' }} />);
+    expect(screen.queryByText(/drink responsibly/i)).toBeNull();
+    expect(screen.queryByText(/18 years and older/i)).toBeNull();
   });
 
   it('includes the newsletter signup', () => {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { CmsBlock, StoreConfig } from '@/lib/data-source/types';
 import {
+  STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
   STORE_DELIVERY_PROMISE_BLOCK,
   STORE_FOOTER_COLUMNS_BLOCK,
   STORE_FOOTER_PAYMENT_METHODS_BLOCK,
@@ -348,6 +349,10 @@ describe('composeStoreIdentity', () => {
       '<p class="delivery-copy">Voor 22:00 besteld, morgen in huis</p>' +
         '<p class="delivery-cutoff-hour">22</p>',
     ),
+    block(
+      STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
+      '<p>Geen verkoop van alcohol aan personen onder de 18 jaar.</p>',
+    ),
   ];
 
   it('composes every field from mocked storeConfig + block data', () => {
@@ -377,6 +382,7 @@ describe('composeStoreIdentity', () => {
         { heading: 'Over ons', links: [{ label: 'Over ons', href: '/over-ons' }] },
       ],
       deliveryPromise: { copy: 'Voor 22:00 besteld, morgen in huis', cutoffHour: 22 },
+      alcoholLegalNotice: 'Geen verkoop van alcohol aan personen onder de 18 jaar.',
     });
   });
 
@@ -533,6 +539,27 @@ describe('composeStoreIdentity', () => {
       );
       const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
       expect(result.deliveryPromise).toStrictEqual({ copy: '', cutoffHour: 0 });
+    });
+
+    it('alcoholLegalNotice degrades to "" when unauthored (no throw) — render-empty, not fail-closed', () => {
+      const blocks = validBlocks.filter(
+        (b) => b.identifier !== STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.alcoholLegalNotice).toBe('');
+    });
+
+    it('alcoholLegalNotice is sanitized-then-stripped-to-plain-text, same as tagline', () => {
+      const blocks = validBlocks.map((b) =>
+        b.identifier === STORE_ALCOHOL_LEGAL_NOTICE_BLOCK
+          ? block(
+              STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
+              '<p>No sale <script>alert(1)</script>to minors.</p>',
+            )
+          : b,
+      );
+      const result = composeStoreIdentity({ storeConfig: validStoreConfig, blocks });
+      expect(result.alcoholLegalNotice).toBe('No sale to minors.');
     });
   });
 });

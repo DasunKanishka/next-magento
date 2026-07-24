@@ -1,9 +1,11 @@
 import 'server-only';
 
+import { ClientError } from 'graphql-request';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { resolveSlotCategoryId } from '@/config/merchandising-slots';
 import { STORE_IDENTITY_CONTENT_IDENTIFIERS } from '@/config/store-identity-content';
+import type { EditorialBlocksQuery } from '@/gql/graphql';
 import type {
   CmsBlock,
   DataSource,
@@ -44,6 +46,41 @@ import {
 
 function notNull<T>(value: T): value is NonNullable<T> {
   return value != null;
+}
+
+/**
+ * Fetch CMS blocks by identifier with partial-error recovery.
+ *
+ * Magento returns a per-identifier GraphQL error for any identifier with no
+ * matching CMS block — the EXPECTED shape for an optional/not-yet-authored
+ * identifier (e.g. a home zone a merchant hasn't set up yet, or the alcohol
+ * legal notice before it's authored; see `store-identity-content.ts` /
+ * `content-zones.ts` for which identifiers are optional vs required by their
+ * respective callers). `graphql-request` throws a `ClientError` on ANY
+ * top-level `errors` entry even though its `response.data` still carries
+ * every OTHER identifier that WAS found. Recovering that partial `data` here
+ * is what stops ONE missing identifier from taking down every OTHER
+ * identifier in the same batched request — shared by `loadStoreIdentity`
+ * (identity content) and `getEditorialContent` (home/header editorial
+ * zones), both of which batch multiple identifiers in one call. A genuine
+ * transport failure (the endpoint unreachable, no data at all, or any other
+ * non-`ClientError`) still degrades to `[]`, unchanged from before this
+ * function existed.
+ */
+async function fetchEditorialBlocksResilient(
+  client: ReturnType<typeof getMagentoClient>,
+  identifiers: string[],
+): Promise<CmsBlock[]> {
+  try {
+    const data = await client.request(EditorialBlocksDocument, { identifiers });
+    return mapCmsBlocks((data.cmsBlocks?.items ?? []).filter(notNull));
+  } catch (err) {
+    const partialItems =
+      err instanceof ClientError
+        ? (err.response.data as EditorialBlocksQuery | undefined)?.cmsBlocks?.items
+        : undefined;
+    return partialItems ? mapCmsBlocks(partialItems.filter(notNull)) : [];
+  }
 }
 
 /**
@@ -101,15 +138,16 @@ export async function loadStoreIdentity({
     storeConfig = mapStoreConfig({});
   }
 
-  let blocks: CmsBlock[];
-  try {
-    const data = await client.request(EditorialBlocksDocument, {
-      identifiers: STORE_IDENTITY_CONTENT_IDENTIFIERS,
-    });
-    blocks = mapCmsBlocks((data.cmsBlocks?.items ?? []).filter(notNull));
-  } catch {
-    blocks = [];
-  }
+  // Partial-error recovery (see `fetchEditorialBlocksResilient` above): one
+  // unauthored OPTIONAL identity field (e.g. the alcohol legal notice before
+  // it's set up) must never cascade into a fail-closed throw for an
+  // UNRELATED REQUIRED field (registrationNumber) that resolved just fine —
+  // treating a partial not-found the same as a total outage would be MORE
+  // fail-closed than the design calls for, not less.
+  const blocks = await fetchEditorialBlocksResilient(
+    client,
+    STORE_IDENTITY_CONTENT_IDENTIFIERS,
+  );
 
   return composeStoreIdentity({ storeConfig, blocks });
 }
@@ -151,9 +189,12 @@ export const magentoGraphQLAdapter: DataSource = {
 
   async getEditorialContent({ storeCode, identifiers }) {
     const client = getMagentoClient({ storeCode });
-    const data = await client.request(EditorialBlocksDocument, { identifiers });
-    const items = (data.cmsBlocks?.items ?? []).filter(notNull);
-    return mapCmsBlocks(items);
+    // Partial-error recovery (see `fetchEditorialBlocksResilient` above): a
+    // single unauthored/misconfigured identifier among several requested in
+    // one batch (e.g. a home zone, or the header mega-menu promo block) must
+    // not take down every OTHER identifier's content — that would turn one
+    // missing optional zone into a hard-failed home/header render.
+    return fetchEditorialBlocksResilient(client, identifiers);
   },
 
   async subscribeToNewsletter({ storeCode, currency, email }) {

@@ -84,19 +84,24 @@ test.describe('default (mobile, 390px) viewport', () => {
     }
   });
 
-  test('the footer renders its chrome (payment methods + 18+ notice) in English, not the pre-fix Dutch', async ({
+  test('the footer renders its chrome (payment methods) in English, not the pre-fix Dutch', async ({
     page,
   }) => {
     await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
+    // The alcohol legal notice is DELIBERATELY OUT OF SCOPE here: it moved
+    // from the chrome-copy locale catalog this file guards to
+    // merchant-owned, backend-sourced content (`identity.alcoholLegalNotice`)
+    // — its wording is no longer a locale-migration concern. See
+    // `admin-roundtrip.spec.ts`'s dedicated round-trip case (asserts the
+    // sourced text renders) and `home.spec.ts` (asserts, content-agnostic,
+    // that it renders at all).
     const footer = page.getByRole('contentinfo');
     await expect(footer.getByRole('list', { name: 'Payment methods' })).toBeVisible();
-    await expect(footer.getByText(/18 years and older/)).toBeVisible();
-    await expect(footer.getByText(/drink responsibly/)).toBeVisible();
 
     const footerHtml = await footer.innerHTML();
-    for (const banned of ['Betaalmethoden', '18 jaar en ouder', 'drink met mate']) {
+    for (const banned of ['Betaalmethoden']) {
       expect(
         footerHtml,
         `footer must not render the pre-fix Dutch literal "${banned}"`,
@@ -201,7 +206,7 @@ test.describe('desktop (1280px) viewport', () => {
 });
 
 test.describe('age/country compliance gate (no consent seeded)', () => {
-  test('the gate title, CTA, legal notice, and country tile names render in English, not the pre-fix Dutch', async ({
+  test('the gate title, CTA, and country tile names render in English, not the pre-fix Dutch', async ({
     page,
   }) => {
     // Deliberately NOT seeding consent — the gate is the render this test
@@ -213,11 +218,11 @@ test.describe('age/country compliance gate (no consent seeded)', () => {
       page.getByRole('heading', { name: 'Where can we deliver to?' }),
     ).toBeVisible();
     await expect(page.getByRole('button', { name: /Enter the store/ })).toBeVisible();
-    // Legal/compliance-sensitive fine print — translated from the Dutch
-    // original; flagged `needs-confirm` for legal review in this change's
-    // handoff, not asserted here as a claim of legal accuracy, only that it
-    // renders in English and not the untranslated Dutch original.
-    await expect(page.getByText(/No sale of alcohol to persons under 18/)).toBeVisible();
+    // The legal-compliance fine print is DELIBERATELY OUT OF SCOPE here: it
+    // moved from the chrome-copy locale catalog this file guards to
+    // merchant-owned, backend-sourced content (`identity.alcoholLegalNotice`)
+    // — see `admin-roundtrip.spec.ts`'s dedicated round-trip case and
+    // `age-gate.spec.ts`'s content-agnostic testid assertion instead.
 
     // Country tile names — resolved via Intl.DisplayNames in the active
     // (English) locale, never a hardcoded table (src/i18n/display-names.ts).
@@ -238,7 +243,6 @@ test.describe('age/country compliance gate (no consent seeded)', () => {
       'Waar mogen we naartoe bezorgen?',
       'Kies je bezorgland',
       'De winkel betreden',
-      'Geen verkoop van alcohol onder de 18 jaar',
       '>Nederland<',
       'Duitsland',
       'Denemarken',

@@ -7,6 +7,7 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { AgeGate } from '@/components/ui/gate/AgeGate';
 import { recordConsent } from '@/lib/age-gate/actions';
 import { hasConsented } from '@/lib/age-gate/server';
+import { getDataSource } from '@/lib/data-source';
 import { resolveStoreContext } from '@/lib/data-source/store-context';
 import { resolveActiveLocale } from '@/i18n/resolve-locale';
 import { routing } from '@/i18n/routing';
@@ -75,7 +76,7 @@ export default async function LocaleLayout({
   // `src/i18n/locales.ts`). With exactly one store view today the two always
   // agree; this is the seam that keeps resolving correctly if a second store
   // view (with a different locale) is ever added.
-  const { storeConfig } = await resolveStoreContext();
+  const { storeCode, storeConfig } = await resolveStoreContext();
   const locale = resolveActiveLocale(storeConfig.locale);
 
   // Provides the locale to next-intl's server components. Note the storefront is
@@ -91,6 +92,29 @@ export default async function LocaleLayout({
   // with client JS disabled because the page simply does not exist in the
   // response until consent is recorded.
   const consented = await hasConsented();
+
+  // The gate's alcohol legal-compliance notice, backend-sourced via
+  // `getStoreIdentity()` (`identity.alcoholLegalNotice` — see
+  // `src/config/store-identity-content.ts`). Only fetched when the gate is
+  // actually about to render (`!consented`) — the consented path never pays
+  // for it here (the home page fetches its own `identity` for the footer via
+  // the same cached `'use cache'` read). Wrapped in its own try/catch,
+  // DELIBERATELY separate from the fail-closed identity fields (name /
+  // copyright / registrationNumber): a completely unrelated fail-closed
+  // throw from `getStoreIdentity()` must never also take down the gate's
+  // own rendering — the notice degrades to `''` (rendered as nothing) on ANY
+  // failure to resolve it, while the gate's actual compliance mechanism
+  // (the country + 18+ form, validated server-side by `recordConsent`)
+  // remains completely unaffected either way.
+  let legalNotice = '';
+  if (!consented) {
+    try {
+      const identity = await getDataSource().getStoreIdentity({ storeCode });
+      legalNotice = identity.alcoholLegalNotice;
+    } catch {
+      legalNotice = '';
+    }
+  }
 
   // Server-side, at render time: resolve the deployment's active brand and its
   // full token sheet, then inject the resolved CSS custom-property block so
@@ -109,7 +133,11 @@ export default async function LocaleLayout({
           {consented ? (
             children
           ) : (
-            <AgeGate locale={locale} recordConsentAction={recordConsent} />
+            <AgeGate
+              locale={locale}
+              recordConsentAction={recordConsent}
+              legalNotice={legalNotice}
+            />
           )}
         </NextIntlClientProvider>
       </body>
