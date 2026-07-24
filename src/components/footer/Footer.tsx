@@ -70,12 +70,20 @@ export function Footer({ identity, locale = defaultLocale }: FooterProps) {
             © {year} {identity.copyright} · {identity.registrationNumber}
           </span>
           {/*
-            Legal/compliance-sensitive fine print (alcohol age-restriction
-            notice) — same caveat as AgeGate's: translated from the Dutch
-            original in `src/i18n/chrome-copy.ts` (`footerAlcoholNotice`),
-            flagged `needs-confirm` in this change's handoff for legal review.
+            Alcohol legal-compliance notice — backend-sourced via
+            `getStoreIdentity()` (`identity.alcoholLegalNotice`, a native CMS
+            block the merchant/legal team owns, see
+            `src/config/store-identity-content.ts`). Renders gracefully empty
+            (never a hardcoded fallback) when unauthored — see that module's
+            doc comment for why this field degrades rather than fail-closes.
+            `data-testid` (content-agnostic — the wording is merchant-owned
+            and intentionally NOT asserted by any E2E spec outside the
+            dedicated round-trip test) lets E2E assert the notice RENDERS
+            without coupling to its current wording.
           */}
-          <span>{copy.footerAlcoholNotice}</span>
+          {identity.alcoholLegalNotice !== '' && (
+            <span data-testid="alcohol-legal-notice">{identity.alcoholLegalNotice}</span>
+          )}
         </div>
       </div>
     </footer>

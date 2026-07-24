@@ -17,6 +17,17 @@ export interface AgeGateProps {
    * the gate `<form>` so submission works even with client JS disabled.
    */
   recordConsentAction: (formData: FormData) => void | Promise<void>;
+  /**
+   * The alcohol legal-compliance disclosure notice, resolved server-side by
+   * the layout via `getStoreIdentity()` (`identity.alcoholLegalNotice` — a
+   * native, merchant/legal-authored CMS block, see
+   * `src/config/store-identity-content.ts`). `''` when unauthored OR when the
+   * layout's identity fetch failed for any reason — renders nothing rather
+   * than a hardcoded fallback. The GATE ITSELF (country + 18+ confirmation,
+   * validated server-side in `recordConsent`) is entirely independent of this
+   * string and blocks access regardless of whether it is set.
+   */
+  legalNotice: string;
 }
 
 /**
@@ -253,7 +264,7 @@ function GateMark() {
  * confirmed. Before hydration (and therefore with JS disabled) the CTA is
  * enabled so a no-JS visitor can submit and be validated on the server.
  */
-export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
+export function AgeGate({ locale, recordConsentAction, legalNotice }: AgeGateProps) {
   const router = useRouter();
   const pathname = usePathname();
   const copy = getChromeCopy(locale);
@@ -351,14 +362,18 @@ export function AgeGate({ locale, recordConsentAction }: AgeGateProps) {
         </Button>
 
         {/*
-          Legal/compliance-sensitive fine print (alcohol age-restriction
-          notice). Translated from the Dutch original in
-          `src/i18n/chrome-copy.ts` (`ageGateLegalNotice`) as part of the
-          store-locale migration — flagged `needs-confirm` in this change's
-          handoff for a legal-accuracy review before this ships; do not alter
-          the wording again without the same review.
+          Alcohol legal-compliance notice — backend-sourced (see the
+          `legalNotice` prop doc). Renders gracefully empty (never a
+          hardcoded fallback) when unauthored; the gate above still blocks
+          access regardless. `data-testid` (content-agnostic, see Footer's
+          matching notice span) lets E2E assert the notice RENDERS without
+          coupling to its current, merchant-owned wording.
         */}
-        <p className="agegate__legal">{copy.ageGateLegalNotice}</p>
+        {legalNotice !== '' && (
+          <p className="agegate__legal" data-testid="alcohol-legal-notice">
+            {legalNotice}
+          </p>
+        )}
       </form>
     </div>
   );

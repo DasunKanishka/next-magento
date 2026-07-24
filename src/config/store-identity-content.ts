@@ -25,6 +25,18 @@
  *   | paymentMethods       | `STORE_FOOTER_PAYMENT_METHODS_BLOCK` (`<li>` list)| `[]`                        |
  *   | footerColumns        | `STORE_FOOTER_COLUMNS_BLOCK` (repeated `.footer-column`) | `[]`                 |
  *   | deliveryPromise      | `STORE_DELIVERY_PROMISE_BLOCK` (`.delivery-copy` + `.delivery-cutoff-hour`) | `{ copy: '', cutoffHour: 0 }`, atomic — see note below |
+ *   | alcoholLegalNotice   | `STORE_ALCOHOL_LEGAL_NOTICE_BLOCK` (whole-block text) | `''` — deliberately RENDER-EMPTY, not fail-closed (see below) |
+ *
+ * `alcoholLegalNotice` degrades to `''` rather than throwing, unlike the three
+ * `THROWS` legal fields above. The age/country compliance GATE (server-side
+ * consent check + the country/18+ form validation in `recordConsent`) is a
+ * structural mechanism entirely independent of this string — it blocks access
+ * whether or not this notice is authored. Making a missing DISCLOSURE STRING
+ * take down the whole storefront (as the three `THROWS` fields do) would not
+ * make the gate any more compliant, only less available; render-empty is the
+ * correct choice here. This block is fetched via the same batched
+ * `getEditorialContent` call and rendered on BOTH the age-gate and the
+ * footer.
  *
  * `registrationNumber` lives in `STORE_IDENTITY_LEGAL_BLOCK`. The footer's
  * legal/copyright line is sourced from the native `storeConfig.copyright`
@@ -49,6 +61,13 @@ export const STORE_FOOTER_PAYMENT_METHODS_BLOCK = 'store_footer_payment_methods'
 export const STORE_FOOTER_COLUMNS_BLOCK = 'store_footer_columns';
 /** `.delivery-copy` + `.delivery-cutoff-hour` — the delivery-promise pair. */
 export const STORE_DELIVERY_PROMISE_BLOCK = 'store_delivery_promise';
+/**
+ * Free-form plain-text alcohol legal-compliance notice (whole block content
+ * is the notice), rendered on BOTH the age-gate and the footer. Merchant/
+ * legal-authored, store-scoped — see the field → source table above for the
+ * render-empty (not fail-closed) decision.
+ */
+export const STORE_ALCOHOL_LEGAL_NOTICE_BLOCK = 'store_alcohol_legal_notice';
 
 /** Wrapper-class shape contract for `STORE_IDENTITY_LEGAL_BLOCK`. */
 export const STORE_IDENTITY_REGISTRATION_NUMBER_CLASS = 'registration-number';
@@ -69,4 +88,5 @@ export const STORE_IDENTITY_CONTENT_IDENTIFIERS: string[] = [
   STORE_FOOTER_PAYMENT_METHODS_BLOCK,
   STORE_FOOTER_COLUMNS_BLOCK,
   STORE_DELIVERY_PROMISE_BLOCK,
+  STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
 ];

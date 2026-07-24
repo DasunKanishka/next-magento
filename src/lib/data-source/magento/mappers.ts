@@ -7,6 +7,7 @@ import type {
 } from '@/lib/data-source/types';
 import { sanitizeCmsHtml } from '@/lib/sanitize/cms-html';
 import {
+  STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
   STORE_DELIVERY_COPY_CLASS,
   STORE_DELIVERY_CUTOFF_HOUR_CLASS,
   STORE_DELIVERY_PROMISE_BLOCK,
@@ -338,6 +339,17 @@ function parseTagline(raw: string): string {
   return toText(sanitizeCmsHtml(raw));
 }
 
+/**
+ * The alcohol legal-notice block's whole sanitized text content. `''` when
+ * unauthored — deliberately render-empty, not fail-closed (see
+ * `src/config/store-identity-content.ts` for the reasoning). Same
+ * sanitize-then-strip-to-text shape as `parseTagline`: the notice always
+ * renders as an auto-escaped text node, never `dangerouslySetInnerHTML`.
+ */
+function parseAlcoholLegalNotice(raw: string): string {
+  return toText(sanitizeCmsHtml(raw));
+}
+
 /** Every `<li>` text in the payment-methods block, in order. `[]` when unauthored. */
 function parsePaymentMethods(raw: string): string[] {
   const clean = sanitizeCmsHtml(raw);
@@ -430,6 +442,9 @@ export function composeStoreIdentity(args: {
     ),
     deliveryPromise: parseDeliveryPromise(
       findBlockContent(blocks, STORE_DELIVERY_PROMISE_BLOCK),
+    ),
+    alcoholLegalNotice: parseAlcoholLegalNotice(
+      findBlockContent(blocks, STORE_ALCOHOL_LEGAL_NOTICE_BLOCK),
     ),
   };
 }
