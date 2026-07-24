@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import type { StoreIdentityLogo } from '@/lib/data-source';
 import styles from './Logo.module.css';
 
@@ -28,13 +30,13 @@ export interface LogoProps {
  * consumers rendered before this component existed. The accessible name of
  * the home link is `logo.alt` on the image path and the wordmark text on the
  * fallback path; either way the link itself carries the
- * `"{name} — naar de homepagina"` aria-label.
+ * `"{name} — go to homepage"` aria-label, resolved to the store locale.
  */
 export function Logo({ logo, className }: LogoProps) {
   return (
     <Link
       href="/"
-      aria-label={`${logo.fallbackText} — naar de homepagina`}
+      aria-label={getChromeCopy(defaultLocale).homeLinkLabel(logo.fallbackText)}
       className={className}
     >
       {logo.src ? (

@@ -17,7 +17,7 @@ describe('DeliveryCountdown', () => {
     render(
       <DeliveryCountdown copy="Voor 22:00 besteld, morgen in huis" cutoffHour={22} />,
     );
-    const region = screen.getByText(/morgen/);
+    const region = screen.getByText(/tomorrow/);
     expect(region).toHaveAttribute('aria-live', 'polite');
   });
 

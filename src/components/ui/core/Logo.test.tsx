@@ -66,13 +66,13 @@ describe('Logo', () => {
   it('carries the home-link aria-label built from fallbackText on both the image and text paths', () => {
     const { unmount } = render(<Logo logo={TEXT_LOGO} className="consumer-class" />);
     expect(
-      screen.getByRole('link', { name: 'Test Store — naar de homepagina' }),
+      screen.getByRole('link', { name: 'Test Store — go to homepage' }),
     ).toBeInTheDocument();
     unmount();
 
     render(<Logo logo={IMAGE_LOGO} className="consumer-class" />);
     expect(
-      screen.getByRole('link', { name: 'Test Store — naar de homepagina' }),
+      screen.getByRole('link', { name: 'Test Store — go to homepage' }),
     ).toBeInTheDocument();
   });
 

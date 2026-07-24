@@ -52,6 +52,12 @@ export interface ProductOfMonthEditorial {
   paragraphs: string[];
 }
 
+/** A single headline proof-point figure (e.g. assortment size, rating). */
+export interface StatCallout {
+  value: string;
+  label: string;
+}
+
 const NAMED_ENTITIES: Record<string, string> = {
   '&amp;': '&',
   '&lt;': '<',
@@ -190,4 +196,24 @@ export function parseProductOfMonthEditorial(
   const clean = sanitizeCmsHtml(raw);
   const block = itemBlocks(clean, 'product-of-month-editorial')[0] ?? clean;
   return { paragraphs: paragraphs(block).map((p) => p.text) };
+}
+
+/**
+ * Parse the headline proof-point figures, capped to `max`. Each authored item
+ * is a `.stat-callout` wrapper carrying a `<strong>` figure and a `<p>` label;
+ * an item without a figure drops. Empty/unauthored input returns `[]` — there
+ * is no fallback figure set, so an empty backend renders none.
+ */
+export function parseStatCallouts(
+  raw: string | null | undefined,
+  max: number,
+): StatCallout[] {
+  const clean = sanitizeCmsHtml(raw);
+  return itemBlocks(clean, 'stat-callout')
+    .map((block) => ({
+      value: firstStrong(block),
+      label: paragraphs(block)[0]?.text ?? '',
+    }))
+    .filter((stat) => stat.value !== '')
+    .slice(0, max);
 }

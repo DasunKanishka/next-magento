@@ -86,14 +86,14 @@ describe('ProductCard', () => {
 
   it('renders the wishlist heart as a real, accessible button meeting the 44×44px minimum touch target', () => {
     render(<ProductCard name="Tanqueray No. TEN 1L" price={34.95} />);
-    const heart = screen.getByRole('button', { name: 'Voeg toe aan verlanglijst' });
+    const heart = screen.getByRole('button', { name: 'Add to wishlist' });
     expect(heart.style.getPropertyValue('--local-size')).toBe('var(--tap-target-min)');
   });
 
   it('omits the wishlist heart when wishlist=false', () => {
     render(<ProductCard name="Tanqueray No. TEN 1L" price={34.95} wishlist={false} />);
     expect(
-      screen.queryByRole('button', { name: 'Voeg toe aan verlanglijst' }),
+      screen.queryByRole('button', { name: 'Add to wishlist' }),
     ).not.toBeInTheDocument();
   });
 
@@ -108,7 +108,7 @@ describe('ProductCard', () => {
         }}
       />,
     );
-    const addButton = screen.getByRole('button', { name: 'Toevoegen aan winkelmandje' });
+    const addButton = screen.getByRole('button', { name: 'Add to cart' });
     expect(addButton.style.getPropertyValue('--local-size')).toBe(
       'var(--tap-target-min)',
     );
@@ -127,7 +127,7 @@ describe('ProductCard', () => {
     const base = renderWithBrandTokens(
       <ProductCard name="Tanqueray No. TEN 1L" price={34.95} />,
     );
-    const baseBtn = base.getByRole('button', { name: 'Toevoegen aan winkelmandje' });
+    const baseBtn = base.getByRole('button', { name: 'Add to cart' });
     expect(resolvedToken(baseBtn, '--color-cta')).toBe(defaultTokens['--color-cta']);
     expect(baseBtn.style.getPropertyValue('--local-bg')).toBe('var(--color-cta)');
     base.unmount();
@@ -137,7 +137,7 @@ describe('ProductCard', () => {
       <ProductCard name="Tanqueray No. TEN 1L" price={34.95} />,
       { '--color-cta': overrideColor },
     );
-    const overBtn = over.getByRole('button', { name: 'Toevoegen aan winkelmandje' });
+    const overBtn = over.getByRole('button', { name: 'Add to cart' });
     // The token resolved on the exact element carrying the --local-bg binding
     // (not merely an ancestor) now reflects the override…
     expect(resolvedToken(overBtn, '--color-cta')).toBe(overrideColor);

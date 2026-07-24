@@ -32,17 +32,17 @@ describe('timeUntilCutoff', () => {
 });
 
 describe('deliveryCountdownLabel', () => {
-  it('formats a live countdown before the cut-off', () => {
+  it('formats a live countdown before the cut-off, in the store locale', () => {
     const now = new Date(2026, 6, 10, 16, 18, 0);
     expect(deliveryCountdownLabel(now, TEST_CUTOFF_HOUR)).toBe(
-      'Vandaag nog 5u 42m voor levering morgen',
+      'Today, 5h 42m left for delivery tomorrow',
     );
   });
 
-  it('falls back to the plain promise after the cut-off', () => {
+  it('falls back to the plain promise after the cut-off, in the store locale', () => {
     const now = new Date(2026, 6, 10, 23, 0, 0);
     expect(deliveryCountdownLabel(now, TEST_CUTOFF_HOUR)).toBe(
-      'Bestel voor 22:00 voor levering morgen',
+      'Order before 22:00 for delivery tomorrow',
     );
   });
 });

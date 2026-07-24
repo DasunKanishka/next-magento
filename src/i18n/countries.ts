@@ -8,9 +8,8 @@ import type { SupportedLocale } from './locales';
 export type CountryCode = 'NL' | 'DE' | 'DK' | 'AT' | 'BE' | 'FR' | 'ES';
 
 export interface Country {
+  /** ISO 3166-1 alpha-2 code — also the key `countryDisplayName` (`./display-names.ts`) resolves a locale-correct display name from. No separate display-name field: a hardcoded name here would be exactly the frontend-owned locale artifact this project forbids. */
   code: CountryCode;
-  /** Display name, authored in the storefront's primary content language (nl). */
-  name: string;
   /** The UI locale most natural for this country — used to pair a country pick with a sensible default language. */
   defaultLocale: SupportedLocale;
   /** Inline flag as an SVG data-URI (no external asset request). */
@@ -45,17 +44,23 @@ const ES_FLAG = flag(
 );
 
 /**
- * The 7 seeded delivery countries. All are selectable from day one; only `nl` resolves to
- * distinct real content in V0.1.0 (the rest fall back — see `./locale-resolver`).
+ * The 7 seeded delivery countries — a real, orthogonal business dimension
+ * (see the module doc comment above), independent of the UI locale. All
+ * remain selectable: delivery country and UI language are not coupled to the
+ * same backend concept, so de-speculating the locale model (see
+ * `./languages.ts`) does not remove any of them. Every country's
+ * `defaultLocale` now points at the single real store view (`en`); previously
+ * each pointed at a distinct phantom locale with no corresponding store view.
+ * Display names are NOT data here — see `Country.code`'s own comment.
  */
 export const countries: readonly Country[] = [
-  { code: 'NL', name: 'Nederland', defaultLocale: 'nl', flag: NL_FLAG },
-  { code: 'DE', name: 'Duitsland', defaultLocale: 'de', flag: DE_FLAG },
-  { code: 'DK', name: 'Denemarken', defaultLocale: 'da', flag: DK_FLAG },
-  { code: 'AT', name: 'Oostenrijk', defaultLocale: 'de', flag: AT_FLAG },
-  { code: 'BE', name: 'België', defaultLocale: 'nl', flag: BE_FLAG },
-  { code: 'FR', name: 'Frankrijk', defaultLocale: 'fr', flag: FR_FLAG },
-  { code: 'ES', name: 'Spanje', defaultLocale: 'es', flag: ES_FLAG },
+  { code: 'NL', defaultLocale: 'en', flag: NL_FLAG },
+  { code: 'DE', defaultLocale: 'en', flag: DE_FLAG },
+  { code: 'DK', defaultLocale: 'en', flag: DK_FLAG },
+  { code: 'AT', defaultLocale: 'en', flag: AT_FLAG },
+  { code: 'BE', defaultLocale: 'en', flag: BE_FLAG },
+  { code: 'FR', defaultLocale: 'en', flag: FR_FLAG },
+  { code: 'ES', defaultLocale: 'en', flag: ES_FLAG },
 ];
 
 /** The default delivery country when none has been chosen yet. */

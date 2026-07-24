@@ -12,7 +12,7 @@ const MODULE_CSS_PATH = join(process.cwd(), 'src/components/header/CartPill.modu
 describe('CartPill', () => {
   it('shows the running total and describes count + total in its label', () => {
     render(<CartPill count={0} total={0} />);
-    const button = screen.getByRole('button', { name: /Winkelmandje: 0 artikelen/ });
+    const button = screen.getByRole('button', { name: /Cart: 0 items/ });
     expect(button).toHaveTextContent('€0,00');
   });
 
@@ -20,7 +20,7 @@ describe('CartPill', () => {
     const { rerender } = render(<CartPill count={0} total={0} />);
     expect(screen.getByRole('button')).not.toHaveTextContent('3');
     rerender(<CartPill count={3} total={49.9} />);
-    expect(screen.getByRole('button', { name: /3 artikelen/ })).toHaveTextContent('3');
+    expect(screen.getByRole('button', { name: /3 items/ })).toHaveTextContent('3');
   });
 
   it('forwards clicks', () => {

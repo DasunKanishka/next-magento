@@ -2,12 +2,101 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import i18next from 'eslint-plugin-i18next';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   // Disable ESLint rules that conflict with Prettier formatting.
   eslintConfigPrettier,
+  // No-hardcoded-UI-literal gate (constitution P5/P6, v1.4.0 — V0.1.4 issue
+  // 002). Scoped to the two component/page surfaces, excluding test files (a
+  // test fixture legitimately exercises a component with literal sample
+  // text — mirrors `check-no-hardcoded-content.sh`'s own test-file
+  // exclusion).
+  //
+  // `eslint-plugin-i18next`'s `no-literal-string` (not `react/jsx-no-literals`
+  // — tried first, rejected: with `noAttributeStrings` it flags EVERY literal
+  // JSX attribute value indiscriminately, `type="button"`/`variant="primary"`
+  // included, which is unusable noise) is semantically scoped: `mode:
+  // 'jsx-only'` checks JSX text children AND attribute values; for a NATIVE
+  // DOM element only the human-facing attributes (`placeholder`, `alt`,
+  // `aria-label`, `value`, `title`) are checked, every other DOM attribute
+  // (`type`, `role`, `aria-hidden`, …) is skipped automatically — exactly the
+  // H1 defect's shape (hardcoded Dutch aria-labels/placeholders). `words.exclude`
+  // (rule default) already ignores punctuation-only/all-caps/emoji literals,
+  // so decorative glyphs (✓, ★, →, 👤, code chips) need no per-line handling.
+  //
+  // `jsx-attributes.exclude` below extends the rule's own default exclusion
+  // list with this codebase's UI-kit's non-linguistic prop names (variant/
+  // size/tone tokens, not language) — a short, maintained list of PROP NAMES,
+  // not an ever-growing list of literal STRING VALUES. Every remaining
+  // reported literal is either fixed (resolved via a store-locale catalog) or
+  // suppressed with an inline `eslint-disable-next-line i18next/no-literal-string`
+  // comment carrying a short reason, at the exact offending line — remove a
+  // disable comment the moment its literal is migrated; never widen this
+  // rule's scope or exclusion list to compensate for an unmigrated component.
+  {
+    files: ['src/components/**/*.{ts,tsx}', 'src/app/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    plugins: { i18next },
+    rules: {
+      'i18next/no-literal-string': [
+        'error',
+        {
+          mode: 'jsx-only',
+          words: {
+            exclude: [
+              // Rule defaults (replaced, not merged, by this override — see
+              // the plugin's `lib/options/defaults.js` — so they are
+              // repeated here rather than silently dropped). Broadened from
+              // the default's ASCII-only punctuation class to full Unicode
+              // punctuation/symbol categories, so decorative glyphs used
+              // throughout this UI kit (✓ ★ → ‹ › ▾ ♡ – …) are recognized as
+              // a CLASS (not language) without enumerating each one.
+              /^[\p{P}\p{S}\s0-9]+$/u,
+              '[A-Z_-]+',
+              /^\p{Emoji}+$/u,
+              // This codebase's `--local-*`/design-token CSS custom-property
+              // bridge idiom (`style={{ '--local-x': cond ? 'var(--a)' :
+              // 'var(--b)' : 'transparent' }}`) — structural token/CSS-keyword
+              // references, not language.
+              /^var\(--[\w-]+\)$/,
+              'transparent',
+            ],
+          },
+          'jsx-attributes': {
+            exclude: [
+              'className',
+              'styleName',
+              'style',
+              'type',
+              'key',
+              'id',
+              'width',
+              'height',
+              // This UI kit's own enum/token-style props — identifiers, not
+              // language. Extend when a new one is introduced.
+              'variant',
+              'size',
+              'tone',
+              'slot',
+              'color',
+              'align',
+              'name',
+              'role',
+              'href',
+              'testId',
+              'data-testid',
+              'as',
+              // PagerButton's prev/next enum, not language.
+              'direction',
+            ],
+          },
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

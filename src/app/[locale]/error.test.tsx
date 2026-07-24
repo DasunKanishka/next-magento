@@ -18,11 +18,11 @@ describe('LocaleError', () => {
     render(<LocaleError error={error} reset={() => {}} />);
 
     expect(
-      screen.getByText('De pagina kan op dit moment niet worden weergegeven.', {
+      screen.getByText('The page cannot be displayed right now.', {
         exact: false,
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Opnieuw proberen' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
   });
 
   it('logs the thrown error for observability without rendering its detail', () => {
@@ -47,7 +47,7 @@ describe('LocaleError', () => {
     );
     render(<LocaleError error={error} reset={reset} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Opnieuw proberen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(reset).toHaveBeenCalledTimes(1);
   });
 });

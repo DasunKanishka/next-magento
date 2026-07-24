@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { languages } from '@/i18n/languages';
+import { languageDisplayName } from '@/i18n/display-names';
 import { expectModuleCssReferencesRealTokens } from '../test-utils/tokenAssertions';
 import { LanguageSelector } from './LanguageSelector';
 import styles from './selectorShared.module.css';
@@ -16,32 +17,34 @@ const MODULE_CSS_PATH = join(
 
 describe('LanguageSelector', () => {
   it('renders the full trigger with a label + active language name', () => {
-    render(<LanguageSelector value="nl" />);
-    const trigger = screen.getByRole('button', { name: /Taal: Nederlands/ });
-    expect(within(trigger).getByText('Taal')).toBeInTheDocument();
-    expect(within(trigger).getByText('Nederlands')).toBeInTheDocument();
+    render(<LanguageSelector value="en" />);
+    const trigger = screen.getByRole('button', { name: /Language: English/ });
+    expect(within(trigger).getByText('Language')).toBeInTheDocument();
+    expect(within(trigger).getByText('English')).toBeInTheDocument();
   });
 
   it('compact mode omits the descriptive label', () => {
-    render(<LanguageSelector value="nl" compact />);
-    // The word "Taal" label copy is not rendered in compact mode.
-    expect(screen.queryByText('Taal')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Taal: Nederlands/ })).toBeInTheDocument();
+    render(<LanguageSelector value="en" compact />);
+    // The word "Language" label copy is not rendered in compact mode.
+    expect(screen.queryByText('Language')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Language: English/ })).toBeInTheDocument();
   });
 
-  it('opens a single-column list of all 6 languages', () => {
-    render(<LanguageSelector value="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
-    const menu = screen.getByRole('menu', { name: 'Taal' });
+  it('opens a single-column list of every supported language (currently one — the store view the backend defines)', () => {
+    render(<LanguageSelector value="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
+    const menu = screen.getByRole('menu', { name: 'Language' });
     for (const l of languages) {
-      expect(within(menu).getByText(l.name)).toBeInTheDocument();
+      expect(
+        within(menu).getByText(languageDisplayName('en', l.locale)),
+      ).toBeInTheDocument();
     }
   });
 
   it('marks the active language as checked', () => {
-    render(<LanguageSelector value="de" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
-    expect(screen.getByRole('menuitemradio', { name: /Duits/ })).toHaveAttribute(
+    render(<LanguageSelector value="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
+    expect(screen.getByRole('menuitemradio', { name: /English/ })).toHaveAttribute(
       'aria-checked',
       'true',
     );
@@ -49,16 +52,16 @@ describe('LanguageSelector', () => {
 
   it('closes on selection and reports the chosen locale', () => {
     const onLanguageChange = vi.fn();
-    render(<LanguageSelector value="nl" onLanguageChange={onLanguageChange} />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
-    fireEvent.click(screen.getByRole('menuitemradio', { name: /Frans/ }));
-    expect(onLanguageChange).toHaveBeenCalledWith('fr');
+    render(<LanguageSelector value="en" onLanguageChange={onLanguageChange} />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /English/ }));
+    expect(onLanguageChange).toHaveBeenCalledWith('en');
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
   it('closes on Escape', () => {
-    render(<LanguageSelector value="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
+    render(<LanguageSelector value="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
     expect(screen.getByRole('menu')).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
@@ -67,23 +70,23 @@ describe('LanguageSelector', () => {
   it('closes on an outside click', () => {
     render(
       <div>
-        <button type="button">buiten</button>
-        <LanguageSelector value="nl" />
+        <button type="button">outside</button>
+        <LanguageSelector value="en" />
       </div>,
     );
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
     expect(screen.getByRole('menu')).toBeInTheDocument();
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'buiten' }));
+    fireEvent.mouseDown(screen.getByRole('button', { name: 'outside' }));
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
   it('trigger carries the shared module class in both modes, meeting the tap target via the module', () => {
-    const { rerender } = render(<LanguageSelector value="nl" />);
-    expect(screen.getByRole('button', { name: /Taal:/ }).className).toContain(
+    const { rerender } = render(<LanguageSelector value="en" />);
+    expect(screen.getByRole('button', { name: /Language:/ }).className).toContain(
       styles.trigger,
     );
-    rerender(<LanguageSelector value="nl" compact />);
-    expect(screen.getByRole('button', { name: /Taal:/ }).className).toContain(
+    rerender(<LanguageSelector value="en" compact />);
+    expect(screen.getByRole('button', { name: /Language:/ }).className).toContain(
       styles.trigger,
     );
     const css = readFileSync(MODULE_CSS_PATH, 'utf8');
@@ -92,29 +95,27 @@ describe('LanguageSelector', () => {
   });
 
   it('wraps the option list in a labeled group', () => {
-    render(<LanguageSelector value="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
-    expect(screen.getByRole('group', { name: 'Taal' })).toBeInTheDocument();
+    render(<LanguageSelector value="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
+    expect(screen.getByRole('group', { name: 'Language' })).toBeInTheDocument();
   });
 
-  it('roves focus across options with ArrowDown/ArrowUp and wraps around', () => {
-    render(<LanguageSelector value="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Taal:/ }));
+  it('roving focus starts on the (sole) first option and Escape still closes the panel', () => {
+    // Only one language is supported today (the frontend tracks the backend's
+    // store views, currently one), so ArrowDown/ArrowUp
+    // wrap-around across >1 option is exercised by CountrySelector's combined
+    // country+language menu instead (see CountrySelector.test.tsx and the
+    // selector-keyboard E2E) — this test only confirms the single option is
+    // focusable and the panel still closes correctly around it.
+    render(<LanguageSelector value="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Language:/ }));
     const menu = screen.getByRole('menu');
     const options = screen.getAllByRole('menuitemradio');
-
-    options[0].focus();
-    fireEvent.keyDown(menu, { key: 'ArrowDown' });
-    expect(options[1]).toHaveFocus();
-
-    fireEvent.keyDown(menu, { key: 'ArrowUp' });
+    expect(options).toHaveLength(1);
     expect(options[0]).toHaveFocus();
 
-    fireEvent.keyDown(menu, { key: 'ArrowUp' });
-    expect(options[options.length - 1]).toHaveFocus();
-
-    fireEvent.keyDown(menu, { key: 'End' });
-    expect(options[options.length - 1]).toHaveFocus();
+    fireEvent.keyDown(menu, { key: 'Escape' });
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
   it('the shared selector stylesheet references only real tokens', () => {

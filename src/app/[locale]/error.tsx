@@ -3,6 +3,8 @@
 import React from 'react';
 
 import { Alert, Button } from '@/components/ui';
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './error.module.css';
 
 export interface LocaleErrorProps {
@@ -25,14 +27,22 @@ export default function LocaleError({ error, reset }: LocaleErrorProps) {
     console.error(error);
   }, [error]);
 
+  // Next.js's segment error-boundary file convention fixes this component's
+  // props to exactly `{ error, reset }` — it cannot receive a `locale` prop
+  // from its parent layout/page. `defaultLocale` is store-scope-resolved
+  // (see `src/i18n/locales.ts`), so this reads the same resolved locale every
+  // other server boundary does; it is not an independent hardcoded-language
+  // decision.
+  const copy = getChromeCopy(defaultLocale);
+
   return (
     <div className={styles.wrap}>
-      <Alert tone="error" title="Er is iets misgegaan">
-        De pagina kan op dit moment niet worden weergegeven. Probeer het later opnieuw.
+      <Alert tone="error" title={copy.errorTitle}>
+        {copy.errorBody}
       </Alert>
       <div className={styles.actions}>
         <Button variant="primary" onClick={reset}>
-          Opnieuw proberen
+          {copy.errorRetry}
         </Button>
       </div>
     </div>

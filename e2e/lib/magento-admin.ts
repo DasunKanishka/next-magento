@@ -200,6 +200,96 @@ export async function setCmsBlockContent(id: number, content: string): Promise<v
   }
 }
 
+/**
+ * Creates a NEW CMS block via the admin REST API (used for the one home zone —
+ * `home_stat_callouts` — that did not already exist on the dev store before
+ * the stat-callouts figures were moved out of the frontend). Idempotent in
+ * effect: if the identifier already exists, use `setCmsBlockContent` instead.
+ */
+export async function createCmsBlock(args: {
+  identifier: string;
+  title: string;
+  content: string;
+}): Promise<CmsBlockRecord> {
+  const ctx = await adminApiContext();
+  const token = await getAdminToken();
+  const resp = await ctx.post(`${MAGENTO_ADMIN_BASE_URL}/rest/V1/cmsBlock`, {
+    data: {
+      block: {
+        identifier: args.identifier,
+        title: args.title,
+        content: args.content,
+        active: true,
+      },
+    },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!resp.ok()) {
+    throw new Error(
+      `cmsBlock create failed for "${args.identifier}": ${resp.status()} ${await resp.text()}`,
+    );
+  }
+  const body = (await resp.json()) as { id: number; identifier: string; content: string };
+  return { id: body.id, identifier: body.identifier, content: body.content };
+}
+
+/**
+ * Reads a CMS block by identifier, creating it (with `defaultContent`) if it
+ * does not exist yet. Used by the home-editorial round-trip suite for
+ * `home_stat_callouts` — a newly introduced zone, so an environment that has
+ * not been set up yet (a fresh backend, a CI restore from an older snapshot)
+ * can still run the round-trip case instead of failing on a missing fixture.
+ */
+export async function ensureCmsBlock(args: {
+  identifier: string;
+  title: string;
+  defaultContent: string;
+}): Promise<CmsBlockRecord> {
+  try {
+    return await getCmsBlockByIdentifier(args.identifier);
+  } catch {
+    return createCmsBlock({
+      identifier: args.identifier,
+      title: args.title,
+      content: args.defaultContent,
+    });
+  }
+}
+
+/**
+ * Reads a category's native `name` by id (the "slot config" source for a home
+ * merchandising rail heading — see `getHomeShellData`'s `railHeadings`).
+ */
+export async function getCategoryName(id: string): Promise<string> {
+  const ctx = await adminApiContext();
+  const token = await getAdminToken();
+  const resp = await ctx.get(`${MAGENTO_ADMIN_BASE_URL}/rest/V1/categories/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!resp.ok()) {
+    throw new Error(
+      `category read failed for id ${id}: ${resp.status()} ${await resp.text()}`,
+    );
+  }
+  const body = (await resp.json()) as { name: string };
+  return body.name;
+}
+
+/** Overwrites a category's native `name` by id. Reflects on the storefront GraphQL immediately (confirmed live) — no cache:flush needed. */
+export async function setCategoryName(id: string, name: string): Promise<void> {
+  const ctx = await adminApiContext();
+  const token = await getAdminToken();
+  const resp = await ctx.put(`${MAGENTO_ADMIN_BASE_URL}/rest/V1/categories/${id}`, {
+    data: { category: { id: Number(id), name } },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!resp.ok()) {
+    throw new Error(
+      `category update failed for id ${id}: ${resp.status()} ${await resp.text()}`,
+    );
+  }
+}
+
 // ── Direct GraphQL reads (black-box verification, independent of app internals) ──
 
 export async function queryGraphQL<T>(query: string): Promise<T> {

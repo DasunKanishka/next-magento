@@ -98,7 +98,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('heading', { level: 1 }).first()).toContainText(
           newName,
         );
@@ -120,7 +120,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newCopyright)).toBeVisible();
       } finally {
         magentoConfigSet('design/footer/copyright', original);
@@ -140,7 +140,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newTagline)).toBeVisible();
       } finally {
         await setCmsBlockContent(block.id, original);
@@ -168,7 +168,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(
           page.getByRole('contentinfo').getByText(newRegistrationNumber),
         ).toBeVisible();
@@ -190,7 +190,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(
           page.getByRole('contentinfo').getByRole('listitem', { name: newMethod }),
         ).toBeVisible();
@@ -214,7 +214,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         const nav = page.getByRole('navigation', { name: newHeading });
         await expect(nav).toBeVisible();
         await expect(nav.getByRole('link', { name: newLinkLabel })).toBeVisible();
@@ -237,7 +237,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(
           page.getByText(newCopy).filter({ visible: true }).first(),
         ).toBeVisible();
@@ -271,9 +271,9 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        await page.goto('/nl');
+        await page.goto('/en');
         const homeLink = page
-          .getByRole('link', { name: /naar de homepagina/ })
+          .getByRole('link', { name: /go to homepage/ })
           .filter({ visible: true })
           .first();
         const img = homeLink.locator('img');
@@ -287,9 +287,9 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
       }
 
       // Unset path, now restored to the dev store's baseline: text wordmark.
-      await page.goto('/nl');
+      await page.goto('/en');
       const homeLinkAfter = page
-        .getByRole('link', { name: /naar de homepagina/ })
+        .getByRole('link', { name: /go to homepage/ })
         .filter({ visible: true })
         .first();
       await expect(homeLinkAfter.locator('img')).toHaveCount(0);
@@ -312,10 +312,10 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        const resp = await page.goto('/nl');
+        const resp = await page.goto('/en');
         expect(resp?.status(), 'fail-closed render must be non-200').toBe(500);
         await expect(
-          page.getByRole('status').getByText('Er is iets misgegaan'),
+          page.getByRole('status').getByText('Something went wrong'),
         ).toBeVisible();
         expect(
           await waitForFailClosedMarker(offset, 'name'),
@@ -339,10 +339,10 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        const resp = await page.goto('/nl');
+        const resp = await page.goto('/en');
         expect(resp?.status(), 'fail-closed render must be non-200').toBe(500);
         await expect(
-          page.getByRole('status').getByText('Er is iets misgegaan'),
+          page.getByRole('status').getByText('Something went wrong'),
         ).toBeVisible();
         expect(
           await waitForFailClosedMarker(offset, 'copyright'),
@@ -374,10 +374,10 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await revalidateAuthed(request);
 
         await seedConsent(page.context());
-        const resp = await page.goto('/nl');
+        const resp = await page.goto('/en');
         expect(resp?.status(), 'fail-closed render must be non-200').toBe(500);
         await expect(
-          page.getByRole('status').getByText('Er is iets misgegaan'),
+          page.getByRole('status').getByText('Something went wrong'),
         ).toBeVisible();
         expect(
           await waitForFailClosedMarker(offset, 'registrationNumber'),
@@ -404,7 +404,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         // PRIME the cache with the pre-edit value FIRST. Entering this test the
         // `store-identity` tag is expired — every prior round-trip test ends
         // its finally with an authed revalidate — so without an explicit
-        // priming render the very first `/nl` hit after the edit would be a
+        // priming render the very first `/en` hit after the edit would be a
         // cache MISS that fetches the already-edited value, making the
         // "cache persists" assertion impossible to satisfy for reasons that
         // have nothing to do with the safety window. Expire, then render once,
@@ -413,7 +413,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         // definitely seated before we mutate the backend.
         await seedConsent(page.context());
         await revalidateAuthed(request);
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newTagline)).toHaveCount(0);
 
         // Edit the backend with NO trigger. The storefront must keep serving
@@ -423,13 +423,13 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         // without waiting the full 1h in CI; see the companion static-source
         // assertion below for the exact window length.
         await setCmsBlockContent(block.id, `<p>${newTagline}</p>`);
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newTagline)).toHaveCount(0);
 
         // Unauthenticated revalidate: rejected, storefront still unchanged.
         const unauthedResp = await request.post('/api/revalidate', { data: {} });
         expect(unauthedResp.status()).toBe(401);
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newTagline)).toHaveCount(0);
 
         // Authed revalidate: on-demand precedence — visible on the very next request.
@@ -437,7 +437,7 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
           headers: { 'x-revalidate-secret': REVALIDATE_SECRET },
         });
         expect(authedResp.status()).toBe(200);
-        await page.goto('/nl');
+        await page.goto('/en');
         await expect(page.getByRole('contentinfo').getByText(newTagline)).toBeVisible();
       } finally {
         await setCmsBlockContent(block.id, original);

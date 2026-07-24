@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './DeliveryNote.module.css';
 
 export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -10,18 +12,23 @@ export interface DeliveryNoteProps extends React.HTMLAttributes<HTMLDivElement> 
    * one.
    */
   title: string;
-  /** Countdown to the same-day order deadline, e.g. "5u 42m". Omit/null to hide. */
+  /** Countdown to the same-day order deadline, e.g. "5h 42m". Omit/null to hide. */
   countdown?: string | null;
-  /** Free-shipping threshold line. */
+  /** Free-shipping threshold line. An illustrative example default, not real store content. */
   threshold?: string;
+  /** "Order within {countdown} <suffix>" copy, resolved to the store locale. */
+  orderPrefix?: string;
+  orderSuffix?: string;
   style?: React.CSSProperties;
 }
 
 /** Blue delivery-reassurance block for the buy box (deadline + countdown). */
 export function DeliveryNote({
   title,
-  countdown = '5u 42m',
-  threshold = 'Gratis vanaf €150',
+  countdown = '5h 42m',
+  threshold = 'Free from €150',
+  orderPrefix = getChromeCopy(defaultLocale).deliveryNoteOrderPrefix,
+  orderSuffix = getChromeCopy(defaultLocale).deliveryNoteOrderSuffix,
   style = {},
   ...rest
 }: DeliveryNoteProps) {
@@ -45,7 +52,7 @@ export function DeliveryNote({
         <div className={styles.body}>
           {countdown ? (
             <>
-              Nog <strong>{countdown}</strong> om vandaag te bestellen ·{' '}
+              {orderPrefix} <strong>{countdown}</strong> {orderSuffix}{' '}
             </>
           ) : null}
           {threshold}

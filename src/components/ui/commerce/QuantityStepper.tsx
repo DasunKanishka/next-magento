@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './QuantityStepper.module.css';
 
 export type QuantityStepperSize = 'md' | 'lg';
@@ -14,6 +16,9 @@ export interface QuantityStepperProps extends Omit<
   onChange?: (next: number) => void;
   /** md (46px, sticky bars) or lg (56px, main buy box). */
   size?: QuantityStepperSize;
+  /** Decrease/increase control aria-labels, resolved to the store locale. */
+  decreaseLabel?: string;
+  increaseLabel?: string;
   style?: React.CSSProperties;
 }
 
@@ -65,6 +70,8 @@ export function QuantityStepper({
   max = 99,
   onChange,
   size = 'md',
+  decreaseLabel = getChromeCopy(defaultLocale).quantityDecreaseLabel,
+  increaseLabel = getChromeCopy(defaultLocale).quantityIncreaseLabel,
   style = {},
   ...rest
 }: QuantityStepperProps) {
@@ -83,7 +90,7 @@ export function QuantityStepper({
     <div className={styles.wrap} style={{ ...bridge, ...style }} {...rest}>
       <button
         type="button"
-        aria-label="Aantal verlagen"
+        aria-label={decreaseLabel}
         onClick={() => set(value - 1)}
         className={styles.button}
       >
@@ -92,7 +99,7 @@ export function QuantityStepper({
       <div className={styles.num}>{value}</div>
       <button
         type="button"
-        aria-label="Aantal verhogen"
+        aria-label={increaseLabel}
         onClick={() => set(value + 1)}
         className={styles.button}
       >

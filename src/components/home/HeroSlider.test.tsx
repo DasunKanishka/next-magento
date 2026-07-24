@@ -48,25 +48,25 @@ describe('HeroSlider', () => {
     const user = userEvent.setup();
     render(<HeroSlider slides={slides} />);
     const tablist = screen.getByRole('tablist');
-    await user.click(within(tablist).getByRole('tab', { name: 'Campagne 2' }));
+    await user.click(within(tablist).getByRole('tab', { name: 'Slide 2' }));
     expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
   });
 
   it('advances/retreats via the PagerButton prev/next arrows, wrapping at the ends', async () => {
     const user = userEvent.setup();
     render(<HeroSlider slides={slides} />);
-    await user.click(screen.getByRole('button', { name: 'Volgende campagne' }));
+    await user.click(screen.getByRole('button', { name: 'Next campaign' }));
     expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Volgende campagne' }));
+    await user.click(screen.getByRole('button', { name: 'Next campaign' }));
     expect(screen.getByRole('heading', { name: 'Eerste campagne' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Vorige campagne' }));
+    await user.click(screen.getByRole('button', { name: 'Previous campaign' }));
     expect(screen.getByRole('heading', { name: 'Tweede campagne' })).toBeInTheDocument();
   });
 
   it('paging controls are the on-brand PagerButton variant', () => {
     render(<HeroSlider slides={slides} />);
-    const prev = screen.getByRole('button', { name: 'Vorige campagne' });
-    const next = screen.getByRole('button', { name: 'Volgende campagne' });
+    const prev = screen.getByRole('button', { name: 'Previous campaign' });
+    const next = screen.getByRole('button', { name: 'Next campaign' });
     expect(prev.className).toContain(pagerButtonStyles.onBrand);
     expect(prev.className).toContain(pagerButtonStyles.prev);
     expect(next.className).toContain(pagerButtonStyles.onBrand);

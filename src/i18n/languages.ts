@@ -1,33 +1,34 @@
 import type { SupportedLocale } from './locales';
 
 /** 2-letter display code shown in the selector's language code-chip. */
-export type LanguageCode = 'EN' | 'NL' | 'FR' | 'DE' | 'DA' | 'ES';
+export type LanguageCode = 'EN';
 
 export interface Language {
   /** Uppercase 2-letter chip code shown in the selector. */
   code: LanguageCode;
-  /** The routing/message locale this language maps to. */
+  /**
+   * The BCP-47 subtag this language maps to — also the key
+   * `languageDisplayName` (`./display-names.ts`) resolves a locale-correct
+   * display name from. No separate display-name field: a hardcoded name here
+   * would be exactly the frontend-owned locale artifact this project forbids.
+   */
   locale: SupportedLocale;
-  /** Display name, authored in the storefront's primary content language (nl). */
-  name: string;
 }
 
 /**
- * The 6 seeded UI languages shown in the LanguageSelector. Every language is a real,
- * selectable option; the store-view/currency each resolves to is governed by
- * `./locale-resolver.ts` (only `nl` has distinct real content in V0.1.0).
+ * The UI languages shown in the LanguageSelector.
+ *
+ * The UI language tracks the backend's store views, not a frontend-owned
+ * wishlist — this list has exactly as many entries as `SupportedLocale`
+ * (`./locales.ts`), which today is the single `249.magento.default` store
+ * view (English). Adding a language is a table entry made alongside a new
+ * `SupportedLocale` value, once the backend defines the store view for it.
+ * Display names are NOT data here — see `Language.locale`'s own comment.
  */
-export const languages: readonly Language[] = [
-  { code: 'EN', locale: 'en', name: 'Engels' },
-  { code: 'NL', locale: 'nl', name: 'Nederlands' },
-  { code: 'FR', locale: 'fr', name: 'Frans' },
-  { code: 'DE', locale: 'de', name: 'Duits' },
-  { code: 'DA', locale: 'da', name: 'Deens' },
-  { code: 'ES', locale: 'es', name: 'Spaans' },
-];
+export const languages: readonly Language[] = [{ code: 'EN', locale: 'en' }];
 
-/** The default active language (Nederlands), matching the default locale. */
-export const defaultLanguageCode: LanguageCode = 'NL';
+/** The default active language, matching the default locale. */
+export const defaultLanguageCode: LanguageCode = 'EN';
 
 export function findLanguageByLocale(locale: SupportedLocale): Language | undefined {
   return languages.find((l) => l.locale === locale);

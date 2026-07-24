@@ -37,38 +37,38 @@ const categories: NavCategory[] = [
 ];
 
 function open() {
-  fireEvent.click(screen.getByRole('button', { name: 'Menu openen' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
 }
 
 describe('MobileMenu', () => {
   it('toggles the drawer from the hamburger trigger', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
+    render(<MobileMenu categories={categories} locale="en" />);
     expect(
-      screen.queryByRole('navigation', { name: 'Hoofdmenu' }),
+      screen.queryByRole('navigation', { name: 'Main menu' }),
     ).not.toBeInTheDocument();
     open();
-    expect(screen.getByRole('navigation', { name: 'Hoofdmenu' })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Main menu' })).toBeInTheDocument();
   });
 
   it('leads with the accent Deals entry and lists categories + languages', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
+    render(<MobileMenu categories={categories} locale="en" />);
     open();
-    const drawer = screen.getByRole('navigation', { name: 'Hoofdmenu' });
+    const drawer = screen.getByRole('navigation', { name: 'Main menu' });
     expect(within(drawer).getByRole('link', { name: /Deals/ })).toBeInTheDocument();
     expect(within(drawer).getByRole('link', { name: 'Vrouwen' })).toBeInTheDocument();
-    const langMenu = within(drawer).getByRole('menu', { name: 'Taal' });
+    const langMenu = within(drawer).getByRole('menu', { name: 'Language' });
     expect(
-      within(langMenu).getByRole('menuitemradio', { name: /Nederlands/ }),
+      within(langMenu).getByRole('menuitemradio', { name: /English/ }),
     ).toBeChecked();
   });
 
   it('drills into a category with subtypes and returns via the back control', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
+    render(<MobileMenu categories={categories} locale="en" />);
     open();
-    fireEvent.click(screen.getByRole('button', { name: /Mannen — submenu openen/ }));
-    expect(screen.getByRole('link', { name: 'Alles in Mannen' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Mannen — open submenu/ }));
+    expect(screen.getByRole('link', { name: 'All in Mannen' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Shirts' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /terug/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Back/ }));
     expect(screen.getByRole('link', { name: 'Vrouwen' })).toBeInTheDocument();
   });
 
@@ -77,29 +77,29 @@ describe('MobileMenu', () => {
     render(
       <MobileMenu
         categories={categories}
-        locale="nl"
+        locale="en"
         onLanguageChange={onLanguageChange}
       />,
     );
     open();
-    fireEvent.click(screen.getByRole('menuitemradio', { name: /Frans/ }));
-    expect(onLanguageChange).toHaveBeenCalledWith('fr');
+    fireEvent.click(screen.getByRole('menuitemradio', { name: /English/ }));
+    expect(onLanguageChange).toHaveBeenCalledWith('en');
     expect(
-      screen.queryByRole('navigation', { name: 'Hoofdmenu' }),
+      screen.queryByRole('navigation', { name: 'Main menu' }),
     ).not.toBeInTheDocument();
   });
 
   it('closes on Escape and on a backdrop click', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
+    render(<MobileMenu categories={categories} locale="en" />);
     open();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(
-      screen.queryByRole('navigation', { name: 'Hoofdmenu' }),
+      screen.queryByRole('navigation', { name: 'Main menu' }),
     ).not.toBeInTheDocument();
     open();
     fireEvent.click(screen.getByTestId('mobile-menu-backdrop'));
     expect(
-      screen.queryByRole('navigation', { name: 'Hoofdmenu' }),
+      screen.queryByRole('navigation', { name: 'Main menu' }),
     ).not.toBeInTheDocument();
   });
 

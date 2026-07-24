@@ -3,11 +3,16 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './SearchBar.module.css';
 
 export interface SearchBarProps {
   placeholder?: string;
   buttonLabel?: string;
+  /** Accessible label for the search input + the empty-query validation message. Both resolved to the store locale by default. */
+  searchLabel?: string;
+  emptyQueryMessage?: string;
   /**
    * Compact header row (shorter). Defaults to the taller standalone row. Both
    * heights keep the stretched controls at the minimum tap target.
@@ -17,8 +22,6 @@ export interface SearchBarProps {
   onSearch?: (value: string) => void;
   style?: React.CSSProperties;
 }
-
-const EMPTY_QUERY_MESSAGE = 'Vul een zoekterm in om te zoeken.';
 
 /**
  * Primary site search — `--color-brand`-framed input with a `--color-cta`
@@ -32,8 +35,10 @@ const EMPTY_QUERY_MESSAGE = 'Vul een zoekterm in om te zoeken.';
  * so this component sets no `--local-*` bridge property.
  */
 export function SearchBar({
-  placeholder = 'Zoek 8.000+ producten — merk, soort of cadeau…',
-  buttonLabel = '⌕ Zoeken',
+  placeholder = getChromeCopy(defaultLocale).searchPlaceholder,
+  buttonLabel = `⌕ ${getChromeCopy(defaultLocale).searchLabel}`,
+  searchLabel = getChromeCopy(defaultLocale).searchLabel,
+  emptyQueryMessage = getChromeCopy(defaultLocale).searchEmptyQueryMessage,
   compact = false,
   onSearch,
   style = {},
@@ -70,7 +75,7 @@ export function SearchBar({
         data-invalid={invalid}
       >
         <label htmlFor={inputId} className={styles.srOnly}>
-          Zoeken
+          {searchLabel}
         </label>
         <input
           id={inputId}
@@ -91,7 +96,7 @@ export function SearchBar({
       </form>
       {invalid ? (
         <p id={errorId} role="alert" className={styles.error}>
-          {EMPTY_QUERY_MESSAGE}
+          {emptyQueryMessage}
         </p>
       ) : null}
     </div>

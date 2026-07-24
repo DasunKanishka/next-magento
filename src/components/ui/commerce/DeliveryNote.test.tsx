@@ -26,15 +26,15 @@ describe('DeliveryNote', () => {
 
   it('renders the countdown and threshold by default', () => {
     render(<DeliveryNote title={TEST_TITLE} />);
-    expect(screen.getByText('5u 42m')).toBeInTheDocument();
-    expect(screen.getByText(/Gratis vanaf €150/)).toBeInTheDocument();
+    expect(screen.getByText('5h 42m')).toBeInTheDocument();
+    expect(screen.getByText(/Free from €150/)).toBeInTheDocument();
   });
 
   it('omits the countdown clause entirely when countdown is null', () => {
     render(
       <DeliveryNote title={TEST_TITLE} countdown={null} threshold="Gratis vanaf €150" />,
     );
-    expect(screen.queryByText(/om vandaag te bestellen/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Order within/)).not.toBeInTheDocument();
     expect(screen.getByText('Gratis vanaf €150')).toBeInTheDocument();
   });
 

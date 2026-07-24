@@ -21,6 +21,11 @@ pnpm codegen                 # generate typed GraphQL documents into src/gql/
 pnpm dev                     # http://localhost:3000
 ```
 
+`pnpm install` also runs the `prepare` script, which points git at this repo's
+committed hooks (`git config core.hooksPath .githooks`) — see
+[Git Hooks](#git-hooks) below. This takes effect starting with the _next_ git
+operation after `pnpm install` completes.
+
 ## Environment
 
 Server-only configuration (never `NEXT_PUBLIC_` — the connector is `server-only`,
@@ -49,17 +54,18 @@ shared cache (cache-key correctness).
 
 ## Scripts
 
-| Script                         | What it does                                              |
-| ------------------------------ | --------------------------------------------------------- |
-| `pnpm dev` / `build` / `start` | Next.js dev server / production build / serve             |
-| `pnpm lint`                    | ESLint (Next core-web-vitals + TS, Prettier-compatible)   |
-| `pnpm format` / `format:check` | Prettier write / check                                    |
-| `pnpm test`                    | Vitest unit tests (jsdom)                                 |
-| `pnpm test:e2e`                | Playwright E2E (390px mobile viewport)                    |
-| `pnpm schema:pull`             | Introspect the dev endpoint → `schema.graphql` (dev only) |
-| `pnpm codegen`                 | Generate typed documents from the committed snapshot      |
-| `pnpm codegen:check`           | Git-free drift check (regenerate to temp + diff)          |
-| `pnpm check:imports`           | Enforce the DataSource adapter-import boundary            |
+| Script                         | What it does                                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev` / `build` / `start` | Next.js dev server / production build / serve                                                                   |
+| `pnpm lint`                    | ESLint (Next core-web-vitals + TS, Prettier-compatible)                                                         |
+| `pnpm format` / `format:check` | Prettier write / check                                                                                          |
+| `pnpm test`                    | Vitest unit tests (jsdom)                                                                                       |
+| `pnpm test:e2e`                | Playwright E2E (390px mobile viewport)                                                                          |
+| `pnpm schema:pull`             | Introspect the dev endpoint → `schema.graphql` (dev only)                                                       |
+| `pnpm codegen`                 | Generate typed documents from the committed snapshot                                                            |
+| `pnpm codegen:check`           | Git-free drift check (regenerate to temp + diff)                                                                |
+| `pnpm check:imports`           | Enforce the DataSource adapter-import boundary                                                                  |
+| `pnpm check:no-ai-artifacts`   | No tracked CLAUDE.md/AGENTS.md/.cursor\*/.aider\*/copilot artifact; no AI co-author trailer in the commit range |
 
 ## Architecture — DataSource connector
 
@@ -105,3 +111,23 @@ checkout builds without network access; CI proves they stay in sync.
 Branching model: **`main` ← `develop` ← `feature/*`**. Feature branches open
 PRs into `develop`; after a PR merges, `main` is fast-forwarded to `develop` so
 the two stay in sync (`main == develop`). Never commit directly to `main`.
+
+## Git Hooks
+
+This repo ships committed hooks in [`.githooks/`](.githooks/) (no external
+hook-manager dependency) and installs them by pointing git at that directory:
+`git config core.hooksPath .githooks`. That command runs automatically as
+this package's `prepare` script on every `pnpm install` — nothing to run by
+hand on a fresh clone, beyond the `pnpm install` you'd already run. It takes
+effect on the _next_ git command after `pnpm install` finishes (the config
+write itself doesn't retroactively apply to an install already in flight).
+
+| Hook         | What it enforces                                                                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commit-msg` | Rejects a commit message carrying a `Co-authored-by:` trailer matching `claude`\|`anthropic` (case-insensitive) — no AI-tool provenance may enter history. |
+| `pre-commit` | Runs `pnpm check:no-ai-artifacts` — rejects a commit that stages a `CLAUDE.md`/`AGENTS.md`/`.cursor*`/`.aider*`/copilot config artifact.                   |
+
+Both hooks mirror `check:no-ai-artifacts`, the same guard CI runs (see the
+Scripts table above and `.github/workflows/ci.yml`) — the hooks catch a
+violation locally, before it's pushed; CI is the backstop for anyone who
+bypasses or predates the local hook install.

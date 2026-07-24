@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { buildBrandStyleBlock } from '@/theme/css';
 import { defaultTokens } from '@/theme/brands/default';
 import { countries } from '@/i18n/countries';
+import { countryDisplayName } from '@/i18n/display-names';
 import {
   expectAllVarTokensAreContractKeys,
   expectModuleCssReferencesRealTokens,
@@ -19,7 +20,7 @@ vi.mock('@/i18n/navigation', () => ({
 }));
 
 function renderGate() {
-  return render(<AgeGate locale="nl" recordConsentAction={vi.fn()} />);
+  return render(<AgeGate locale="en" recordConsentAction={vi.fn()} />);
 }
 
 describe('AgeGate', () => {
@@ -28,7 +29,7 @@ describe('AgeGate', () => {
     const radios = screen.getAllByRole('radio');
     expect(radios).toHaveLength(countries.length);
     for (const c of countries) {
-      expect(screen.getByText(c.name)).toBeInTheDocument();
+      expect(screen.getByText(countryDisplayName('en', c.code))).toBeInTheDocument();
     }
   });
 
@@ -42,7 +43,7 @@ describe('AgeGate', () => {
   it('the 18+ checkbox is a real, non-pre-checked checkbox', () => {
     renderGate();
     const checkbox = screen.getByRole('checkbox', {
-      name: /18 jaar of ouder/i,
+      name: /18 years or older/i,
     });
     expect(checkbox).not.toBeChecked();
   });
@@ -55,7 +56,7 @@ describe('AgeGate', () => {
     expect(form!.querySelector('input[name="country"]')).not.toBeNull();
     expect(form!.querySelector('input[name="ageConfirmed"]')).not.toBeNull();
     expect(form!.querySelector('input[name="locale"]')).not.toBeNull();
-    expect(screen.getByRole('button', { name: /De winkel betreden/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /Enter the store/ })).toHaveAttribute(
       'type',
       'submit',
     );
@@ -63,14 +64,14 @@ describe('AgeGate', () => {
 
   it('CTA is disabled until a country is selected AND 18+ is confirmed, then enables', () => {
     renderGate();
-    const cta = screen.getByRole('button', { name: /De winkel betreden/ });
+    const cta = screen.getByRole('button', { name: /Enter the store/ });
     // After hydration (effects flushed by RTL) the CTA gates on validity.
     expect(cta).toBeDisabled();
 
     fireEvent.click(screen.getAllByRole('radio')[0]);
     expect(cta).toBeDisabled(); // country only — still not enough
 
-    fireEvent.click(screen.getByRole('checkbox', { name: /18 jaar of ouder/i }));
+    fireEvent.click(screen.getByRole('checkbox', { name: /18 years or older/i }));
     expect(cta).toBeEnabled();
   });
 
@@ -78,14 +79,14 @@ describe('AgeGate', () => {
     renderGate();
     expect(
       screen.getByText(
-        'Geen verkoop van alcohol onder de 18 jaar · Geniet, maar drink met mate',
+        'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly',
       ),
     ).toBeInTheDocument();
   });
 
   it('embeds the compact LanguageSelector', () => {
     renderGate();
-    expect(screen.getByRole('button', { name: /Taal:/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Language:/ })).toBeInTheDocument();
   });
 
   it('every var(--*) the gate emits is a real contract token', () => {
@@ -102,7 +103,7 @@ describe('AgeGate', () => {
     const { container } = render(
       <div data-brand="default">
         <style dangerouslySetInnerHTML={{ __html: styleBlock }} />
-        <AgeGate locale="nl" recordConsentAction={vi.fn()} />
+        <AgeGate locale="en" recordConsentAction={vi.fn()} />
       </div>,
     );
 

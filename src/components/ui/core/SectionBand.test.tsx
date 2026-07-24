@@ -152,7 +152,7 @@ describe('SectionBand (shared tinted section shape)', () => {
   });
 
   it('SeoContent composes the insetA variant onto its section', () => {
-    const { container } = render(<SeoContent html="<p>x</p>" />);
+    const { container } = render(<SeoContent html="<p>x</p>" stats={[]} />);
     const section = container.querySelector('section');
     expect(section?.className).toContain(sectionBandStyles.insetA);
   });
