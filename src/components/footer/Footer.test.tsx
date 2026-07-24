@@ -59,10 +59,10 @@ describe('Footer', () => {
     render(<Footer identity={TEST_IDENTITY} />);
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(
-      screen.getAllByRole('link', { name: /naar de homepagina/ }).length,
+      screen.getAllByRole('link', { name: /go to homepage/ }).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText(TEST_IDENTITY.tagline)).toBeInTheDocument();
-    const payments = screen.getByRole('list', { name: 'Betaalmethoden' });
+    const payments = screen.getByRole('list', { name: 'Payment methods' });
     for (const method of TEST_IDENTITY.paymentMethods) {
       expect(within(payments).getByText(method)).toBeInTheDocument();
     }
@@ -85,13 +85,13 @@ describe('Footer', () => {
     expect(
       screen.getByText(new RegExp(TEST_IDENTITY.registrationNumber)),
     ).toBeInTheDocument();
-    expect(screen.getByText(/18 jaar en ouder/)).toBeInTheDocument();
-    expect(screen.getByText(/drink met mate/)).toBeInTheDocument();
+    expect(screen.getByText(/18 years and older/)).toBeInTheDocument();
+    expect(screen.getByText(/drink responsibly/)).toBeInTheDocument();
   });
 
   it('includes the newsletter signup', () => {
     render(<Footer identity={TEST_IDENTITY} />);
-    expect(screen.getByRole('button', { name: 'Inschrijven' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
   });
 
@@ -112,7 +112,7 @@ describe('Footer', () => {
   it('falls back to the text wordmark carrying the .wordmark class when logo.src is null', () => {
     render(<Footer identity={TEST_IDENTITY} />);
     const link = screen.getByRole('link', {
-      name: `${TEST_IDENTITY.name} — naar de homepagina`,
+      name: `${TEST_IDENTITY.name} — go to homepage`,
     });
     expect(link).toHaveTextContent(TEST_IDENTITY.name);
     expect(link.className).toContain(styles.wordmark);
@@ -130,7 +130,7 @@ describe('Footer', () => {
     };
     render(<Footer identity={identityWithImage} />);
     const link = screen.getByRole('link', {
-      name: `${TEST_IDENTITY.name} — naar de homepagina`,
+      name: `${TEST_IDENTITY.name} — go to homepage`,
     });
     expect(link.className).toContain(styles.wordmark);
     const img = link.querySelector('img');

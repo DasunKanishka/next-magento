@@ -23,8 +23,8 @@ describe('QuantityStepper', () => {
   it('renders the current value between − and + controls, wiring the module classes', () => {
     const { container } = render(<QuantityStepper value={3} onChange={() => {}} />);
     expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Aantal verlagen' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Aantal verhogen' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Decrease quantity' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Increase quantity' })).toBeInTheDocument();
     expect(container.querySelector(`.${styles.wrap}`)).not.toBeNull();
     expect(container.querySelector(`.${styles.num}`)).not.toBeNull();
     for (const btn of Array.from(container.querySelectorAll('button'))) {
@@ -42,7 +42,7 @@ describe('QuantityStepper', () => {
         }}
       />,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Aantal verhogen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Increase quantity' }));
     expect(next).toBe(2);
   });
 
@@ -58,7 +58,7 @@ describe('QuantityStepper', () => {
         }}
       />,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Aantal verlagen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Decrease quantity' }));
     expect(next).toBe(1);
   });
 
@@ -74,7 +74,7 @@ describe('QuantityStepper', () => {
         }}
       />,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Aantal verhogen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Increase quantity' }));
     expect(next).toBe(99);
   });
 
@@ -86,11 +86,11 @@ describe('QuantityStepper', () => {
     const { rerender } = render(
       <QuantityStepper value={2} min={2} max={6} onChange={onChange} />,
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Aantal verlagen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Decrease quantity' }));
     expect(next).toBe(2);
 
     rerender(<QuantityStepper value={6} min={2} max={6} onChange={onChange} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Aantal verhogen' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Increase quantity' }));
     expect(next).toBe(6);
   });
 

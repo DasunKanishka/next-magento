@@ -1,12 +1,16 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './Rating.module.css';
 
 export interface RatingProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Star fill, 0–5 (rounded to whole stars). */
   value?: number;
-  /** Number of reviews; renders "<count> reviews" in the subtle-text color. */
+  /** Number of reviews; renders "<count> <reviewsSuffix>" in the subtle-text color. */
   count?: number | null;
+  /** The word after the count (e.g. "reviews"), resolved to the store locale. */
+  reviewsSuffix?: string;
   /** Numeric score shown after the stars, e.g. 4.8. */
   score?: number | null;
   /**
@@ -28,6 +32,7 @@ export function Rating({
   value = 5,
   count = null,
   score = null,
+  reviewsSuffix = getChromeCopy(defaultLocale).reviewsSuffix,
   size,
   style = {},
   ...rest
@@ -49,7 +54,11 @@ export function Rating({
         {stars}
       </span>
       {score != null ? <span className={styles.score}>{score}</span> : null}
-      {count != null ? <span className={styles.count}>{count} reviews</span> : null}
+      {count != null ? (
+        <span className={styles.count}>
+          {count} {reviewsSuffix}
+        </span>
+      ) : null}
     </span>
   );
 }

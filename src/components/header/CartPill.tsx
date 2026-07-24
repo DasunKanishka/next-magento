@@ -3,6 +3,8 @@
 import React from 'react';
 
 import { formatEuro } from '@/components/ui';
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './CartPill.module.css';
 
 export interface CartPillProps {
@@ -11,6 +13,8 @@ export interface CartPillProps {
   /** Running cart total in EUR. */
   total?: number;
   onClick?: () => void;
+  /** aria-label builder, resolved to the store locale by default. */
+  ariaLabel?: (count: number, total: string) => string;
   style?: React.CSSProperties;
 }
 
@@ -20,13 +24,19 @@ export interface CartPillProps {
  * version; it exposes the affordance and forwards the click. Meets the minimum
  * tap target.
  */
-export function CartPill({ count = 0, total = 0, onClick, style = {} }: CartPillProps) {
+export function CartPill({
+  count = 0,
+  total = 0,
+  onClick,
+  ariaLabel = getChromeCopy(defaultLocale).cartAriaLabel,
+  style = {},
+}: CartPillProps) {
   const hasItems = count > 0;
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={`Winkelmandje: ${count} artikelen, totaal ${formatEuro(total)}`}
+      aria-label={ariaLabel(count, formatEuro(total))}
       className={styles.pill}
       style={style}
     >

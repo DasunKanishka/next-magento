@@ -31,15 +31,25 @@ import { revalidateTag } from 'next/cache';
  * Contract:  POST { tag?: string; storeCode?: string }  ->  { revalidated: boolean; tag?: string }
  * `tag` defaults to `store-identity` and MUST be on the allow-list below —
  * this keeps the endpoint from being usable to invalidate arbitrary cache
- * tags. `storeCode` is accepted for operator bookkeeping / forward
+ * tags. Two tags are allowed, one per cached read this storefront holds:
+ *   - `store-identity` — the header/footer identity read (`getStoreIdentity`).
+ *   - `home-shell` — the home page's cached editorial + navigation shell
+ *     (`getHomeShellData`), which carries every home content zone (hero,
+ *     banners, reviews, product-of-month, stat callouts, SEO copy, and the
+ *     rail headings). Without this an operator could surface a header/footer
+ *     edit immediately but a HOME editorial edit only after the shell's own
+ *     time window elapsed — the exact staleness asymmetry a headless,
+ *     content-driven storefront must not have.
+ * `storeCode` is accepted for operator bookkeeping / forward
  * compatibility but does not currently change which entries are invalidated:
- * `store-identity` is a single flat tag (set in the adapter, not parameterized
- * per store), so a revalidation call marks every store's identity cache entry
- * stale at once. That is NOT a cross-store leak: each entry is still keyed
- * independently by `storeCode` via the `'use cache'` argument-based cache key,
- * so the next read for a given store always re-fetches and re-caches that
- * store's own data — invalidating broadly just means "every store's cached
- * identity is due for a fresh fetch," never "store A can read store B's data."
+ * each allow-listed tag is a single flat tag (set in the adapter / data
+ * layer, not parameterized per store), so a revalidation call marks every
+ * store's cache entry for that tag stale at once. That is NOT a cross-store
+ * leak: each entry is still keyed independently by `storeCode` via the
+ * `'use cache'` argument-based cache key, so the next read for a given store
+ * always re-fetches and re-caches that store's own data — invalidating broadly
+ * just means "every store's cached entry is due for a fresh fetch," never
+ * "store A can read store B's data."
  *
  * Replay safety: `revalidateTag` is idempotent — invoking it twice for the
  * same tag before anything re-reads it is a no-op the second time. No
@@ -48,7 +58,7 @@ import { revalidateTag } from 'next/cache';
 
 const SECRET_HEADER = 'x-revalidate-secret';
 const DEFAULT_TAG = 'store-identity';
-const ALLOWED_TAGS: ReadonlySet<string> = new Set(['store-identity']);
+const ALLOWED_TAGS: ReadonlySet<string> = new Set(['store-identity', 'home-shell']);
 
 interface RevalidateResponse {
   revalidated: boolean;

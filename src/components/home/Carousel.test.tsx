@@ -37,10 +37,10 @@ describe('Carousel', () => {
     // Arrows are a desktop-only enhancement (CSS-hidden on mobile), so match by
     // their label attribute rather than by computed accessible name.
     expect(
-      container.querySelector<HTMLElement>('button[aria-label="Vorige"]'),
+      container.querySelector<HTMLElement>('button[aria-label="Previous"]'),
     ).not.toBeNull();
     expect(
-      container.querySelector<HTMLElement>('button[aria-label="Volgende"]'),
+      container.querySelector<HTMLElement>('button[aria-label="Next"]'),
     ).not.toBeNull();
   });
 
@@ -50,8 +50,8 @@ describe('Carousel', () => {
         <div>Item</div>
       </Carousel>,
     );
-    const prev = container.querySelector<HTMLElement>('button[aria-label="Vorige"]')!;
-    const next = container.querySelector<HTMLElement>('button[aria-label="Volgende"]')!;
+    const prev = container.querySelector<HTMLElement>('button[aria-label="Previous"]')!;
+    const next = container.querySelector<HTMLElement>('button[aria-label="Next"]')!;
     expect(prev.className).toContain(pagerButtonStyles.onSurface);
     expect(prev.className).toContain(pagerButtonStyles.prev);
     expect(next.className).toContain(pagerButtonStyles.onSurface);
@@ -75,8 +75,8 @@ describe('Carousel', () => {
           <div>Item</div>
         </Carousel>,
       );
-      const prev = container.querySelector<HTMLElement>('button[aria-label="Vorige"]')!;
-      const next = container.querySelector<HTMLElement>('button[aria-label="Volgende"]')!;
+      const prev = container.querySelector<HTMLElement>('button[aria-label="Previous"]')!;
+      const next = container.querySelector<HTMLElement>('button[aria-label="Next"]')!;
       // jsdom always reports 0 layout metrics; stub a non-zero clientWidth so
       // page()'s `track.clientWidth * 0.9` produces a distinguishable
       // non-zero scroll distance.

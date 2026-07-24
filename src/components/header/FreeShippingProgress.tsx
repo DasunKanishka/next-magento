@@ -8,6 +8,8 @@ import {
   freeShippingRemaining,
 } from '@/config/delivery';
 import { formatEuro } from '@/components/ui';
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './FreeShippingProgress.module.css';
 
 export interface FreeShippingProgressProps {
@@ -29,10 +31,14 @@ export function FreeShippingProgress({
   const pct = freeShippingProgressPct(cartTotal);
   const remaining = freeShippingRemaining(cartTotal);
   const reached = remaining <= 0;
+  // No `locale` prop yet on this component (see the handoff note on threading
+  // scope) — resolves the store-scope default locale directly, same seam as
+  // ProductCard's default-prop pattern.
+  const copy = getChromeCopy(defaultLocale);
 
   const message = reached
-    ? 'Je hebt gratis bezorging'
-    : `Nog ${formatEuro(remaining)} tot gratis bezorging`;
+    ? copy.freeShippingReachedMessage
+    : copy.freeShippingRemainingMessage(formatEuro(remaining));
 
   const bridge = {
     '--local-message-fg': reached ? 'var(--color-cta)' : 'var(--color-text-muted)',
@@ -44,7 +50,7 @@ export function FreeShippingProgress({
       <div className={styles.message}>{message}</div>
       <div
         role="progressbar"
-        aria-label={`Gratis bezorging vanaf ${formatEuro(FREE_SHIPPING_THRESHOLD_EUR)}`}
+        aria-label={copy.freeShippingAriaLabel(formatEuro(FREE_SHIPPING_THRESHOLD_EUR))}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}

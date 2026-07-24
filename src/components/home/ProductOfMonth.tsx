@@ -2,22 +2,28 @@ import React, { Suspense } from 'react';
 
 import { getSlotProducts } from '@/lib/home/home-data';
 import type { ProductOfMonthEditorial } from '@/lib/home/editorial';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { AddToCartCard } from './AddToCartCard';
 import styles from './ProductOfMonth.module.css';
 
 export interface ProductOfMonthProps {
   editorial: ProductOfMonthEditorial;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /** Fetches the single featured product fresh (price/stock) per request. */
-async function FeaturedProduct() {
+async function FeaturedProduct({ locale }: { locale: SupportedLocale }) {
   const [product] = await getSlotProducts('product-of-month', 1);
   if (!product) {
     return (
-      <p className={styles.fallbackNote}>Er is deze maand nog geen product uitgelicht.</p>
+      <p className={styles.fallbackNote}>
+        {getChromeCopy(locale).productOfMonthEmptyState}
+      </p>
     );
   }
-  return <AddToCartCard product={product} />;
+  return <AddToCartCard product={product} locale={locale} />;
 }
 
 /**
@@ -25,11 +31,15 @@ async function FeaturedProduct() {
  * featured product. The copy comes from the cached shell; the product (with its
  * fresh price/stock) streams into the dynamic hole beside it.
  */
-export function ProductOfMonth({ editorial }: ProductOfMonthProps) {
+export function ProductOfMonth({
+  editorial,
+  locale = defaultLocale,
+}: ProductOfMonthProps) {
+  const copy = getChromeCopy(locale);
   return (
-    <section aria-label="Product van de maand" className={styles.section}>
+    <section aria-label={copy.productOfMonthLabel} className={styles.section}>
       <div className={styles.copy}>
-        <span className={styles.eyebrow}>Product van de maand</span>
+        <span className={styles.eyebrow}>{copy.productOfMonthLabel}</span>
         {editorial.paragraphs.map((paragraph, i) => (
           <p key={i} className={styles.paragraph}>
             {paragraph}
@@ -38,7 +48,7 @@ export function ProductOfMonth({ editorial }: ProductOfMonthProps) {
       </div>
       <div>
         <Suspense fallback={<div aria-hidden="true" className={styles.fallbackMedia} />}>
-          <FeaturedProduct />
+          <FeaturedProduct locale={locale} />
         </Suspense>
       </div>
     </section>

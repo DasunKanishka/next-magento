@@ -51,3 +51,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.e2e-manual-server.log
+
+# AI-tool instruction/config artifacts — never committed to this public repo
+# (check:no-ai-artifacts + the commit-msg/pre-commit hooks fail the build/
+# commit if one is staged anyway; this lets a LOCAL uncommitted copy exist for
+# whichever AI tool a contributor uses, without it ever entering history).
+CLAUDE.md
+AGENTS.md
+.cursor*
+.aider*
+.copilot*
+.github/copilot-instructions.md

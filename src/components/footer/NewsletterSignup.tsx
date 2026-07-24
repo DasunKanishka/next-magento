@@ -3,6 +3,8 @@
 import React from 'react';
 
 import { Button, TextField } from '@/components/ui';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import styles from './NewsletterSignup.module.css';
 
 type SubmitState = 'idle' | 'submitting' | 'subscribed' | 'error';
@@ -10,6 +12,8 @@ type SubmitState = 'idle' | 'submitting' | 'subscribed' | 'error';
 export interface NewsletterSignupProps {
   /** Endpoint the signup posts to. Defaults to the first-party newsletter route. */
   endpoint?: string;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,23 +28,25 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 export function NewsletterSignup({
   endpoint = '/api/bff/newsletter',
+  locale = defaultLocale,
 }: NewsletterSignupProps) {
   const [email, setEmail] = React.useState('');
   const [consent, setConsent] = React.useState(false);
   const [state, setState] = React.useState<SubmitState>('idle');
   const [message, setMessage] = React.useState('');
   const consentId = React.useId();
+  const copy = getChromeCopy(locale);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!EMAIL_RE.test(email.trim())) {
       setState('error');
-      setMessage('Vul een geldig e-mailadres in.');
+      setMessage(copy.newsletterInvalidEmailMessage);
       return;
     }
     if (!consent) {
       setState('error');
-      setMessage('Geef toestemming om je in te schrijven.');
+      setMessage(copy.newsletterConsentRequiredMessage);
       return;
     }
 
@@ -55,23 +61,21 @@ export function NewsletterSignup({
       const data = (await res.json().catch(() => null)) as { status?: string } | null;
       if (res.ok && data?.status === 'subscribed') {
         setState('subscribed');
-        setMessage(
-          'Bijna klaar! Bevestig je inschrijving via de e-mail die we net stuurden.',
-        );
+        setMessage(copy.newsletterAlmostDoneMessage);
       } else {
         setState('error');
-        setMessage('Inschrijven is niet gelukt. Probeer het later opnieuw.');
+        setMessage(copy.newsletterErrorMessage);
       }
     } catch {
       setState('error');
-      setMessage('Inschrijven is niet gelukt. Probeer het later opnieuw.');
+      setMessage(copy.newsletterErrorMessage);
     }
   }
 
   if (state === 'subscribed') {
     return (
       <div role="status" className={styles.status}>
-        <strong className={styles.statusStrong}>Gelukt ✓</strong>
+        <strong className={styles.statusStrong}>{copy.newsletterSuccessLabel}</strong>
         {message}
       </div>
     );
@@ -80,7 +84,7 @@ export function NewsletterSignup({
   return (
     <form onSubmit={onSubmit} noValidate className={styles.form}>
       <label htmlFor={`${consentId}-email`} className={styles.label}>
-        Blijf op de hoogte van aanbiedingen
+        {copy.newsletterHeading}
       </label>
       <div className={styles.row}>
         <div className={styles.field}>
@@ -89,13 +93,15 @@ export function NewsletterSignup({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="jij@voorbeeld.nl"
-            aria-label="E-mailadres"
+            placeholder={copy.newsletterEmailPlaceholder}
+            aria-label={copy.newsletterEmailAriaLabel}
             aria-invalid={state === 'error'}
           />
         </div>
         <Button type="submit" disabled={state === 'submitting'}>
-          {state === 'submitting' ? 'Bezig…' : 'Inschrijven'}
+          {state === 'submitting'
+            ? copy.newsletterSubmittingLabel
+            : copy.newsletterSubmitLabel}
         </Button>
       </div>
       <label htmlFor={`${consentId}-consent`} className={styles.consent}>
@@ -106,7 +112,7 @@ export function NewsletterSignup({
           onChange={(e) => setConsent(e.target.checked)}
           className={styles.checkbox}
         />
-        Ja, ik wil de nieuwsbrief ontvangen en ga akkoord met dubbele opt-in bevestiging.
+        {copy.newsletterConsentLabel}
       </label>
       {state === 'error' && message ? (
         <p role="alert" className={styles.error}>

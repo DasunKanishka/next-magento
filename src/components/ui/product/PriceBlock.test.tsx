@@ -60,25 +60,20 @@ describe('PriceBlock', () => {
 
   it('auto-computes the savings label from concrete price/oldPrice pairs when showSavings is set', () => {
     render(<PriceBlock price={74.95} oldPrice={89.95} showSavings />);
-    expect(screen.getByText('Je bespaart €15,00')).toBeInTheDocument();
+    expect(screen.getByText('You save €15,00')).toBeInTheDocument();
   });
 
   it('does not render a savings label when showSavings is false, even on sale', () => {
     render(<PriceBlock price={74.95} oldPrice={89.95} />);
-    expect(screen.queryByText(/Je bespaart/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/You save/)).not.toBeInTheDocument();
   });
 
   it('savingsLabel overrides the auto-computed savings text', () => {
     render(
-      <PriceBlock
-        price={74.95}
-        oldPrice={89.95}
-        showSavings
-        savingsLabel="−N% korting"
-      />,
+      <PriceBlock price={74.95} oldPrice={89.95} showSavings savingsLabel="−N% off" />,
     );
-    expect(screen.getByText('−N% korting')).toBeInTheDocument();
-    expect(screen.queryByText(/Je bespaart/)).not.toBeInTheDocument();
+    expect(screen.getByText('−N% off')).toBeInTheDocument();
+    expect(screen.queryByText(/You save/)).not.toBeInTheDocument();
   });
 
   it('renders perUnit and note joined with a middle dot', () => {

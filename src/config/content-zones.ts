@@ -42,6 +42,7 @@ export const HOME_ZONE_KEYS = [
   'banners3',
   'businessReviews',
   'productOfMonthEditorial',
+  'statCallouts',
 ] as const;
 
 export type HomeZoneKey = (typeof HOME_ZONE_KEYS)[number];
@@ -78,9 +79,25 @@ export const HOME_CONTENT_ZONES: Record<HomeZoneKey, ContentZone> = {
     description: 'Narrative editorial copy for the product-of-the-month hero.',
     maxItems: 1,
   },
+  statCallouts: {
+    identifier: 'home_stat_callouts',
+    description:
+      'Headline proof-point figures (e.g. assortment size, rating, delivery promise) shown above the SEO copy panel.',
+    maxItems: 3,
+  },
 };
 
 /** All structured-zone identifiers, e.g. for a single batched fetch. */
 export const HOME_STRUCTURED_ZONE_IDENTIFIERS: string[] = HOME_ZONE_KEYS.map(
   (key) => HOME_CONTENT_ZONES[key].identifier,
 );
+
+/**
+ * Free-form editorial block authored under the store's home page. NOT a
+ * structured zone (it has no shape contract — see this file's header), so it
+ * is fetched via the flexible `cmsBlocks` path separately from
+ * `HOME_STRUCTURED_ZONE_IDENTIFIERS`. Lives here (a non-`server-only` config
+ * module) so both the server data layer and the E2E harness can reference the
+ * one identifier without pulling in a `server-only` module.
+ */
+export const HOME_SEO_BLOCK_IDENTIFIER = 'home_seo_content';

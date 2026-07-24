@@ -47,13 +47,13 @@ describe('AddToCartCard', () => {
   it('acknowledges an add click without mutating a basket', async () => {
     const user = userEvent.setup();
     render(<AddToCartCard product={product()} />);
-    await user.click(screen.getByRole('button', { name: /winkelmandje/i }));
-    expect(screen.getByText('Toegevoegd ✓')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /add to cart/i }));
+    expect(screen.getByText('Added ✓')).toBeInTheDocument();
   });
 
   it('marks an out-of-stock line and tags it via a data attribute', () => {
     render(<AddToCartCard product={product({ stockStatus: 'OUT_OF_STOCK' })} />);
-    expect(screen.getByText('Tijdelijk uitverkocht')).toBeInTheDocument();
+    expect(screen.getByText('Temporarily out of stock')).toBeInTheDocument();
     expect(screen.getByTestId('product-card')).toHaveAttribute(
       'data-stock',
       'OUT_OF_STOCK',

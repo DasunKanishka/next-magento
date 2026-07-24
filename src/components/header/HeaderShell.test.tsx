@@ -69,26 +69,26 @@ describe('HeaderShell', () => {
   it('renders the logo link home, the search bar, the trust promise, and the account entry point', () => {
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
     expect(
-      screen.getAllByRole('link', { name: /naar de homepagina/ }).length,
+      screen.getAllByRole('link', { name: /go to homepage/ }).length,
     ).toBeGreaterThan(0);
     expect(screen.getAllByRole('search').length).toBeGreaterThan(0);
     expect(
       screen.getAllByText(new RegExp(TEST_DELIVERY_PROMISE.copy)).length,
     ).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: 'Inloggen' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 
   it('leads the nav with the accent Deals shortcut and shows the free-shipping progress + cart', () => {
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         cartCount={0}
         cartTotal={0}
@@ -98,15 +98,13 @@ describe('HeaderShell', () => {
     );
     expect(screen.getByRole('link', { name: /Deals/ })).toBeInTheDocument();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
-    expect(
-      screen.getAllByRole('button', { name: /Winkelmandje/ }).length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: /Cart/ }).length).toBeGreaterThan(0);
   });
 
   it('opens the mega-menu for a category and closes it on Escape', () => {
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         megaPromoHtml=""
         logo={TEST_LOGO}
@@ -114,10 +112,10 @@ describe('HeaderShell', () => {
       />,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Mannen' }));
-    expect(screen.getByRole('region', { name: /Categoriemenu/ })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /Category menu/ })).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(
-      screen.queryByRole('region', { name: /Categoriemenu/ }),
+      screen.queryByRole('region', { name: /Category menu/ }),
     ).not.toBeInTheDocument();
   });
 
@@ -126,21 +124,21 @@ describe('HeaderShell', () => {
     // (the responsive switch is media-query driven), so query it as hidden.
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
     expect(
-      screen.getByRole('button', { name: 'Menu openen', hidden: true }),
+      screen.getByRole('button', { name: 'Open menu', hidden: true }),
     ).toBeInTheDocument();
   });
 
   it('emits only real contract tokens', () => {
     const { container } = render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
@@ -156,7 +154,7 @@ describe('HeaderShell', () => {
   it('bridge is consistent both ways across the full scrolled/active state surface', () => {
     const { container, getByRole } = render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
@@ -190,7 +188,7 @@ describe('HeaderShell', () => {
 
     const { container, getByRole } = renderWithBrandTokens(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
@@ -224,14 +222,14 @@ describe('HeaderShell', () => {
   it('falls back to the text wordmark when logo.src is null, carrying the .logo class + home-link aria-label', () => {
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
     const links = screen.getAllByRole('link', {
-      name: `${TEST_STORE_NAME} — naar de homepagina`,
+      name: `${TEST_STORE_NAME} — go to homepage`,
     });
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) {
@@ -243,14 +241,14 @@ describe('HeaderShell', () => {
   it('renders the logo IMAGE when logo.src is configured, with the alt text and the home-link aria-label preserved', () => {
     render(
       <HeaderShell
-        locale="nl"
+        locale="en"
         categories={categories}
         logo={TEST_LOGO_IMAGE}
         deliveryPromise={TEST_DELIVERY_PROMISE}
       />,
     );
     const links = screen.getAllByRole('link', {
-      name: `${TEST_STORE_NAME} — naar de homepagina`,
+      name: `${TEST_STORE_NAME} — go to homepage`,
     });
     expect(links.length).toBeGreaterThan(0);
     for (const link of links) {

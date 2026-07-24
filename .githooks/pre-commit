@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Runs the AI-artifact + provenance guard before allowing a commit — catches a
+# staged CLAUDE.md/AGENTS.md/.cursor*/.aider*/copilot artifact (git ls-files
+# includes staged-but-uncommitted files) before it can enter the repo.
+#
+# Installed via `git config core.hooksPath .githooks` (see package.json's
+# `prepare` script, run automatically on `pnpm install`).
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+pnpm check:no-ai-artifacts

@@ -17,16 +17,16 @@ test.beforeEach(async ({ context }) => {
   await seedConsent(context);
 });
 
-const megaRegion = (page: Page) => page.getByRole('region', { name: /Categoriemenu/ });
+const megaRegion = (page: Page) => page.getByRole('region', { name: /Category menu/ });
 
 const navTriggers = (page: Page) =>
-  page.locator('nav[aria-label="Hoofdnavigatie"] button[aria-haspopup="true"]');
+  page.locator('nav[aria-label="Main navigation"] button[aria-haspopup="true"]');
 
 test.describe('desktop mega-menu', () => {
   test.use({ viewport: { width: 1280, height: 900 } });
 
   test('opens a three-column panel on hover', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
     const trigger = navTriggers(page).first();
@@ -36,12 +36,12 @@ test.describe('desktop mega-menu', () => {
     await expect(region).toBeVisible();
     // Left rail (category links), middle column (subtypes/heading), and the
     // right promo tile "shop all" link together make the three columns.
-    await expect(region.getByRole('link', { name: /Bekijk alles in/ })).toBeVisible();
+    await expect(region.getByRole('link', { name: /View all in/ })).toBeVisible();
     expect(await region.getByRole('link').count()).toBeGreaterThan(1);
   });
 
   test('shows only one panel at a time', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
     const triggers = navTriggers(page);
@@ -59,7 +59,7 @@ test.describe('desktop mega-menu', () => {
   });
 
   test('closes on mouse-leave', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
     await navTriggers(page).first().hover();
@@ -67,14 +67,14 @@ test.describe('desktop mega-menu', () => {
 
     // Move the pointer up to the logo (out of the nav row) -> mouse-leave.
     await page
-      .getByRole('link', { name: /homepagina/ })
+      .getByRole('link', { name: /go to homepage/ })
       .first()
       .hover();
     await expect(megaRegion(page)).toHaveCount(0);
   });
 
   test('closes on click-outside', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
     await navTriggers(page).first().hover();
@@ -85,7 +85,7 @@ test.describe('desktop mega-menu', () => {
   });
 
   test('closes on Escape', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
     await navTriggers(page).first().hover();
@@ -98,40 +98,42 @@ test.describe('desktop mega-menu', () => {
 
 test.describe('mobile drawer (390px)', () => {
   test('opens the drawer with the language list', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Menu openen' }).click();
-    const drawer = page.getByRole('navigation', { name: 'Hoofdmenu' });
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    const drawer = page.getByRole('navigation', { name: 'Main menu' });
     await expect(drawer).toBeVisible();
 
-    // The language list at the bottom is a menu of radio options.
-    const langMenu = drawer.getByRole('menu', { name: 'Taal' });
+    // The language list at the bottom is a menu of radio options — currently
+    // exactly one (the single store view the backend defines), so this
+    // asserts presence rather than a count > 1.
+    const langMenu = drawer.getByRole('menu', { name: 'Language' });
     await expect(langMenu).toBeVisible();
-    expect(await langMenu.getByRole('menuitemradio').count()).toBeGreaterThan(1);
+    expect(await langMenu.getByRole('menuitemradio').count()).toBe(1);
   });
 
   test('drills into a category and returns via the back control', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await expect(page.getByTestId('home-page')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Menu openen' }).click();
-    const drawer = page.getByRole('navigation', { name: 'Hoofdmenu' });
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    const drawer = page.getByRole('navigation', { name: 'Main menu' });
     await expect(drawer).toBeVisible();
 
-    const drill = drawer.locator('button[aria-label*="submenu openen"]').first();
+    const drill = drawer.locator('button[aria-label*="open submenu"]').first();
     if ((await drill.count()) === 0) {
       test.skip(true, 'no category with subtypes in the live tree');
     }
     await drill.click();
 
-    // Second level: an "Alles in ..." link plus the back control.
-    await expect(drawer.getByRole('link', { name: /^Alles in / })).toBeVisible();
-    const back = drawer.getByRole('button', { name: /terug/ });
+    // Second level: an "All in ..." link plus the back control.
+    await expect(drawer.getByRole('link', { name: /^All in / })).toBeVisible();
+    const back = drawer.getByRole('button', { name: /Back/ });
     await expect(back).toBeVisible();
 
     await back.click();
     // Back at the root list: the language section is visible again.
-    await expect(drawer.getByRole('menu', { name: 'Taal' })).toBeVisible();
+    await expect(drawer.getByRole('menu', { name: 'Language' })).toBeVisible();
   });
 });

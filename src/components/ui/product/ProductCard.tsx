@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { defaultLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { Badge } from '../core/Badge';
 import { IconButton } from '../core/IconButton';
 import { Rating } from '../core/Rating';
@@ -27,6 +29,17 @@ export interface ProductCardProps extends React.HTMLAttributes<HTMLDivElement> {
    * exposes the affordance and forwards the click.
    */
   onAdd?: () => void;
+  /**
+   * Add-to-cart control aria-label, resolved to the store locale. Defaults to
+   * the store-scope-resolved default locale's catalog entry — callers that
+   * thread a request-resolved locale down may override.
+   */
+  addToCartLabel?: string;
+  /**
+   * Wishlist control aria-label, resolved to the store locale. Same
+   * default/override contract as `addToCartLabel`.
+   */
+  wishlistLabel?: string;
   style?: React.CSSProperties;
 }
 
@@ -50,6 +63,8 @@ export function ProductCard({
   reviews = null,
   saleBadge = null,
   onAdd,
+  addToCartLabel = getChromeCopy(defaultLocale).addToCartLabel,
+  wishlistLabel = getChromeCopy(defaultLocale).wishlistLabel,
   wishlist = true,
   style = {},
   className,
@@ -75,12 +90,14 @@ export function ProductCard({
       ) : null}
       {wishlist ? (
         <span className={styles.wishlistSlot}>
-          <IconButton aria-label="Voeg toe aan verlanglijst" color="var(--color-urgency)">
+          <IconButton aria-label={wishlistLabel} color="var(--color-urgency)">
             ♡
           </IconButton>
         </span>
       ) : null}
-      <div className={styles.media}>PRODUCTFOTO</div>
+      <div className={styles.media}>
+        {getChromeCopy(defaultLocale).productPhotoPlaceholder}
+      </div>
       {brand ? <div className={styles.brand}>{brand}</div> : null}
       <div className={styles.name}>{name}</div>
       {reviews != null ? (
@@ -99,7 +116,7 @@ export function ProductCard({
           onClick={onAdd}
           bordered={false}
           color="var(--color-text-on-fill)"
-          aria-label="Toevoegen aan winkelmandje"
+          aria-label={addToCartLabel}
           style={
             {
               '--local-bg': 'var(--color-cta)',

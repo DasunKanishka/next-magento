@@ -21,32 +21,32 @@ afterEach(() => {
 });
 
 function fillEmail(value: string) {
-  fireEvent.change(screen.getByLabelText('E-mailadres'), { target: { value } });
+  fireEvent.change(screen.getByLabelText('Email address'), { target: { value } });
 }
 
 describe('NewsletterSignup', () => {
   it('renders an email field, a consent checkbox, and a subscribe button', () => {
     render(<NewsletterSignup />);
-    expect(screen.getByLabelText('E-mailadres')).toBeInTheDocument();
+    expect(screen.getByLabelText('Email address')).toBeInTheDocument();
     expect(screen.getByRole('checkbox')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Inschrijven' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Subscribe' })).toBeInTheDocument();
   });
 
   it('rejects an invalid email without calling the endpoint', () => {
     const fetchSpy = vi.spyOn(global, 'fetch');
     render(<NewsletterSignup />);
     fillEmail('not-an-email');
-    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
-    expect(screen.getByRole('alert')).toHaveTextContent(/geldig e-mailadres/i);
+    fireEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/valid email/i);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it('requires consent before submitting', () => {
     const fetchSpy = vi.spyOn(global, 'fetch');
     render(<NewsletterSignup />);
-    fillEmail('jij@voorbeeld.nl');
-    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
-    expect(screen.getByRole('alert')).toHaveTextContent(/toestemming/i);
+    fillEmail('you@example.com');
+    fireEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/consent/i);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
@@ -57,9 +57,9 @@ describe('NewsletterSignup', () => {
         new Response(JSON.stringify({ status: 'subscribed' }), { status: 200 }),
       );
     render(<NewsletterSignup />);
-    fillEmail('jij@voorbeeld.nl');
+    fillEmail('you@example.com');
     fireEvent.click(screen.getByRole('checkbox'));
-    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
 
     await waitFor(() => expect(screen.getByRole('status')).toBeInTheDocument());
     expect(fetchSpy).toHaveBeenCalledWith(
@@ -68,7 +68,7 @@ describe('NewsletterSignup', () => {
     );
     const [, init] = fetchSpy.mock.calls[0];
     expect(JSON.parse(String(init?.body))).toEqual({
-      email: 'jij@voorbeeld.nl',
+      email: 'you@example.com',
       consent: true,
     });
   });
@@ -78,12 +78,12 @@ describe('NewsletterSignup', () => {
       new Response(JSON.stringify({ status: 'error' }), { status: 200 }),
     );
     render(<NewsletterSignup />);
-    fillEmail('jij@voorbeeld.nl');
+    fillEmail('you@example.com');
     fireEvent.click(screen.getByRole('checkbox'));
-    fireEvent.click(screen.getByRole('button', { name: 'Inschrijven' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Subscribe' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
-    expect(screen.getByRole('alert')).toHaveTextContent(/niet gelukt/i);
+    expect(screen.getByRole('alert')).toHaveTextContent(/failed/i);
   });
 
   it('emits only real contract tokens', () => {

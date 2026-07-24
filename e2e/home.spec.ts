@@ -25,18 +25,18 @@ async function assertCoreHome(page: Page) {
   await expect(page.getByRole('banner')).toBeVisible();
   await expect(
     page
-      .getByRole('link', { name: /homepagina/ })
+      .getByRole('link', { name: /go to homepage/ })
       .filter({ visible: true })
       .first(),
   ).toBeVisible();
 
   // Category bar sourced from the live category tree.
-  await expect(page.getByRole('heading', { name: 'Shop per categorie' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Shop by category' })).toBeVisible();
 
   // Search-optimised figures (scoped to the content block, since the same
   // headline figure also appears in the footer tagline).
   await expect(
-    page.getByRole('region', { name: 'Over onze winkel' }).getByText('8.000+'),
+    page.getByRole('region', { name: 'About our store' }).getByText('8.000+'),
   ).toBeVisible();
 
   // At least one merchandising product card streamed in (fresh price/stock).
@@ -45,8 +45,8 @@ async function assertCoreHome(page: Page) {
   // Footer landmark + newsletter interaction surface + age notice.
   const footer = page.getByRole('contentinfo');
   await expect(footer).toBeVisible();
-  await expect(footer.getByRole('button', { name: 'Inschrijven' })).toBeVisible();
-  await expect(footer.getByText(/18 jaar en ouder/)).toBeVisible();
+  await expect(footer.getByRole('button', { name: 'Subscribe' })).toBeVisible();
+  await expect(footer.getByText(/18 years and older/)).toBeVisible();
 
   // Unified delivery promise present; retired promise gone from the output.
   await expect(
@@ -57,14 +57,14 @@ async function assertCoreHome(page: Page) {
 
 test.describe('mobile (390px)', () => {
   test('renders the home page, header, and footer', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await assertCoreHome(page);
   });
 
   test('lets a visitor type into the newsletter email field', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     const footer = page.getByRole('contentinfo');
-    const email = footer.getByLabel('E-mailadres');
+    const email = footer.getByLabel('Email address');
     await email.fill('klant@voorbeeld.nl');
     await expect(email).toHaveValue('klant@voorbeeld.nl');
   });
@@ -74,13 +74,13 @@ test.describe('desktop', () => {
   test.use({ viewport: { width: 1280, height: 900 } });
 
   test('renders the home page, header, and footer', async ({ page }) => {
-    await page.goto('/nl');
+    await page.goto('/en');
     await assertCoreHome(page);
   });
 
   test('exposes the primary navigation with the deals entry first', async ({ page }) => {
-    await page.goto('/nl');
-    const nav = page.getByRole('navigation', { name: 'Hoofdnavigatie' });
+    await page.goto('/en');
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
     await expect(nav).toBeVisible();
     await expect(nav.getByRole('link', { name: /Deals/ })).toBeVisible();
   });

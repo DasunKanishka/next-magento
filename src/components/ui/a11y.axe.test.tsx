@@ -119,8 +119,8 @@ function Harness() {
 
       <QuantityStepper value={2} onChange={() => {}} size="lg" />
 
-      <CountrySelector value="NL" language="nl" />
-      <LanguageSelector value="nl" />
+      <CountrySelector value="NL" language="en" />
+      <LanguageSelector value="en" />
     </div>
   );
 }

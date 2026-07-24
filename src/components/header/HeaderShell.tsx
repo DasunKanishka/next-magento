@@ -8,6 +8,7 @@ import { useDismissMenu } from '@/components/ui/core/useDismissMenu';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { defaultCountryCode, findCountry, type CountryCode } from '@/i18n/countries';
 import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import { REVIEW_RATING_COPY } from '@/config/delivery';
 import type { StoreIdentityDeliveryPromise, StoreIdentityLogo } from '@/lib/data-source';
 import { CartPill } from './CartPill';
@@ -53,6 +54,10 @@ export function HeaderShell({
 }: HeaderShellProps) {
   const router = useRouter();
   const pathname = usePathname();
+  // Store-locale chrome copy — resolved from the `locale` prop, itself
+  // resolved from `storeConfig` at the server boundary (see `Header`'s
+  // caller). Never hardcode UI-chrome text in this component.
+  const copy = getChromeCopy(locale);
   const [scrolled, setScrolled] = React.useState(false);
   const [country, setCountry] = React.useState<CountryCode>(defaultCountryCode);
   const [megaActiveId, setMegaActiveId] = React.useState<string | null>(null);
@@ -91,9 +96,9 @@ export function HeaderShell({
   const logoEl = <Logo logo={logo} className={styles.logo} />;
 
   const accountButton = (
-    <button type="button" aria-label="Inloggen" className={styles.accountButton}>
+    <button type="button" aria-label={copy.accountLabel} className={styles.accountButton}>
       <span aria-hidden="true">👤</span>
-      Inloggen
+      {copy.accountLabel}
     </button>
   );
 
@@ -109,7 +114,11 @@ export function HeaderShell({
           <div className={styles.logoWrap}>{logoEl}</div>
 
           <div className={styles.searchCol}>
-            <SearchBar />
+            <SearchBar
+              placeholder={copy.searchPlaceholder}
+              searchLabel={copy.searchLabel}
+              emptyQueryMessage={copy.searchEmptyQueryMessage}
+            />
             <div className={styles.trustRow}>
               <span className={styles.trustDelivery}>✓ {deliveryPromise.copy}</span>
               <span className={styles.trustRating}>★ {REVIEW_RATING_COPY}</span>
@@ -142,7 +151,7 @@ export function HeaderShell({
             onMouseLeave={closeMega}
             className={`${styles.maxwRow} ${styles.navRowOuter}`}
           >
-            <nav aria-label="Hoofdnavigatie" className={styles.navBar}>
+            <nav aria-label={copy.mainNavLabel} className={styles.navBar}>
               {dealsPill}
               {inlineCats.map((c) => (
                 <button
@@ -176,13 +185,14 @@ export function HeaderShell({
                     overflowCats.some((c) => c.id === megaActiveId),
                   )}
                 >
-                  meer ▾
+                  {copy.moreLabel}
                 </button>
               ) : null}
               <span className={styles.countdownSlot}>
                 <DeliveryCountdown
                   copy={deliveryPromise.copy}
                   cutoffHour={deliveryPromise.cutoffHour}
+                  locale={locale}
                 />
               </span>
             </nav>
@@ -194,6 +204,7 @@ export function HeaderShell({
                 onActivate={setMegaActiveId}
                 promoHtml={megaPromoHtml}
                 onClose={closeMega}
+                locale={locale}
               />
             ) : null}
           </div>
@@ -226,7 +237,13 @@ export function HeaderShell({
         </div>
 
         <div className={styles.mobileSearchWrap}>
-          <SearchBar compact placeholder="Zoek merk, soort of product…" buttonLabel="⌕" />
+          <SearchBar
+            compact
+            placeholder={copy.searchPlaceholder}
+            buttonLabel="⌕"
+            searchLabel={copy.searchLabel}
+            emptyQueryMessage={copy.searchEmptyQueryMessage}
+          />
         </div>
       </div>
     </header>

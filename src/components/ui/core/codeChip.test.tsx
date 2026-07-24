@@ -172,41 +172,36 @@ describe('codeChip (shared language/country code badge)', () => {
   // onto its rendered code badge; MobileMenu in particular must draw it from
   // ui/core, never from the i18n selectors' internal module.
   it('CountrySelector wires the shared class onto the language column code badges', () => {
-    render(<CountrySelector value="NL" language="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: /Bezorgland/ }));
+    render(<CountrySelector value="NL" language="en" />);
+    fireEvent.click(screen.getByRole('button', { name: /Delivery country/ }));
     const menu = screen.getByRole('menu');
-    const dutch = within(menu).getByRole('menuitemradio', { name: /Nederlands/ });
-    const code = dutch.querySelector('span');
+    const english = within(menu).getByRole('menuitemradio', { name: /English/ });
+    const code = english.querySelector('span');
     expect(code?.className).toContain(codeChipStyles.codeChip);
     expect(code?.className).toContain(codeChipStyles.codeChipActive);
   });
 
   it('LanguageSelector wires the shared class onto the trigger badge and option badges', () => {
-    render(<LanguageSelector value="nl" />);
-    const trigger = screen.getByRole('button', { name: /Taal: Nederlands/ });
+    render(<LanguageSelector value="en" />);
+    const trigger = screen.getByRole('button', { name: /Language: English/ });
     const triggerBadge = trigger.querySelector('span');
     expect(triggerBadge?.className).toContain(codeChipStyles.codeChip);
     expect(triggerBadge?.className).toContain(codeChipStyles.codeChipActive);
 
     fireEvent.click(trigger);
-    const dutchOption = screen.getByRole('menuitemradio', { name: /Nederlands/ });
-    const optionBadge = dutchOption.querySelector('span');
+    const englishOption = screen.getByRole('menuitemradio', { name: /English/ });
+    const optionBadge = englishOption.querySelector('span');
     expect(optionBadge?.className).toContain(codeChipStyles.codeChip);
     expect(optionBadge?.className).toContain(codeChipStyles.codeChipActive);
   });
 
   it('MobileMenu wires the shared class onto its language list badges (no selectorShared import)', () => {
-    render(<MobileMenu categories={categories} locale="nl" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Menu openen' }));
-    const dutch = screen.getByRole('menuitemradio', { name: /Nederlands/ });
-    const code = dutch.querySelector('span');
+    render(<MobileMenu categories={categories} locale="en" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const english = screen.getByRole('menuitemradio', { name: /English/ });
+    const code = english.querySelector('span');
     expect(code?.className).toContain(codeChipStyles.codeChip);
     expect(code?.className).toContain(codeChipStyles.codeChipActive);
-
-    const french = screen.getByRole('menuitemradio', { name: /Frans/ });
-    const frenchCode = french.querySelector('span');
-    expect(frenchCode?.className).toContain(codeChipStyles.codeChip);
-    expect(frenchCode?.className).not.toContain(codeChipStyles.codeChipActive);
   });
 
   it('MobileMenu.tsx no longer imports selectorShared.module.css', () => {

@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Link } from '@/i18n/navigation';
 import { Logo } from '@/components/ui/core/Logo';
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
 import type { StoreIdentity } from '@/lib/data-source';
 import { NewsletterSignup } from './NewsletterSignup';
 import styles from './Footer.module.css';
@@ -9,6 +11,8 @@ import styles from './Footer.module.css';
 export interface FooterProps {
   /** Store identity resolved by the caller (`getStoreIdentity()`) and threaded down — Footer never fetches it itself. */
   identity: StoreIdentity;
+  /** Active locale — resolved from `storeConfig` by the caller. */
+  locale?: SupportedLocale;
 }
 
 /**
@@ -19,8 +23,9 @@ export interface FooterProps {
  * and the explicit 18+ / drink-responsibly notice. All links are real,
  * keyboard-operable anchors.
  */
-export function Footer({ identity }: FooterProps) {
+export function Footer({ identity, locale = defaultLocale }: FooterProps) {
   const year = new Date().getFullYear();
+  const copy = getChromeCopy(locale);
 
   return (
     <footer className={styles.footer}>
@@ -29,7 +34,7 @@ export function Footer({ identity }: FooterProps) {
           <div className={styles.brand}>
             <Logo logo={identity.logo} className={styles.wordmark} />
             <p className={styles.tagline}>{identity.tagline}</p>
-            <ul aria-label="Betaalmethoden" className={styles.payments}>
+            <ul aria-label={copy.footerPaymentMethods} className={styles.payments}>
               {identity.paymentMethods.map((method) => (
                 <li key={method} aria-label={method} className={styles.payment}>
                   {method}
@@ -54,7 +59,7 @@ export function Footer({ identity }: FooterProps) {
           ))}
 
           <div className={styles.newsletter}>
-            <NewsletterSignup />
+            <NewsletterSignup locale={locale} />
           </div>
         </div>
       </div>
@@ -64,10 +69,13 @@ export function Footer({ identity }: FooterProps) {
           <span>
             © {year} {identity.copyright} · {identity.registrationNumber}
           </span>
-          <span>
-            18+ Verkoop van alcohol alleen aan personen van 18 jaar en ouder · Geniet,
-            maar drink met mate.
-          </span>
+          {/*
+            Legal/compliance-sensitive fine print (alcohol age-restriction
+            notice) — same caveat as AgeGate's: translated from the Dutch
+            original in `src/i18n/chrome-copy.ts` (`footerAlcoholNotice`),
+            flagged `needs-confirm` in this change's handoff for legal review.
+          */}
+          <span>{copy.footerAlcoholNotice}</span>
         </div>
       </div>
     </footer>

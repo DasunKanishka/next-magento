@@ -1,3 +1,6 @@
+import { defaultLocale, type SupportedLocale } from '@/i18n/locales';
+import { getChromeCopy } from '@/i18n/chrome-copy';
+
 /**
  * Free-shipping configuration + the cut-off-countdown math.
  *
@@ -7,7 +10,9 @@
  * components that render the promise/countdown receive the sourced `copy` +
  * `cutoffHour` as props and pass `cutoffHour` into `timeUntilCutoff` /
  * `deliveryCountdownLabel` below, which stay pure cut-off-hour-parametric
- * helpers with no store-identity value of their own.
+ * helpers with no store-identity value of their own. `deliveryCountdownLabel`'s
+ * own WORDING (not the sourced copy) is store-locale chrome, resolved via
+ * `src/i18n/chrome-copy.ts`.
  */
 
 /** Free-shipping threshold in EUR. */
@@ -45,17 +50,23 @@ export function timeUntilCutoff(now: Date, cutoffHour: number): CutoffRemaining 
 }
 
 /**
- * Right-aligned nav countdown label, e.g. "Vandaag nog 5u 42m voor levering
- * morgen". After the cut-off it falls back to the plain next-day promise so the
- * line never shows a stale or negative countdown.
+ * Right-aligned nav countdown label, e.g. "Today, 5h 42m left for delivery
+ * tomorrow". After the cut-off it falls back to the plain next-day promise so
+ * the line never shows a stale or negative countdown. `locale` resolves the
+ * label's wording to the store locale (`src/i18n/chrome-copy.ts`).
  */
-export function deliveryCountdownLabel(now: Date, cutoffHour: number): string {
+export function deliveryCountdownLabel(
+  now: Date,
+  cutoffHour: number,
+  locale: SupportedLocale = defaultLocale,
+): string {
   const remaining = timeUntilCutoff(now, cutoffHour);
   const cutoffLabel = `${String(cutoffHour).padStart(2, '0')}:00`;
+  const copy = getChromeCopy(locale);
   if (remaining.past) {
-    return `Bestel voor ${cutoffLabel} voor levering morgen`;
+    return copy.deliveryCountdownPastCutoff(cutoffLabel);
   }
-  return `Vandaag nog ${remaining.hours}u ${remaining.minutes}m voor levering morgen`;
+  return copy.deliveryCountdownRemaining(remaining.hours, remaining.minutes);
 }
 
 /** Amount (EUR) still needed to reach the free-shipping threshold. */

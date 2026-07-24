@@ -14,6 +14,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history (not the default shallow depth-1 clone): the
+          # AI-provenance commit-range scan below needs the base branch / the
+          # pre-push commit to be resolvable locally.
+          fetch-depth: 0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -74,6 +79,31 @@ jobs:
       # references.
       - name: No hardcoded content
         run: pnpm check:no-hardcoded-content
+
+      # Framework-currency gate: no deprecated framework file-convention may
+      # silently persist (Next 16 deprecated `middleware` in favor of `proxy`).
+      - name: Framework currency
+        run: pnpm check:framework-currency
+
+      # AI-tool provenance gate: no CLAUDE.md/AGENTS.md/.cursor*/.aider*/
+      # copilot config artifact may ever be tracked, and no commit newly
+      # introduced by this push/PR may carry a Claude/Anthropic co-author
+      # trailer into history. Bounded to NEW commits only (see the script's
+      # own header comment) — this repo's pre-remediation history is handled
+      # by a separate, dedicated history-rewrite, not by this gate.
+      - name: No AI-tool artifacts / provenance trailers
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            RANGE="origin/${{ github.event.pull_request.base.ref }}..HEAD"
+          else
+            BEFORE="${{ github.event.before }}"
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+              RANGE="HEAD"
+            else
+              RANGE="$BEFORE..HEAD"
+            fi
+          fi
+          pnpm check:no-ai-artifacts "$RANGE"
 
       # "Typed end-to-end" is the connector's premise — enforce it for the
       # hand-written adapter/mapper code, not just the generated documents.
