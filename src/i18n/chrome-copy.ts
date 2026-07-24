@@ -14,12 +14,16 @@ import type { SupportedLocale } from './locales';
  * "chrome" that ships with the component regardless of what a merchant sells.
  * Content a merchant authors (store identity, marketing/editorial copy, CMS
  * blocks) is a DIFFERENT concern and stays backend-sourced via
- * `getStoreIdentity()`/`getEditorialContent()` — never duplicated here. A few
- * entries below are legal/compliance-adjacent (the age-gate legal notice, the
- * footer's 18+ notice, the newsletter consent line): they are catalogued here
- * because they are still fixed UI copy shipped with the component (not
- * merchant-authored), but their WORDING carries compliance weight — see each
- * entry's own comment for exact-wording constraints.
+ * `getStoreIdentity()`/`getEditorialContent()` — never duplicated here. One
+ * entry below is legal/compliance-adjacent (the newsletter consent line): it
+ * is catalogued here because it is still fixed UI copy shipped with the
+ * component (not merchant-authored), but its WORDING carries compliance
+ * weight — see its own comment for exact-wording constraints. The age-gate
+ * legal notice and the footer's 18+ alcohol notice are NOT here — they are
+ * merchant/legal-authored content, backend-sourced via `getStoreIdentity()`
+ * (`StoreIdentity.alcoholLegalNotice`, see
+ * `src/config/store-identity-content.ts`), same as every other admin-owned
+ * legal/identity field.
  *
  * `Record<SupportedLocale, ChromeCopy>` is a closed map keyed by the type, not
  * a lookup with a fallback branch: TypeScript forces every entry in
@@ -103,22 +107,10 @@ export interface ChromeCopy {
   ageGateAgeConfirm: string;
   /** AgeGate submit CTA. */
   ageGateCta: string;
-  /**
-   * AgeGate's legal fine-print string (alcohol age-restriction notice) —
-   * translated from the original Dutch wording. Compliance-sensitive: this
-   * translation is flagged `needs-confirm` for legal review, not a routine
-   * translation — see `AgeGate.tsx`'s point of use.
-   */
-  ageGateLegalNotice: string;
 
   // ---- Footer / newsletter ------------------------------------------------
   /** Footer payment-methods list aria-label. */
   footerPaymentMethods: string;
-  /**
-   * Footer's 18+ alcohol-responsibility notice. Compliance-adjacent, same
-   * caveat as `ageGateLegalNotice` — see the handoff note.
-   */
-  footerAlcoholNotice: string;
   /** NewsletterSignup section label above the email field. */
   newsletterHeading: string;
   /** NewsletterSignup email input placeholder (an illustrative example, not real content). */
@@ -241,12 +233,8 @@ const CHROME_COPY: Record<SupportedLocale, ChromeCopy> = {
     ageGateCountryLegend: 'Delivery country',
     ageGateAgeConfirm: 'Yes, I am 18 years or older',
     ageGateCta: 'Enter the store →',
-    ageGateLegalNotice:
-      'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly',
 
     footerPaymentMethods: 'Payment methods',
-    footerAlcoholNotice:
-      '18+ Sale of alcohol only to persons 18 years and older · Enjoy, but drink responsibly.',
     newsletterHeading: 'Stay up to date with offers',
     newsletterEmailPlaceholder: 'you@example.com',
     newsletterEmailAriaLabel: 'Email address',

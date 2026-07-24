@@ -42,11 +42,15 @@ async function assertCoreHome(page: Page) {
   // At least one merchandising product card streamed in (fresh price/stock).
   await expect(page.getByTestId('product-card').first()).toBeVisible();
 
-  // Footer landmark + newsletter interaction surface + age notice.
+  // Footer landmark + newsletter interaction surface + age notice. The
+  // notice's wording is merchant-owned, backend-sourced content (see
+  // `admin-roundtrip.spec.ts`'s dedicated round-trip case) — this smoke test
+  // asserts only that it RENDERS, via the content-agnostic testid, never a
+  // specific wording.
   const footer = page.getByRole('contentinfo');
   await expect(footer).toBeVisible();
   await expect(footer.getByRole('button', { name: 'Subscribe' })).toBeVisible();
-  await expect(footer.getByText(/18 years and older/)).toBeVisible();
+  await expect(footer.getByTestId('alcohol-legal-notice')).toBeVisible();
 
   // Unified delivery promise present; retired promise gone from the output.
   await expect(

@@ -66,6 +66,7 @@ SURFACE_DIRS=(
   "$BASE/src/components/header"
   "$BASE/src/components/footer"
   "$BASE/src/components/home"
+  "$BASE/src/components/ui/gate"
   "$BASE/src/app"
   "$BASE/src/config"
 )
@@ -110,6 +111,12 @@ DENYLIST=(
   "'8.000+'"
   "'4,8 ★'"
   "'Morgen in huis'"
+  # Alcohol legal-compliance notices (V0.1.4 issue 007): the exact
+  # pre-migration `ageGateLegalNotice`/`footerAlcoholNotice` literals, moved
+  # from `src/i18n/chrome-copy.ts` to the backend-sourced
+  # `store_alcohol_legal_notice` CMS block (`StoreIdentity.alcoholLegalNotice`).
+  'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly'
+  '18+ Sale of alcohol only to persons 18 years and older · Enjoy, but drink responsibly.'
   # JUDGMENT CALL: the pre-migration COLUMNS array also carried per-link
   # `href`/`label` pairs (e.g. `/whisky`, `/verzending`, `/over-ons`). Those
   # are deliberately NOT denylisted here: several of those exact route paths

@@ -19,8 +19,10 @@ vi.mock('@/i18n/navigation', () => ({
   usePathname: () => '/',
 }));
 
-function renderGate() {
-  return render(<AgeGate locale="en" recordConsentAction={vi.fn()} />);
+function renderGate(legalNotice = '') {
+  return render(
+    <AgeGate locale="en" recordConsentAction={vi.fn()} legalNotice={legalNotice} />,
+  );
 }
 
 describe('AgeGate', () => {
@@ -75,13 +77,16 @@ describe('AgeGate', () => {
     expect(cta).toBeEnabled();
   });
 
-  it('shows the EXACT legal fine-print notice', () => {
-    renderGate();
-    expect(
-      screen.getByText(
-        'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly',
-      ),
-    ).toBeInTheDocument();
+  it('renders the backend-sourced legal fine-print notice verbatim when provided', () => {
+    const notice =
+      'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly';
+    renderGate(notice);
+    expect(screen.getByText(notice)).toBeInTheDocument();
+  });
+
+  it('renders no legal-notice element when legalNotice is "" (graceful degrade, never a hardcoded fallback)', () => {
+    const { container } = renderGate('');
+    expect(container.querySelector('.agegate__legal')).toBeNull();
   });
 
   it('embeds the compact LanguageSelector', () => {
@@ -103,7 +108,7 @@ describe('AgeGate', () => {
     const { container } = render(
       <div data-brand="default">
         <style dangerouslySetInnerHTML={{ __html: styleBlock }} />
-        <AgeGate locale="en" recordConsentAction={vi.fn()} />
+        <AgeGate locale="en" recordConsentAction={vi.fn()} legalNotice="" />
       </div>,
     );
 

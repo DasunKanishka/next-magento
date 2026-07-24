@@ -1,6 +1,7 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 
 import {
+  STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
   STORE_IDENTITY_LEGAL_BLOCK,
   STORE_IDENTITY_TAGLINE_BLOCK,
   STORE_FOOTER_PAYMENT_METHODS_BLOCK,
@@ -15,6 +16,7 @@ import {
   setStoreViewName,
   getCmsBlockByIdentifier,
   setCmsBlockContent,
+  ensureCmsBlock,
   magentoConfigSet,
   magentoConfigDelete,
   readStoreConfigSnapshot,
@@ -241,6 +243,42 @@ test.describe('admin round-trip + fail-closed (live dev backend)', () => {
         await expect(
           page.getByText(newCopy).filter({ visible: true }).first(),
         ).toBeVisible();
+      } finally {
+        await setCmsBlockContent(block.id, original);
+        await revalidateAuthed(request);
+      }
+    });
+
+    test('alcohol legal notice (store_alcohol_legal_notice CMS block, via the admin REST API) — renders on BOTH the age-gate and the footer', async ({
+      page,
+      request,
+    }) => {
+      // `ensureCmsBlock`: this identifier may not exist yet on a fresh dev
+      // store — this suite is the first to author it. Idempotent against an
+      // environment that already has it (falls through to a plain read).
+      const block = await ensureCmsBlock({
+        identifier: STORE_ALCOHOL_LEGAL_NOTICE_BLOCK,
+        title: 'Store Alcohol Legal Notice',
+        defaultContent:
+          '<p>No sale of alcohol to persons under 18. Enjoy, but drink responsibly.</p>',
+      });
+      const original = block.content;
+      const newNotice = 'QA E2E alcohol legal notice round-trip probe';
+      try {
+        await setCmsBlockContent(block.id, `<p>${newNotice}</p>`);
+        await revalidateAuthed(request);
+
+        // Age-gate half: NO consent cookie seeded on this fresh context — the
+        // gate itself must render (P3 fail-closed, unaffected by this
+        // change) AND carry the freshly-edited notice.
+        await page.goto('/en');
+        await expect(page.getByRole('dialog')).toBeVisible();
+        await expect(page.getByText(newNotice)).toBeVisible();
+
+        // Footer half: seed consent, re-render the storefront proper.
+        await seedConsent(page.context());
+        await page.goto('/en');
+        await expect(page.getByRole('contentinfo').getByText(newNotice)).toBeVisible();
       } finally {
         await setCmsBlockContent(block.id, original);
         await revalidateAuthed(request);

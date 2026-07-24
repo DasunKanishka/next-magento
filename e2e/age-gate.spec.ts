@@ -23,13 +23,12 @@ test('MUST-3: with client JS disabled and no consent cookie, the gate renders an
   expect(response, 'navigation returned a response').not.toBeNull();
   expect(response!.status(), 'status is not an error').toBeLessThan(400);
 
-  // The gate is present...
+  // The gate is present, including its legal-compliance notice. The
+  // notice's wording is merchant-owned, backend-sourced content (see
+  // `admin-roundtrip.spec.ts`'s dedicated round-trip case) — asserted here
+  // only via the content-agnostic testid, never a specific wording.
   await expect(page.getByRole('heading', { name: GATE_TITLE })).toBeVisible();
-  await expect(
-    page.getByText(
-      'No sale of alcohol to persons under 18 · Enjoy, but drink responsibly',
-    ),
-  ).toBeVisible();
+  await expect(page.getByTestId('alcohol-legal-notice')).toBeVisible();
 
   // ...and the storefront page (its product/price/store content) is NOT.
   await expect(page.getByTestId('home-page')).toHaveCount(0);
